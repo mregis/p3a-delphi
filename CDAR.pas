@@ -87,35 +87,31 @@ begin
   begin
     Panel1.Caption := '';
     Panel1.Refresh;
-    if (vernum(copy(edtCodigo.Text,3,9))= true) and (copy(edtCodigo.Text,1,2) = 'DB') then
-    begin
-    if mmCodigo.Items.IndexOf(edtCodigo.Text) = -1 then
-    begin
-      btnSalvar.Enabled := mmCodigo.Items.Count > 0;
-      //eBin.Text :=  copy(edtCodigo.Text,1,6);
-      //edtCodigo.SetFocus;
-      eBin.SetFocus;
-      Inc(qtdAR);
-    end
+    if (validaNumObjCorreios(edtCodigo.Text) = true) then
+      begin
+        if mmCodigo.Items.IndexOf(edtCodigo.Text) = -1 then
+          begin
+            btnSalvar.Enabled := mmCodigo.Items.Count > 0;
+            eBin.SetFocus;
+            Inc(qtdAR);
+          end
+        else
+          begin
+            Panel1.Caption := 'Código AR já lido.';
+            Panel1.Refresh;
+            edtCodigo.Text := '';
+            Panel1.SetFocus;
+            edtCodigo.SetFocus;
+            abort;
+          end;
+      end
     else
-    begin
-      Panel1.Caption := 'Código AR já lido.';
-      Panel1.Refresh;
-      edtCodigo.Text := '';
-      Panel1.SetFocus;
-      edtCodigo.SetFocus;
-      abort;
-    end;
-    end
-    else
-    begin
-      Panel1.Caption := 'Código Inválido.';
-      Panel1.Refresh;
-      Panel1.SetFocus;
-      //      edtCodigo.Text := '';
-      //edtCodigo.SetFocus;
-      abort;
-    end;
+      begin
+        Panel1.Caption := 'Código Inválido.';
+        Panel1.Refresh;
+        Panel1.SetFocus;
+        abort;
+      end;
 
     lblQtde.Caption := 'Quantidade de ARs lidos: ' + IntToStr(qtdAR);
     lblQtde.Caption := 'Quantidade de ARs lidos: ' + IntToStr(mmCodigo.Items.Count);
@@ -582,7 +578,7 @@ end;
 
 procedure TfrmAR.FormShow(Sender: TObject);
 begin
-  dm.SqlAux.Connection  :=  dm.ADOConnection1;
+  dm.SqlAux.Connection  :=  dm.CtrlDvlDBConn;
   dm.SqlAux.Close;
   dm.SqlAux.SQL.Clear;
   dm.SqlAux.SQL.Add('select current_date,localtime(0)');
@@ -736,7 +732,7 @@ end;
 
 procedure TfrmAR.cbDT_DEVOLUCAOEnter(Sender: TObject);
 begin
-  dm.SqlAux.Connection  :=  dm.ADOConnection1;
+  dm.SqlAux.Connection  :=  dm.CtrlDvlDBConn;
   dm.SqlAux.Close;
   dm.SqlAux.SQL.Clear;
   dm.SqlAux.SQL.Add('select current_date');

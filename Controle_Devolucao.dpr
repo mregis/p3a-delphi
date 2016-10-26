@@ -23,19 +23,28 @@ uses
   U_FrmCadUsuario in 'U_FrmCadUsuario.pas' {FrmCadUsuario},
   U_frmAcesso in 'U_frmAcesso.pas' {FrmAcesso},
   uGeraExcelDev in 'uGeraExcelDev.pas' {fGeraExcelDev},
+  U_FrmConfig in 'U_FrmConfig.pas' {U_FrmConfig},
   uGeraArqDev in 'uGeraArqDev.pas' {fGeraArqDev};
 
 {$R *.res}
 
 begin
   Application.Initialize;
-  Application.Title := 'IBISIS - CONTROLE DEVOLUÇÃO';
-  Application.CreateForm(TDM, DM);
-  Application.CreateForm(TfrmMain, frmMain);
-  frmMain.Show;
-  Application.CreateForm(TFrmAcesso, FrmAcesso);
-  FrmAcesso.ShowModal;
-  Application.Run;
-  //  Application.CreateForm(TfrmExcel, frmExcel);
-  //  Application.CreateForm(TDM, DM);
+  Application.Title := 'DEVOLUÇÕES DE FATURAS E CARTÕES';
+  Application.CreateForm(TDM, Dm);
+  if DM.CtrlDvlDBConn.Connected = true then
+    begin
+      Application.CreateForm(TFrmAcesso, FrmAcesso);
+      FrmAcesso.ShowModal;
+      Application.Run;
+    end
+  else
+    begin
+      Application.MessageBox(
+        Pchar('O Sistema não conseguiu se conectar ao Banco de Dados! ' +
+            'Entre em contato com o Administrador!'),
+          Pchar(Application.Title), 0);
+      Application.Terminate;
+    end;
+
 end.

@@ -88,7 +88,7 @@ begin
   DM.qData.Open;
   cbDT_DEVOLUCAO.Date := DM.qDatadata.AsDateTime;
   i := 1;
-  dm.SqlAux.Connection  :=  dm.ADOConnection1;
+  dm.SqlAux.Connection  :=  dm.CtrlDvlDBConn;
   dm.SqlAux.Close;
   dm.SqlAux.SQL.Clear;
   dm.SqlAux.SQL.Add('select current_date,localtime(0)');
@@ -237,7 +237,7 @@ end;
 
 procedure TfrmCartao.cbDT_DEVOLUCAOEnter(Sender: TObject);
 begin
-  dm.SqlAux.Connection  :=  dm.ADOConnection1;
+  dm.SqlAux.Connection  :=  dm.CtrlDvlDBConn;
   dm.SqlAux.Close;
   dm.SqlAux.SQL.Clear;
   dm.SqlAux.SQL.Add('select current_date');

@@ -3,19 +3,16 @@ unit CDDM;
 interface
 
 uses
-  SysUtils, Classes,DB, ZAbstractRODataset, ZDataset, ZConnection, IdMessage,
+  SysUtils, Classes, DB, ZAbstractRODataset, ZDataset, ZConnection, IdMessage,
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient,
   IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase, IdSMTP,
-  ZAbstractDataset, ExtCtrls;
-//  ZAbstractDataset,
-  //IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase, IdSMTP, IdMessage;
-// IdMessage, IdBaseComponent, IdComponent,
-//  IdTCPConnection, IdTCPClient, IdMessageClient, IdSMTP,
+  ZAbstractDataset, ExtCtrls, ZAbstractConnection, Forms, IniFiles, DateUtils,
+  IdCoder, IdCoderMIME;
 
-type
+  type
   TDM = class(TDataModule)
     dtsMotivo: TDataSource;
-    ADOConnection1: TZConnection;
+    CtrlDvlDBConn: TZConnection;
     qMotivo: TZReadOnlyQuery;
     qFac: TZReadOnlyQuery;
     qCodFac: TZReadOnlyQuery;
@@ -134,6 +131,8 @@ type
     dtatu:  TDateTime;
     hratu:  string;
     usuaces :  Int64;
+    iniFile : TIniFile;
+    iniFileName : String;
   end;
 
 var
@@ -141,47 +140,68 @@ var
 
 implementation
 
-uses U_Func, U_FrmCadHost, Main;
+uses U_Func, U_FrmCadHost, Main, U_FrmConfig;
 
 {$R *.dfm}
 
 procedure TDM.DataModuleCreate(Sender: TObject);
 begin
   currdir :=  GetCurrentDir;
-  ADOConnection1.Connected  := false;
+  iniFileName := ChangeFileExt(Application.ExeName, '.ini');
+  // Fechar Conexoes eventualmente abertas ao iniciar a aplicação
+  CtrlDvlDBConn.Connected := false;
+  if not FileExists(iniFileName) then
+    Begin
+      // Criando o formulário de Configuração da aplicação
+      Application.CreateForm(TFrmConfig, FrmConfig);
+      FrmConfig.ShowModal;
+    end;
+
+  Try
+    Try
+      // Recuperando as configurações do aplicativo
+      iniFile := TIniFile.Create(iniFileName);
+      // Letra da unidade onde o executável que está em execução se encontra
+      unidade := iniFile.ReadString('GERAL', 'Unidade', IncludeTrailingBackslash(ExtractFileDrive(currdir)));
+      // Nome do Servidor onde se encontra a Base de Dados Postgres
+      CtrlDvlDBConn.HostName := iniFile.ReadString('BD', 'Host', 'localhost');;
+      // Nome da base de Dados que a aplicação utilizará
+      CtrlDvlDBConn.Database := iniFile.ReadString('BD', 'Banco', 'dbdevibi');
+      // Porta de conexão ao banco de Dados
+      CtrlDvlDBConn.Port := iniFile.ReadInteger('BD', 'Porta', 5432);
+      // Nome de usuario para conexão ao BD
+      CtrlDvlDBConn.User := iniFile.ReadString('BD', 'Usuario', 'dbdevuser');
+      // Senha de acesso ao Bando de Dados
+      CtrlDvlDBConn.Password := decryptstr( iniFile.ReadString('BD', 'Senha', ''), 9, 6, 9);
+    except
+      raise Exception.Create('Erro ao ler informações do arquivo de configuração!');
+    end;
+  finally
+    iniFile.Free;
+  end;
 
   try
-    unidade           := Trim(copy(procarqconf('Unidade'),9,50));
-    ADOConnection1.Database  := decryptstr(Trim(copy(procarqconf('Nome do Banco'),15,50)),9,6,9);
-    ADOConnection1.HostName  := decryptstr(trim(copy(procarqconf('Host'),7,150)),9,6,9);
-    ADOConnection1.Port      := strtoint(decryptstr(Trim(copy(procarqconf('Porta'),7,50)),9,6,9));
-    ADOConnection1.User      := decryptstr(Trim(copy(procarqconf('Usuario'),9,50)),9,6,9);
-    ADOConnection1.Password  := decryptstr(Trim(copy(procarqconf('Senha'),7,50)),9,6,9);
-    ADOConnection1.Connected  := true;
+    CtrlDvlDBConn.Connected := True;
+    CtrlDvlDBConn.StartTransaction;
+    // Forçando o DateStyle a ser sempre o mesmo, independente do
+    // que foi configurado no servidor, devido a Bug da Lib Zeos
+    SqlAux.Close;
+    SqlAux.SQL.Clear;
+    SqlAux.SQL.Add(FORMAT('SET DATESTYLE TO %s', [QuotedStr('ISO, DMY')]));
+    SqlAux.Open;
 
-    except on e: exception do
+    SqlAux.Close;
+    SqlAux.SQL.Clear;
+    SqlAux.SQL.Add('SELECT CURRENT_TIMESTAMP as dthr');
+    SqlAux.Open;
+    dtatu := SqlAux.FieldByName('dthr').AsDateTime;
+    Except on e: exception do
       begin
-{          //TFrmCadHost.Create(self);
-
-          FrmCadHost.ShowModal;
-          unidade           := Trim(copy(procarqconf('Unidade'),9,50));
-          ADOConnection1.Database  := decryptstr(Trim(copy(procarqconf('Nome do Banco'),15,50)),9,6,9);
-          ADOConnection1.HostName  := decryptstr(trim(copy(procarqconf('Host'),7,150)),9,6,9);
-          ADOConnection1.Port      := strtoint(decryptstr(Trim(copy(procarqconf('Porta'),7,50)),9,6,9));
-          ADOConnection1.User      := decryptstr(Trim(copy(procarqconf('Usuario'),9,50)),9,6,9);
-          ADOConnection1.Password  := decryptstr(Trim(copy(procarqconf('Senha'),7,50)),9,6,9);}
+        CtrlDvlDBConn.Rollback;
       end;
     end;
-    //try
-    //a29x!@h29b}
-        SqlAux.Close;
-    SqlAux.SQL.Clear;
-    SqlAux.SQL.Add('select current_date,localtime(0)');
-    SqlAux.Open;
-    dtatu :=  SqlAux.Fields[0].AsDateTime;
-    hratu :=  SqlAux.Fields[1].AsString;
-
 end;
+
 procedure TDM.envarq;
 begin
 //  IdMessage.ContentType :=  'multpart/mixed';
@@ -213,7 +233,6 @@ begin
     SqlAux.Open;
     dtatu :=  SqlAux.Fields[0].AsDateTime;
     hratu :=  SqlAux.Fields[1].AsString;
-
 end;
 
 end.

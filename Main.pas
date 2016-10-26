@@ -4,12 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Menus, ExtCtrls, ComCtrls;//basefc, base,
-  // rxAnimate, rxGIFCtrl, Animate, GIFCtrl;
+  Dialogs, Menus, ExtCtrls, ComCtrls;
 
 type
   TfrmMain = class(TForm)
-//    AniGif: TRxGIFAnimator;
     MainMenu1: TMainMenu;
     Devolucao: TMenuItem;
     AR1: TMenuItem;
@@ -46,7 +44,6 @@ type
     procedure FAT3Click(Sender: TObject);
     procedure CartaSenhaClick(Sender: TObject);
     procedure TimerMenuTimer(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure Fac1Click(Sender: TObject);
     procedure AR1Click(Sender: TObject);
     procedure SairClick(Sender: TObject);
@@ -72,21 +69,6 @@ uses unRelFAC, unRelAR, CDFac, CDAR, Devolucoes, unFamila, unRelAnFAC, unRelAnAR
   U_frmAcesso, uGeraArqDev, uGeraExcelDev;
 
 {$R *.dfm}
-
-procedure TfrmMain.FormCreate(Sender: TObject);
-var
-  sDir: string;
-begin
-//  sDir := ExtractFilePath(Application.ExeName);
-//  AniGif.Image.LoadFromFile(sdir + 'img\menu.gif');
-//  AniGif.Align := alClient;
-
-//  Caption := Caption + ' - Versão : ' + ExtraiVersionInfo(Application.ExeName, 'FileVersion');
-
-//  if not DirectoryExists(ExtractFilePath(Application.ExeName) + 'Relatorios\') then
-//    CreateDirectory(pchar(ExtractFilePath(Application.exename) + 'Relatorios\'), nil);
-
-end;
 
 procedure TfrmMain.Fac1Click(Sender: TObject);
 begin
@@ -124,7 +106,7 @@ end;
 
 procedure TfrmMain.SairClick(Sender: TObject);
 begin
-  close;
+  Close;
 end;
 
 procedure TfrmMain.TimerMenuTimer(Sender: TObject);

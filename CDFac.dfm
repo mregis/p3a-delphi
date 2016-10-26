@@ -322,7 +322,6 @@ object frmCartao: TfrmCartao
     Top = 72
   end
   object qryFamilia: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT CODBIN FROM IBI_CADASTRO_FAMILIA '
       'WHERE '
@@ -348,13 +347,11 @@ object frmCartao: TfrmCartao
       end>
   end
   object FacRelQtde: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     Params = <>
     Left = 205
     Top = 76
   end
   object FacRelTot: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     Params = <>
     Left = 240
     Top = 76

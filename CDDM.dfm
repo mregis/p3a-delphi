@@ -8,19 +8,22 @@ object DM: TDM
     Left = 104
     Top = 8
   end
-  object ADOConnection1: TZConnection
-    Protocol = 'postgresql-8.x'
-    HostName = '192.168.100'
+  object CtrlDvlDBConn: TZConnection
+    ControlsCodePage = cGET_ACP
+    UTF8StringsAsWideField = False
+    AutoEncodeStrings = False
+    DesignConnection = True
+    HostName = 'localhost'
     Port = 5432
     Database = 'dbdevibi'
     User = 'valdires'
     Password = 'valdir!50#'
-    DesignConnection = True
-    Left = 24
+    Protocol = 'postgresql-7'
+    Left = 40
     Top = 8
   end
   object qMotivo: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select * from IBI_MOTIVO_DEVOLUCOES'
       'order by cd_motivo'
@@ -47,7 +50,7 @@ object DM: TDM
     end
   end
   object qFac: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select * from ibi_controle_devolucoes_fac'
       'where id is null'
@@ -99,7 +102,7 @@ object DM: TDM
     end
   end
   object qCodFac: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select max(id) +1 as codigo from ibi_controle_devolucoes_fac'
       '')
@@ -116,7 +119,7 @@ object DM: TDM
     end
   end
   object qBuscaFAC: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       
         'select F.*, D.ds_motivo from ibi_controle_devolucoes_fac F, ibi_' +
@@ -204,7 +207,7 @@ object DM: TDM
     end
   end
   object qData: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select current_date as data')
     Params = <>
@@ -218,7 +221,7 @@ object DM: TDM
     end
   end
   object qArqFac: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select * from ibi_controle_devolucoes_fac'
       'where dt_devolucao between :dt1 and :dt2'
@@ -291,7 +294,7 @@ object DM: TDM
     end
   end
   object qAR: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select * from ibi_controle_devolucoes_AR'
       'where id is null'
@@ -346,7 +349,7 @@ object DM: TDM
     end
   end
   object qCodAR: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select max(id) +1 as codigo from ibi_controle_devolucoes_AR'
       '')
@@ -361,7 +364,7 @@ object DM: TDM
     end
   end
   object qEmail: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select * from ibi_email'
       '')
@@ -386,7 +389,7 @@ object DM: TDM
     end
   end
   object qBuscaAR: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       
         'select A.*, D.ds_motivo from ibi_controle_devolucoes_AR A, ibi_m' +
@@ -474,7 +477,7 @@ object DM: TDM
     end
   end
   object qArqAR: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select * from ibi_controle_devolucoes_ar'
       'where dt_devolucao between :dt_devolucao and :dt_devfim'
@@ -544,7 +547,7 @@ object DM: TDM
     end
   end
   object qParam: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select * from ibi_parametros'
       '')
@@ -569,7 +572,7 @@ object DM: TDM
     end
   end
   object qAusente: TZReadOnlyQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select count(*) as qtde from ibi_controle_devolucoes_ar '
       'where cd_motivo = :cd_motivo and data = :data'
@@ -612,7 +615,7 @@ object DM: TDM
     Top = 112
   end
   object SqlAux: TZQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     Params = <>
     Left = 34
     Top = 168
@@ -655,7 +658,7 @@ object DM: TDM
     Top = 128
   end
   object ZQUsuario: TZQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select * from ibi_cadusuario where (1=1)')
     Params = <>
@@ -704,7 +707,7 @@ object DM: TDM
     Top = 112
   end
   object ZqAusFac: TZQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       
         'select count(nro_cartao) as qtde from ibi_controle_devolucoes_fa' +
@@ -741,7 +744,7 @@ object DM: TDM
     end
   end
   object ZQAusFat: TZQuery
-    Connection = ADOConnection1
+    Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select count(nro_conta) as qtde from cea_controle_devolucoes'
       'where cd_motivo = :cd_motivo and data = :data'

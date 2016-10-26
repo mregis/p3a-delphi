@@ -53,9 +53,12 @@ function RestauraInteger(Valor: string): string;
 Function ValorMonetario(Armazena: string; key:char):string;
 function strtran(Str: String; Antigo: String; Novo: variant): string;
 Function VirgPonto2(Valor: string): string;
+function md5(const input : string) : string;
+function md5File(const fileName : string) : string;
+function validaNumObjCorreios(const numobj : string) : boolean;
 implementation
 
-uses CDDM, CDFac, U_FrmCadHost;
+uses CDDM, CDFac, U_FrmCadHost, IdHashMessageDigest, idHash;
 
 Function FormataValor(Valor:string): string;
 Var
@@ -902,6 +905,7 @@ end;
           showmessage('O código digitado está incorreto!!!');
         end;
   end;
+
 Function vernum(Str: string):boolean;
 Const Num = '0123456789';
 Var
@@ -918,6 +922,7 @@ Begin
     end;
     Result := flag;
 End;
+
 Function verzero(Str: string):boolean;
 Const Num = '000';
 Var
@@ -1422,6 +1427,97 @@ begin
       end;
     end;
     Result := Buffer;
+end;
+
+{
+  Obtem o hash Message Digest 5 de um arquivo
+}
+function md5File(const fileName : string) : string;
+var  idmd5 : TIdHashMessageDigest5;
+  fs : TFileStream;
+  hash : T4x4LongWordRecord;
+begin
+  idmd5 := TIdHashMessageDigest5.Create;
+  fs := TFileStream.Create(fileName, fmOpenRead OR fmShareDenyWrite);
+  try
+    result := idmd5.AsHex(idmd5.HashValue(fs)) ;
+  finally
+    fs.Free;
+    idmd5.Free;
+  end;
+end;
+
+{
+  Obtem o hash Message Digest 5 de uma string
+}
+function md5(const input : string) : string;
+ var idmd5 : TIdHashMessageDigest5;
+begin
+  idmd5 := TIdHashMessageDigest5.Create;
+  try
+    result := LowerCase(idmd5.AsHex(idmd5.HashValue(input)));
+  finally
+    idmd5.Free;
+  end;
+end;
+
+{
+  Função que valida um número de Objeto do Correios
+  Um número de objeto completo é composto por
+  [SIGLA OBJ] + [NUM OBJETO] + [DV] + [SIGLA PAIS]
+  Ex.: DQ080916102BR desmembra-se em [DG] + [08091610] + [2] + [BR]
+  O DV do número de objeto é calculado através do seguinte calculo
+  1 - multiplicase um dos 8 termos que o compõe por um multiplicador
+      seguindo a ordem abaixo
+    TERMO | MULTIPLICADOR | EXEMPLO | RESULTADO
+      1   |     8         |  0 * 8  |    0
+      2   |     6         |  8 * 6  |   48
+      3   |     4         |  0 * 4  |    0
+      4   |     2         |  9 * 2  |   18
+      5   |     3         |  1 * 3  |    3
+      6   |     5         |  6 * 5  |   30
+      7   |     9         |  1 * 9  |    9
+      8   |     7         |  0 * 7  |    0
+  2 - Em seguida somam-se todos os resultados
+    Ex.: 0 + 48 + 0 + 18 + 3 + 30 + 9 + 0 = 108
+  3 - Divide-se o resultado por 11 e recupera-se o resto (Mod)
+     108/11 = 9 + Resto 9
+  4 - Subtrai-se o resto de 11 e obteremos o DV
+     11 - 9 = 2
+     NOTA: Se o Resto for 0, então o DV será 5
+           Se o Resto for 1, então o DV será 0
+}
+function validaNumObjCorreios(const numobj : string) : boolean;
+const STR_CALC = '86423597';
+var soma, i, resto: Integer;
+  dv : String;
+begin
+   result := false;
+  // Validação básica
+  // 13 caracteres
+  // 2 primeiros caracteres são ALFABÉTICOS
+  // do caractere 3 ao 11 são caracteres são NUMÉRICOS
+  // caracteres 12 e 13 são ALFABÉTICOS
+
+  if ( (Length(numobj) = 13) AND
+      (numobj[1] in ['A'..'Z', 'a'..'z']) AND (numobj[2] in ['A'..'Z', 'a'..'z']) AND
+      (numobj[12] in ['A'..'Z', 'a'..'z']) AND (numobj[13] in ['A'..'Z', 'a'..'z'])
+      ) then
+    begin
+      soma := 0;
+      for i := 1 to 8 do
+        soma:= soma + StrToInt(numobj[i+2]) * StrToInt(STR_CALC[i]);
+        
+      resto := soma Mod 11;
+      if resto = 0 then
+        dv := '5'
+      else if resto = 1 then
+        dv := '0'
+      else
+        dv := IntToStr(11 - resto);
+      if (numobj[11] = dv) then
+        result := true;
+    end;
 end;
 
 end.

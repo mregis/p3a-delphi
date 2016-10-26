@@ -337,7 +337,6 @@ object frmAR: TfrmAR
     OnEnter = cbDT_DEVOLUCAOEnter
   end
   object qryFamilia: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT CODBIN FROM IBI_CADASTRO_FAMILIA '
       'WHERE '
@@ -359,13 +358,11 @@ object frmAR: TfrmAR
       end>
   end
   object qraRelatorioTOT: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     Params = <>
     Left = 216
     Top = 416
   end
   object qraRelatorioQtde: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     Params = <>
     Left = 256
     Top = 416

@@ -3,7 +3,7 @@ object frmMain: TfrmMain
   Top = 175
   BorderIcons = [biSystemMenu]
   Caption = 'Controle de Devolu'#231#227'o - Ibi Cart'#245'es'
-  ClientHeight = 598
+  ClientHeight = 618
   ClientWidth = 711
   Color = clHotLight
   Font.Charset = DEFAULT_CHARSET
@@ -14,12 +14,11 @@ object frmMain: TfrmMain
   Menu = MainMenu1
   OldCreateOrder = False
   WindowState = wsMaximized
-  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object StatusBar: TStatusBar
     Left = 0
-    Top = 579
+    Top = 599
     Width = 711
     Height = 19
     Panels = <
@@ -36,7 +35,7 @@ object frmMain: TfrmMain
       item
         Width = 150
       end>
-    ExplicitTop = 559
+    ExplicitTop = 579
   end
   object MainMenu1: TMainMenu
     Left = 8
