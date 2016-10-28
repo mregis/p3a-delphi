@@ -48,7 +48,7 @@ var
 
 implementation
 
-uses CDDM;
+uses CDDM, U_Func;
 
 {$R *.dfm}
 
@@ -65,6 +65,7 @@ begin
 end;
 end;
 procedure TFrmCadUsuario.altdados(tipo: Integer) ;
+var hash : String;
 begin
   with DM do
   begin
@@ -78,10 +79,13 @@ begin
           if  (EdNome.Text<> '' )   and   (EdLogin.Text <> '')  and
               (EdSenha.Text <> '')  and   (codusu > 0 )         then
           begin
-            SqlAux.SQL.Add('nomusu = :nome,logusu = :login,snhusu = md5('+chr(39)+Trim(EdSenha.Text)+chr(39)+') where (codusu = '+IntToStr(codusu)+')');
-            SqlAux.Params[0].AsString   :=  trim(EdNome.Text);
-            SqlAux.Params[1].AsString   :=  Trim(EdLogin.Text);
-//            SqlAux.Params[2].AsString   :=  chr(39)+'md5('+chr(39)+Trim(EdSenha.Text)+chr(39)+')';
+            hash := MD5(EdSenha.Text);
+            SqlAux.SQL.Add('nomusu = :nome, logusu = :login, snhusu = :hash ' +
+                'WHERE codusu = :cod');
+            SqlAux.ParamByName('nome').AsString := trim(EdNome.Text);
+            SqlAux.ParamByName('login').AsString :=  Trim(EdLogin.Text);
+            SqlAux.ParamByName('hash').AsString := hash;
+            SqlAux.ParamByName('cod').AsInteger := codusu;
           end
           else
           begin
@@ -100,7 +104,7 @@ begin
       selusuario;
     except on e: exception do
       begin
-        Application.MessageBox(PChar(e.Message),'IBISIS',IDOK);
+        Application.MessageBox(PChar(e.Message), 'Controle de Devolucões',IDOK);
         EdSenha.SetFocus;
         BtnAltera.Enabled   :=  false;
         BtnDesativa.Enabled :=  false;

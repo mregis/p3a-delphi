@@ -1,13 +1,13 @@
 unit CDDM;
 
 interface
-
+{$WARN UNIT_PLATFORM OFF}
 uses
   SysUtils, Classes, DB, ZAbstractRODataset, ZDataset, ZConnection, IdMessage,
   IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient,
   IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase, IdSMTP,
   ZAbstractDataset, ExtCtrls, ZAbstractConnection, Forms, IniFiles, DateUtils,
-  IdCoder, IdCoderMIME;
+  ZAbstractTable, FileCtrl, Dialogs;
 
   type
   TDM = class(TDataModule)
@@ -117,6 +117,26 @@ uses
     ZqAusFacqtde: TLargeintField;
     ZQAusFat: TZQuery;
     ZQAusFatqtde: TLargeintField;
+    dsMotivos: TDataSource;
+    dsProdutos: TDataSource;
+    dsOrg: TDataSource;
+    dsControle: TDataSource;
+    qraRelatorioTOT: TZReadOnlyQuery;
+    qraRelatorioQtde: TZReadOnlyQuery;
+    qraRetorno: TZReadOnlyQuery;
+    qraControle: TZQuery;
+    qAux: TZTable;
+    qraMotivo: TZReadOnlyQuery;
+    qraProduto: TZReadOnlyQuery;
+    qraOrg: TZQuery;
+    ZQuery1: TZQuery;
+    DataSource1: TDataSource;
+    qraRelMensal: TZQuery;
+    qraRelMensalds_motivo: TStringField;
+    qraRelMensalcd_produto: TStringField;
+    qraRelMensalds_produto: TStringField;
+    qraRelMensaltotal: TLargeintField;
+    DtSRelMensal: TDataSource;
     procedure TimerTimer(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure envarq;
@@ -124,15 +144,15 @@ uses
     { Private declarations }
   public
     { Public declarations }
-    unidade,currdir,msg:string;
-    Texto: TIdMessage;
-    Html: TIdMessage;
-    Anexo: TIdCreateAttachmentEvent;
-    dtatu:  TDateTime;
-    hratu:  string;
+    currdir, relatdir, retdir, msg : string;
+    Texto : TIdMessage;
+    Html : TIdMessage;
+    Anexo : TIdCreateAttachmentEvent;
+    dtatu : TDateTime;
     usuaces :  Int64;
     iniFile : TIniFile;
     iniFileName : String;
+    max_login_erros: Integer;
   end;
 
 var
@@ -161,8 +181,9 @@ begin
     Try
       // Recuperando as configurações do aplicativo
       iniFile := TIniFile.Create(iniFileName);
-      // Letra da unidade onde o executável que está em execução se encontra
-      unidade := iniFile.ReadString('GERAL', 'Unidade', IncludeTrailingBackslash(ExtractFileDrive(currdir)));
+      // Maximo de tentativas de logins antes da aplicação encerrar
+      max_login_erros := iniFile.ReadInteger('Geral', 'MaxLoginErros', 5);
+
       // Nome do Servidor onde se encontra a Base de Dados Postgres
       CtrlDvlDBConn.HostName := iniFile.ReadString('BD', 'Host', 'localhost');;
       // Nome da base de Dados que a aplicação utilizará
@@ -172,9 +193,57 @@ begin
       // Nome de usuario para conexão ao BD
       CtrlDvlDBConn.User := iniFile.ReadString('BD', 'Usuario', 'dbdevuser');
       // Senha de acesso ao Bando de Dados
-      CtrlDvlDBConn.Password := decryptstr( iniFile.ReadString('BD', 'Senha', ''), 9, 6, 9);
+      CtrlDvlDBConn.Password := decryptstr( iniFile.ReadString('BD', 'Senha', encryptstr('dbdevpass', 9, 6, 9)), 9, 6, 9);
+
+      // Diretório padrão da aplicação
+      currdir := DM.IniFile.ReadString('Diretorios', 'Raiz', GetCurrentDir);
+      // Verificando a existência do diretório
+      if (DirectoryExists(currdir) = false) then
+        currdir := StringReplace(GetCurrentDir, GetCurrentDir, '.\',[rfReplaceAll]);
+
+      // Diretório de destino dos arquivos de relatórios gerados
+      relatdir := DM.IniFile.ReadString('Diretorios', 'Relatorios', '.\RELATORIOS');
+      if (DirectoryExists(relatdir) = false) then
+        try
+          CreateDir(relatdir);
+        except on E:Exception do
+          raise Exception.Create('Erro ao tentar definir diretório dos Relatórios');
+        end;
+
+      // Diretório de destino dos arquivos de retorno gerados
+      retdir := DM.IniFile.ReadString('Diretorios', 'Retorno', '.\RETORNO');
+      if (DirectoryExists(retdir) = false) then
+        begin
+          try
+            CreateDir(retdir);
+          except on E:Exception do
+            raise Exception.Create('Erro ao tentar definir diretório dos Arquivos de Retorno');
+          end;
+        end;
+
+      relatdir := IncludeTrailingBackslash(relatdir);
+      retdir := IncludeTrailingBackslash(retdir);
+      currdir := IncludeTrailingBackslash(currdir);
+      
+      // Evitando problemas de arquivo com opções removidas externamente
+      IniFile.WriteString('BD', 'Host', CtrlDvlDBConn.HostName);
+      IniFile.WriteString('BD', 'Banco', CtrlDvlDBConn.Database);
+      IniFile.WriteInteger('BD', 'Porta', CtrlDvlDBConn.Port);
+      IniFile.WriteString('BD', 'Usuario', CtrlDvlDBConn.User);
+      IniFile.WriteString('BD', 'Senha', encryptstr(CtrlDvlDBConn.Password, 9, 6, 9));
+
+      IniFile.WriteInteger('Geral', 'MaxLoginErros', max_login_erros);
+
+      // Diretório padrão da aplicação (Raiz)
+      IniFile.WriteString('Diretorios', 'Raiz', currdir);
+      // Diretório onde serão armazenados os arquivos de Relatórios
+      IniFile.WriteString('Diretorios', 'Relatorios', relatdir);
+      // Diretório onde serão armazenados os arquivos de Retorno
+      IniFile.WriteString('Diretorios', 'Retorno', retdir);
+
+      iniFile.UpdateFile;
     except
-      raise Exception.Create('Erro ao ler informações do arquivo de configuração!');
+      raise Exception.Create('Erro ao ler informações do arquivo de configuração! Tente novamente.');
     end;
   finally
     iniFile.Free;
@@ -206,7 +275,9 @@ procedure TDM.envarq;
 begin
 //  IdMessage.ContentType :=  'multpart/mixed';
   //Html  :=    IdMessage. ;//t TIdMessage.Create();
-  msg :=  '<html><body>table><tr><td width="200"><span class="style1">'+format('%5.5s%',['Teste: Envio Arquivos IBI'])+'</span></td></tr></table></body></html>';
+  msg :=  '<html><body>table><tr><td width="200"><span class="style1">' +
+    format('%5.5s%',['Teste: Envio Arquivos IBI']) +
+    '</span></td></tr></table></body></html>';
   IdMessage.Body.Text :=  msg;
   //Html.Body.Text := msg;
 //  Html.ContentType:=  'text/html';
@@ -229,10 +300,9 @@ procedure TDM.TimerTimer(Sender: TObject);
 begin
     SqlAux.Close;
     SqlAux.SQL.Clear;
-    SqlAux.SQL.Add('select current_date,localtime(0)');
+    SqlAux.SQL.Add('SELECT CURRENT_TIMESTAMP');
     SqlAux.Open;
     dtatu :=  SqlAux.Fields[0].AsDateTime;
-    hratu :=  SqlAux.Fields[1].AsString;
 end;
 
 end.

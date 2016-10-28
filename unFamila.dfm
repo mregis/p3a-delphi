@@ -679,7 +679,6 @@ object cadFamilia: TcadFamilia
     Top = 112
   end
   object qryFamilia: TZTable
-    Connection = DM.ADOConnection1
     TableName = 'ibi_cadastro_familia'
     Left = 392
     Top = 56

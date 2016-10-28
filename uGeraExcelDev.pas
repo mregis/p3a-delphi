@@ -272,8 +272,6 @@ begin
 end;
 
 Procedure TfGeraExcelDev.ListarDatas(dtini : TDate; dtfim : TDate);
-var
-  I: Integer;
 begin
   try
     arrayDataDev    := nil;
@@ -976,6 +974,7 @@ begin
       end;
     end;
 
+    SaveDialog.InitialDir := DM.currdir;
     SaveDialog.Execute;
     xDiretorio := ExtractFilePath(SaveDialog.FileName);
     if (Trim(xDiretorio) = '') or

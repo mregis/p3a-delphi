@@ -3,7 +3,7 @@ object DevolucoesFrm: TDevolucoesFrm
   Top = 173
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
-  Caption = 'Banco IBI (C&A) - Devolu'#231#227'o Correspond'#234'ncia'
+  Caption = ' Devolu'#231#227'o Correspond'#234'ncias'
   ClientHeight = 482
   ClientWidth = 656
   Color = clBtnFace
@@ -15,13 +15,12 @@ object DevolucoesFrm: TDevolucoesFrm
   OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
-  OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Bevel2: TBevel
     Left = 408
-    Top = 73
+    Top = 72
     Width = 233
     Height = 361
     Shape = bsFrame
@@ -29,7 +28,7 @@ object DevolucoesFrm: TDevolucoesFrm
   end
   object Bevel1: TBevel
     Left = 4
-    Top = 73
+    Top = 72
     Width = 397
     Height = 169
     Shape = bsFrame
@@ -93,7 +92,7 @@ object DevolucoesFrm: TDevolucoesFrm
   end
   object Bevel3: TBevel
     Left = 4
-    Top = 257
+    Top = 256
     Width = 397
     Height = 177
     Shape = bsFrame
@@ -139,23 +138,6 @@ object DevolucoesFrm: TDevolucoesFrm
     Font.Style = [fsBold]
     ParentColor = False
     ParentFont = False
-  end
-  object Label6: TLabel
-    Left = 0
-    Top = 0
-    Width = 656
-    Height = 32
-    Align = alTop
-    Alignment = taCenter
-    Caption = 'Banco IBI'
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clBlue
-    Font.Height = -27
-    Font.Name = 'Arial'
-    Font.Pitch = fpFixed
-    Font.Style = [fsBold]
-    ParentFont = False
-    ExplicitWidth = 128
   end
   object Label7: TLabel
     Left = 451
@@ -280,7 +262,7 @@ object DevolucoesFrm: TDevolucoesFrm
     Font.Style = [fsBold]
     KeyField = 'CD_MOTIVO'
     ListField = 'CD_MOTIVO;DS_MOTIVO'
-    ListSource = dsMotivos
+    ListSource = DM.dsMotivos
     ParentFont = False
     ParentShowHint = False
     ShowHint = True
@@ -330,7 +312,7 @@ object DevolucoesFrm: TDevolucoesFrm
     Font.Style = [fsBold]
     KeyField = 'CD_PRODUTO'
     ListField = 'CD_PRODUTO;DS_PRODUTO'
-    ListSource = dsProdutos
+    ListSource = DM.dsProdutos
     ParentFont = False
     ParentShowHint = False
     ShowHint = True
@@ -512,147 +494,5 @@ object DevolucoesFrm: TDevolucoesFrm
     Height = 21
     Enabled = False
     TabOrder = 16
-  end
-  object dsMotivos: TDataSource
-    DataSet = qraMotivo
-    Left = 71
-    Top = 40
-  end
-  object dsControle: TDataSource
-    Left = 167
-    Top = 41
-  end
-  object dsProdutos: TDataSource
-    DataSet = qraProduto
-    Left = 103
-    Top = 40
-  end
-  object dsOrg: TDataSource
-    DataSet = qraOrg
-    Left = 135
-    Top = 40
-  end
-  object ADOConnection2: TZConnection
-    Protocol = 'postgresql-7.4'
-    HostName = '192.168.100.20'
-    Port = 5432
-    Database = 'dbdevibi'
-    User = 'valdires'
-    Password = 'valdir!50#'
-    ReadOnly = True
-    Connected = True
-    Left = 24
-    Top = 40
-  end
-  object qraRelatorioTOT: TZReadOnlyQuery
-    Connection = ADOConnection2
-    SQL.Strings = (
-      'SELECT count(*) AS TOTAL FROM CEA_CONTROLE_DEVOLUCOES'
-      'WHERE'
-      'DT_DEVOLUCAO BETWEEN '#39'2004-08-03 00:00'#39' AND '#39'2004-08-04 00:00'#39
-      '')
-    Params = <>
-    Properties.Strings = (
-      'SELECT count(*) AS TOTAL FROM CEA_CONTROLE_DEVOLUCOES'
-      'WHERE'
-      'DT_DEVOLUCAO BETWEEN '#39'2004-08-03 00:00'#39' AND '#39'2004-08-04 00:00'#39)
-    Left = 200
-    Top = 40
-  end
-  object qraRelatorioQtde: TZReadOnlyQuery
-    Connection = ADOConnection2
-    SQL.Strings = (
-      'SELECT CD.CD_MOTIVO, MD.DS_MOTIVO, COUNT(*) AS QTDE '
-      'FROM CEA_CONTROLE_DEVOLUCOES CD, CEA_MOTIVOS_DEVOLUCOES MD'
-      'WHERE CD.CD_MOTIVO = MD.CD_MOTIVO'
-      'GROUP BY CD.CD_MOTIVO, MD.DS_MOTIVO'
-      'ORDER BY CD.CD_MOTIVO'
-      '')
-    Params = <>
-    Properties.Strings = (
-      'SELECT CD.CD_MOTIVO, MD.DS_MOTIVO, COUNT(*) AS QTDE '
-      'FROM CEA_CONTROLE_DEVOLUCOES CD, CEA_MOTIVOS_DEVOLUCOES MD'
-      'WHERE CD.CD_MOTIVO = MD.CD_MOTIVO'
-      'GROUP BY CD.CD_MOTIVO, MD.DS_MOTIVO'
-      'ORDER BY CD.CD_MOTIVO')
-    Left = 232
-    Top = 40
-  end
-  object qraRetorno: TZReadOnlyQuery
-    Connection = ADOConnection2
-    Params = <>
-    Left = 272
-    Top = 40
-  end
-  object qraMotivo: TZReadOnlyQuery
-    Connection = ADOConnection2
-    SQL.Strings = (
-      'SELECT * FROM cea_motivos_devolucoes'
-      '')
-    Params = <>
-    Left = 376
-    Top = 40
-  end
-  object qraProduto: TZReadOnlyQuery
-    Connection = ADOConnection2
-    SQL.Strings = (
-      'SELECT * FROM CEA_PRODUTOS'
-      '')
-    Params = <>
-    Properties.Strings = (
-      'SELECT * FROM CEA_MOTIVOS_DEVOLUCOES')
-    Left = 408
-    Top = 40
-  end
-  object qAux: TZTable
-    Connection = ADOConnection2
-    ReadOnly = True
-    Left = 336
-    Top = 40
-  end
-  object qraOrg: TZQuery
-    Connection = ADOConnection2
-    SQL.Strings = (
-      'select * from cea_org'
-      '')
-    Params = <>
-    Properties.Strings = (
-      'select * from cea_org')
-    Left = 440
-    Top = 40
-  end
-  object qraControle: TZQuery
-    Connection = ADOConnection2
-    SQL.Strings = (
-      'SELECT * FROM CEA_CONTROLE_DEVOLUCOES'
-      'WHERE NR_CONTA = :NR_CONTA'
-      '')
-    Params = <
-      item
-        DataType = ftUnknown
-        Name = 'NR_CONTA'
-        ParamType = ptUnknown
-      end>
-    Properties.Strings = (
-      'SELECT * FROM CEA_CONTROLE_DEVOLUCOES'
-      'WHERE NR_CONTA = :NR_CONTA')
-    Left = 304
-    Top = 40
-    ParamData = <
-      item
-        DataType = ftUnknown
-        Name = 'NR_CONTA'
-        ParamType = ptUnknown
-      end>
-  end
-  object SqlAux: TZQuery
-    Connection = ADOConnection2
-    Params = <>
-    Left = 480
-    Top = 40
-  end
-  object DtSAux: TDataSource
-    Left = 513
-    Top = 41
   end
 end

@@ -8,7 +8,8 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, Buttons, Db, DBTables, DBCtrls, ExtCtrls,
   Mask, Grids, DBGrids, ComCtrls, ZConnection,
-  ZAbstractRODataset, ZDataset, ZAbstractDataset, ZAbstractTable;//, FileOs, BaseFc, ADODB;
+  ZAbstractRODataset, ZDataset, ZAbstractDataset, ZAbstractTable,
+  ZAbstractConnection;
 
 type
   { Buffer de leitura }
@@ -26,15 +27,12 @@ type
     BtnCloseConsistencia: TBitBtn;
     ListBoxCIF: TListBox;
     BtnLimpaReprocesso: TBitBtn;
-    dsMotivos: TDataSource;
-    dsControle: TDataSource;
     Label2: TLabel;
     lcCD_MOTIVO: TDBLookupComboBox;
     lblDS_MOTIVO: TLabel;
     BtnRelatorio1: TBitBtn;
     lcCD_PRODUTO: TDBLookupComboBox;
     lblDS_PRODUTO: TLabel;
-    dsProdutos: TDataSource;
     Bevel1: TBevel;
     Bevel2: TBevel;
     cbDT_INICIAL: TDateTimePicker;
@@ -45,26 +43,13 @@ type
     Label4: TLabel;
     Label5: TLabel;
     btRelMensal: TBitBtn;
-    dsOrg: TDataSource;
     pmsg: TPanel;
-    Label6: TLabel;
     Label7: TLabel;
     btnProduto: TBitBtn;
     btnOrg: TBitBtn;
     BitBtn2: TBitBtn;
     BitBtn1: TBitBtn;
-    ADOConnection2: TZConnection;
-    qraRelatorioTOT: TZReadOnlyQuery;
-    qraRelatorioQtde: TZReadOnlyQuery;
-    qraRetorno: TZReadOnlyQuery;
-    qraMotivo: TZReadOnlyQuery;
-    qraProduto: TZReadOnlyQuery;
-    qAux: TZTable;
-    qraOrg: TZQuery;
-    qraControle: TZQuery;
     Edarq: TEdit;
-    SqlAux: TZQuery;
-    DtSAux: TDataSource;
     procedure cbDT_DEVOLUCAOEnter(Sender: TObject);
     procedure edCIFKeyPress(Sender: TObject; var Key: Char);
     procedure BtnCloseConsistenciaClick(Sender: TObject);
@@ -88,7 +73,6 @@ type
     procedure MontaRetorno();
     procedure MontaRelatorio();
     procedure btRelMensalClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure btnProdutoClick(Sender: TObject);
     procedure BitBtn2Click(Sender: TObject);
     procedure btnOrgClick(Sender: TObject);
@@ -98,10 +82,8 @@ type
     lin,S, cSQL, cArq,arqaus: string;
     cFieldName, cFieldValue: string;
     F,FA: TextFile;
-    cBuf: TRegDevolucao;
     cPth: string;
     bCopia : boolean;
-    bAusente: Boolean;
     sMensagem : String;
   public
     { Public declarations }
@@ -119,8 +101,7 @@ uses Main, RelMensal, RelMotivos, Cadastro_Org_Bin, Cadastro_Org_Descricao, Cada
 
 procedure TDevolucoesFrm.edCIFKeyPress(Sender: TObject; var Key: Char);
 var
-  cConta, sBin, cSql, sNumOrg: string;
-  DataAtual: TDateTime;
+  cConta, sBin : string;
 begin
   // Salva as sequências
   if (Key = #13) then
@@ -138,13 +119,6 @@ begin
       MessageDlg('Produto não selecionado!', mtError, [mbOK], 0);
       Abort;
     end;
-
-//    DataAtual := DataHoraSQL(qaux);
-//    if (cbDT_DEVOLUCAO.Date) > Trunc(DataAtual + 1) then
-//    begin
-//      MessageDlg('Data de devolução maior que a atual!', mtInformation, [mbOK], 0);
-//      Abort;
-//    end;
 
     if (Length(edCIF.Text) <> 16) and (Length(edCIF.Text) <> 19) then
     begin
@@ -204,58 +178,8 @@ begin
     if (Length(edCIF.Text) = 19) then
       sBin := Copy(edCIF.Text, 4, 6);
 
-//    with qraOrg as TADOQuery do
-   { with qraOrg do
-    begin
-      Close;
-      SQL.Clear;
-      cSQL := '';
-      cSQL := cSQL + 'SELECT NUM_ORG FROM CEA_ORG C ';
-      cSQL := cSQL + 'WHERE ' + sBin + ' = C.BIN ';
-      SQL.Add(cSQL);
-      Open;
-    end;
-
-    sNumOrg := qraOrg.FieldByName('NUM_ORG').AsString;
-
-    if Copy(sBin, 1, 1) = '0' then
-      sNumOrg := '010'
-
-    else if Copy(sBin, 1, 1) = '1' then
-      sNumOrg := '010';}
-
-    {if sNumOrg = '' then
-    begin
-      MessageDlg('Não existe ORG cadastrada para o cartão ' + edCIF.Text + ' !', mtError, [mbOK], 0);
-      Abort;
-    end;}
-
-    // Procurar código da conta no arquivo de controle
-    //qraControle.Close;
-    //qraControle.ParamByName('NR_CONTA').AsString := cConta;
-//    qraControle.Parameters.ParamByName('NR_CONTA').Value := cConta;
-    //qraControle.Open;
-
-    // Gravar dados para o relatório
-//    with qraControle as TADOQuery do
-    with qraControle do
-    begin
-     // solicitação feita pelo Hatsuo, se já existir a conta
-     // inserir + um registro
-     {
-       if RecordCount = 0 then
-            Append
-       else
-            Edit;
-     }
-{      Append;
-      FieldByName('NR_CONTA').AsString := cConta;
-      FieldByName('CD_PRODUTO').AsString := qraProduto.FieldByName('CD_PRODUTO').AsString;
-      FieldByName('CD_MOTIVO').AsString := qraMotivo.FieldByName('CD_MOTIVO').AsString;
-      FieldByName('DT_DEVOLUCAO').AsDateTime := cbDT_DEVOLUCAO.Date;
-      FieldByName('NUM_ORG').AsString := sNumOrg;
-      FieldByName('dt_cadastro').AsDateTime := DataAtual;
-      Post;}
+    With DM do
+      begin
         SqlAux.Close;
         SqlAux.SQL.Clear;
         SqlAux.SQL.Add('insert into cea_controle_devolucoes (nro_conta,cd_produto,cd_motivo,codbin,codusu) values ');
@@ -270,6 +194,7 @@ begin
             exit;
           end;
         end;
+      end;
     end;
 
     // Adiciona no list box
@@ -280,7 +205,6 @@ begin
     edCIF.SetFocus;
     edCIF.Text := '';
   end;
-end;
 
 procedure TDevolucoesFrm.BtnCloseConsistenciaClick(Sender: TObject);
 begin
@@ -295,7 +219,7 @@ end;
 
 procedure TDevolucoesFrm.lcCD_MOTIVOClick(Sender: TObject);
 begin
-  lblDS_MOTIVO.Caption := qraMotivo.FieldByName('DS_MOTIVO').AsString;
+  lblDS_MOTIVO.Caption := DM.qraMotivo.FieldByName('DS_MOTIVO').AsString;
   edCIF.SetFocus;
 end;
 
@@ -320,12 +244,13 @@ end;
 procedure TDevolucoesFrm.FormShow(Sender: TObject);
 begin
   // Abre as tabelas
-  qraMotivo.Close;
-  qraMotivo.Open;
-
-  qraProduto.Close;
-  qraProduto.Open;
-
+  With DM do
+    begin
+      qraMotivo.Close;
+      qraMotivo.Open;
+      qraProduto.Close;
+      qraProduto.Open;
+    end;
   // Seta as datas
   cbDT_DEVOLUCAO.Date := Date;
   cbDT_INICIAL.Date := Date;
@@ -336,23 +261,21 @@ begin
   lblDS_PRODUTO.Caption := '';
   ListBoxCIF.Clear;
 
-//  // Posiciona cursor
-//  cbDT_DEVOLUCAO.SetFocus;
-
-  // pega o path da aplicacao
-//  cPth := 'ExtractFilePath(Application.ExeName);
-  cPth := 'F:\ibisis\';
+  cPth := DM.currdir;
 
 end;
 
 procedure TDevolucoesFrm.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
-  //fecha as tabelas
-  qraRetorno.Close;
-  qraMotivo.Close;
-  qraProduto.Close;
-  qraControle.Close;
+  With DM do
+    begin
+      //fecha as tabelas
+      qraRetorno.Close;
+      qraMotivo.Close;
+      qraProduto.Close;
+      qraControle.Close;
+    end;
 end;
 
 procedure TDevolucoesFrm.BtnRelatorio1Click(Sender: TObject);
@@ -362,31 +285,25 @@ begin
 end;
 
 procedure TDevolucoesFrm.MontaRetorno();
-var     nPos,iObjetos: Integer;
 begin
   bCopia := False;
   sMensagem := '';
-  iObjetos := 0;
   //Procurar o intervalo de datas
 //  with qraRetorno as TADOQuery do
-  with qraRetorno do
-  begin
-    Close;
-    SQL.Clear;
-    cSQL := 'SELECT NRO_CONTA, CD_PRODUTO, CD_MOTIVO,DT_DEVOLUCAO FROM CEA_CONTROLE_DEVOLUCOES WHERE ';
-    cSQL := cSQL + '(DT_DEVOLUCAO between ' + chr(39)+ FormatDateTime('yyyy/mm/dd',cbDT_INICIAL.Date)+chr(39);
-    cSQL := cSQL + ' AND ';
-    cSQL := cSQL + chr(39)+ FormatDateTime('yyyy/mm/dd',cbDT_FINAL.Date)+chr(39)+') ';
-//    cSQL := cSQL + 'AND (D.CD_PRODUTO = P.CD_PRODUTO) ';
-//    cSQL := cSQL + 'AND (D.CD_MOTIVO = M.CD_MOTIVO) ';
-//    cSQL := cSQL + 'GROUP BY M.DS_MOTIVO, P.DS_PRODUTO ';
-//    cSQL := cSQL + ',D.CD_PRODUTO ';
-    cSQL := cSQL + 'ORDER BY DT_DEVOLUCAO, CD_PRODUTO, CD_MOTIVO ';
-    SQL.Add(cSQL);
-    Open;
+  with DM.qraRetorno do
+    begin
+      Close;
+      SQL.Clear;
+      cSQL := 'SELECT NRO_CONTA, CD_PRODUTO, CD_MOTIVO,DT_DEVOLUCAO FROM CEA_CONTROLE_DEVOLUCOES WHERE ';
+      cSQL := cSQL + 'DT_DEVOLUCAO between :dti AND :dtf ';
+      cSQL := cSQL + 'ORDER BY DT_DEVOLUCAO, CD_PRODUTO, CD_MOTIVO ';
+      SQL.Add(cSQL);
+      ParamByName('dti').AsDate := cbDT_INICIAL.Date;
+      ParamByName('dtf').AsDate := cbDT_FINAL.Date;
+      Open;
   end;
 
-  if qraRetorno.IsEmpty then
+  if DM.qraRetorno.IsEmpty then
   begin
     Application.MessageBox('Não existe dados para a data selecionada.', 'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
     Abort;
@@ -397,42 +314,40 @@ begin
   pMsg.Refresh;
 
   try
-    cArq    := dm.unidade + 'ibisis\RETORNO';
-    if (not(DirectoryExists(cArq))) then
-      MkDir(cArq);
+    cArq := dm.retdir;
 
-    cArq      := cArq + '\ADDRESS2ACC.EXTRATO.IBI.';
-    arqaus    := cArq + 'AUS.'+FormatDateTime('ddmmyyyy.',DM.dtatu)+ FormatDateTime('hhmmss', StrToTime(dm.hratu))+'.TMP';
-    cArq      := cArq + FormatDateTime('ddmmyyyy.',DM.dtatu)+ FormatDateTime('hhmmss', StrToTime(dm.hratu))+'.TMP';
-//    cArq := cArq + '_A_';
- //   cArq := cArq + FormatDateTime('ddmmyyyy',cbDT_FINAL.Date);
- //   cArq := cArq + '.TXT';
+    cArq      := cArq + 'ADDRESS2ACC.EXTRATO.IBI.';
+    arqaus    := cArq + 'AUS.' + FormatDateTime('ddmmyyyy.hhmmss', DM.dtatu) + '.TMP';
+    cArq      := cArq + FormatDateTime('ddmmyyyy.hhmmss', DM.dtatu) + '.TMP';
+
     Edarq.Text  :=  cArq;
     AssignFile(F, Edarq.Text);
     ReWrite(F);
     AssignFile(FA, arqaus);
     ReWrite(FA);
 
-    while not qraRetorno.Eof do
-    begin
-      //S := '';
-//      for nPos := 0 to (qraRetorno.FieldCount - 1) do
-//      begin
-        if  (qraRetorno.Fields[2].AsInteger=7)  then
-//            ((qraRetorno.Fields[nPos].Va )then
-          lin  := qraRetorno.Fields[0].AsString+qraRetorno.Fields[1].AsString+qraRetorno.Fields[2].AsString+ FormatDateTime('yyyymmdd',qraRetorno.Fields[3].AsDateTime)
-        else
-          S := qraRetorno.Fields[0].AsString+qraRetorno.Fields[1].AsString+qraRetorno.Fields[2].AsString+ FormatDateTime('yyyymmdd',qraRetorno.Fields[3].AsDateTime);
-  //    end;
+    With DM do
+      begin
+        while not qraRetorno.Eof do
+          begin
+            if  (qraRetorno.Fields[2].AsInteger=7)  then
+              lin := qraRetorno.Fields[0].AsString +
+                  qraRetorno.Fields[1].AsString +
+                  qraRetorno.Fields[2].AsString +
+                  FormatDateTime('yyyymmdd',qraRetorno.Fields[3].AsDateTime)
+            else
+              S := qraRetorno.Fields[0].AsString+qraRetorno.Fields[1].AsString+qraRetorno.Fields[2].AsString+ FormatDateTime('yyyymmdd',qraRetorno.Fields[3].AsDateTime);
 
-      if (Length(trim(S)) > 0) then
-        WriteLn(F, S);
-      if (Length(trim(lin)) > 0) then
-        WriteLn(FA, lin);
-      qraRetorno.Next;
-      //inc(iObjetos);
-    end;
-  Application.MessageBox(PChar('Arquivo Gerado!'+chr(10)+Edarq.Text),'IBISIS',IDOK);
+            if (Length(trim(S)) > 0) then
+              WriteLn(F, S);
+
+            if (Length(trim(lin)) > 0) then
+              WriteLn(FA, lin);
+
+            qraRetorno.Next;
+          end;
+      end;
+    Application.MessageBox(PChar('Arquivo Gerado!'+chr(10)+Edarq.Text),'IBISIS',IDOK);
   except
     on Msg: Exception do
     begin
@@ -441,26 +356,17 @@ begin
   end;
   CloseFile(F);
   CloseFile(FA);
-
-  //if iObjetos > 0 then
-   // bCopia:= CopyFile(pchar(cArq),pchar('\\192.168.11.10\CEA_ret\'+ExtractFileName(cArq)),false);
-
-  //if not bCopia  then
-  //begin
-  //  sMensagem := 'Não foi possível copiar o(s) arquivo(s): ' + ExtractFileName(cArq);
-  //  Application.MessageBox(pchar(sMensagem),'Aviso',MB_OK+MB_ICONERROR+MB_SYSTEMMODAL)
-  //end;
 end;
 
 procedure TDevolucoesFrm.MontaRelatorio();
 var
-  nPos, nFieldSize,iObjetos: Integer;
+  nPos : Integer;
 
 begin
   bCopia := False;
   sMensagem := '';
 //  with qraRelatorioQtde as TADOQuery do
-  with qraRelatorioQtde do
+  with DM.qraRelatorioQtde do
   begin
     Close;
     SQL.Clear;
@@ -468,52 +374,42 @@ begin
     cSQL := '';
     cSQL := cSQL + 'SELECT CD.CD_MOTIVO, MD.DS_MOTIVO, COUNT(*) AS QTDE FROM CEA_CONTROLE_DEVOLUCOES CD, CEA_MOTIVOS_DEVOLUCOES MD ';
     cSQL := cSQL + 'WHERE CD.CD_MOTIVO = MD.CD_MOTIVO ';
-    cSQL := cSQL + ' AND ';
-    cSQL := cSQL + '(CD.DT_DEVOLUCAO BETWEEN '+chr(39)+FormatDateTime('yyyy/mm/dd',cbDT_INICIAL.Date)+chr(39) ;
-//    cSQL := cSQL + DtSQL_Ini(cbDT_INICIAL.Date);
-//    cSQL := cSQL + ' AND ';
-    cSQL := cSQL + ' and '+chr(39) + FormatDateTime('yyyy/mm/dd',cbDT_FINAL.Date)+chr(39)+') ';
+    cSQL := cSQL + ' AND CD.DT_DEVOLUCAO BETWEEN :dti AND :dtf ';
     cSQL := cSQL + 'GROUP BY CD.CD_MOTIVO, MD.DS_MOTIVO ';
     cSQL := cSQL + 'ORDER BY CD.CD_MOTIVO';
-//    inputbox('','',cSQL);
-
     SQL.Add(cSQL);
+    ParamByName('dti').AsDate := cbDT_INICIAL.Date;
+    ParamByName('dtf').AsDate := cbDT_FINAL.Date;
     Open;
   end;
 
 //  with qraRelatorioTOT as TADOQuery do
-  with qraRelatorioTOT do
+  with DM.qraRelatorioTOT do
   begin
     Close;
     SQL.Clear;
     cSQL := '';
     cSQL := cSQL + 'SELECT COUNT(*) AS TOTAL FROM CEA_CONTROLE_DEVOLUCOES ';
-    cSQL := cSQL + 'WHERE (DT_DEVOLUCAO BETWEEN '+chr(39)+FormatDateTime('yyyy/mm/dd',cbDT_INICIAL.Date)+chr(39);
-//    cSQL := cSQL + DtSQL_Ini(cbDT_INICIAL.Date);
-    cSQL := cSQL + ' AND '+chr(39)+FormatDateTime('yyyy/mm/dd',cbDT_FINAL.Date)+chr(39)+') ';
-//    cSQL := cSQL + DtSQL_Fim(cbDT_FINAL.Date)+;
+    cSQL := cSQL + 'WHERE DT_DEVOLUCAO BETWEEN :dti AND :dtf ';
     SQL.Add(cSQL);
+    ParamByName('dti').AsDate := cbDT_INICIAL.Date;
+    ParamByName('dtf').AsDate := cbDT_FINAL.Date;
     Open;
   end;
 
-  if qraRelatorioQtde.IsEmpty then
+  if DM.qraRelatorioQtde.IsEmpty then
   begin
     Application.MessageBox('Não existe dados para a data selecionada.', 'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
     Exit;
   end;
 
   try
-    cArq := dm.unidade+ 'RELATORIOS\';;
-//    cArq := cArq
-    //cArq := cArq + FormatDateTime('YYYYMMDD', now)+ '\' ;
-
+    cArq := DM.relatdir;
     if not DirectoryExists(cArq) then
        CreateDirectory(PAnsiChar(cArq),nil);
 
     cArq := cArq + 'CEA_REL_'+FormatDateTime('ddmmyyyy',cbDT_INICIAL.Date);
-//    cArq := cArq + StrTran(DateToStr(cbDT_INICIAL.Date), '/', '_');
     cArq := cArq + '_A_';
-//    cArq := cArq + StrTran(DateToStr(cbDT_FINAL.Date), '/', '_');
     cArq := cArq + 'CEA_REL_'+FormatDateTime('ddmmyyyy',cbDT_FINAL.Date);
     cArq := cArq + '.TXT';
 
@@ -531,65 +427,54 @@ begin
     WriteLn(F, format('%-57.57s%',[' CODIGO DESCRICAO'])+format('%-04.04s%',['QTDE']));
     WriteLn(F, format('%7.7s%',['------'])+ StringOfChar('-',49)+format('%5.5s%',['----']));
 
-    while not qraRelatorioQtde.Eof do
-    begin
-      S := ' ';
-      for nPos := 0 to (qraRelatorioQtde.FieldCount - 1) do
+    With DM do
       begin
-        cFieldValue := qraRelatorioQtde.FieldByName(qraRelatorioQtde.Fields[nPos].FieldName).AsString;
-        cFieldName := qraRelatorioQtde.Fields[nPos].FieldName;
-        nFieldSize := qraRelatorioQtde.Fields[nPos].Size;
+        while not qraRelatorioQtde.Eof do
+          begin
+            S := ' ';
+            for nPos := 0 to (qraRelatorioQtde.FieldCount - 1) do
+              begin
+                cFieldValue := qraRelatorioQtde.FieldByName(qraRelatorioQtde.Fields[nPos].FieldName).AsString;
+                cFieldName := qraRelatorioQtde.Fields[nPos].FieldName;
 
-        if UpperCase(cFieldName) = 'CD_MOTIVO' then
-          S := S + Format('%2.2d',[StrToInt(cFieldValue)]) + Format('%-5.5s%',[''])
+                if UpperCase(cFieldName) = 'CD_MOTIVO' then
+                  S := S + Format('%2.2d',[StrToInt(cFieldValue)]) +
+                      Format('%-5.5s%',[''])
 
-        else if UpperCase(cFieldName) = 'DS_MOTIVO' then
-        begin
-//          S := S + cFieldValue;
-          S := S + Format('%-49.49s%',[trim(cFieldValue) ]);
-//          S := S + ' ';
-        end
+                else if UpperCase(cFieldName) = 'DS_MOTIVO' then
+                  begin
+                    S := S + Format('%-49.49s%',[trim(cFieldValue) ]);
+                  end
 
-        else if UpperCase(cFieldName) = 'QTDE' then
-        begin
-//          S := S + Replicate(' ', (4 - Length(cFieldValue)));
-          S := S +  Format('%4.4d',[StrToInt(cFieldValue)]);
-        end;
+                else if UpperCase(cFieldName) = 'QTDE' then
+                  begin
+                    S := S +  Format('%4.4d',[StrToInt(cFieldValue)]);
+                  end;
+              end;
+            WriteLn(F, S);
+            qraRelatorioQtde.Next;
+          end;
+
+        cFieldValue := qraRelatorioTOT.FieldByName(qraRelatorioTOT.Fields[0].FieldName).AsString;
+        cFieldName  := qraRelatorioTOT.Fields[0].FieldName;
+        S := StringOfChar(' ', (4 - Length(cFieldValue)));
+        S := S + cFieldValue;
+        WriteLn(F, format('%7.7s%',['------'])+ StringOfChar('-',49)+format('%5.5s%',['----']));
+        WriteLn(F, format('%11.11s%',['TOTAL --->'])+ format('%46.46s%',[''])+format('%4.4d',[StrToInt(S)]));
       end;
-      WriteLn(F, S);
-      qraRelatorioQtde.Next;
-    end;
-    cFieldValue := qraRelatorioTOT.FieldByName(qraRelatorioTOT.Fields[0].FieldName).AsString;
-    cFieldName  := qraRelatorioTOT.Fields[0].FieldName;
-    S := StringOfChar(' ', (4 - Length(cFieldValue)));
-    S := S + cFieldValue;
-    WriteLn(F, format('%7.7s%',['------'])+ StringOfChar('-',49)+format('%5.5s%',['----']));
-    WriteLn(F, format('%11.11s%',['TOTAL --->'])+ format('%46.46s%',[''])+format('%4.4d',[StrToInt(S)]));
-
-  except
-    on Msg: Exception do
+  except on Msg: Exception do
     begin
       MessageDlg(Msg.Message, mtInformation, [mbOK], 0)
     end;
   end;
   CloseFile(F);
-
-  if qraRelatorioQtde.RecordCount > 0 then
-    //bCopia:= CopyFile(pchar(cArq),pchar('\\192.168.11.10\CEA_ret\'+ExtractFileName(cArq)),false);
-
-  if not bCopia  then
-  begin
-    //sMensagem := 'Não foi possível copiar o(s) arquivo(s): ' + ExtractFileName(cArq);
-    //Application.MessageBox(pchar(sMensagem),'Aviso',MB_OK+MB_ICONERROR+MB_SYSTEMMODAL)
-  end;
-
-  pMsg.Caption := 'Total de Objetos: ' + IntToStr(iObjetos);
+  pMsg.Caption := 'Total de Objetos: ' + cFieldValue;
   pMsg.Refresh;
 end;
 
 procedure TDevolucoesFrm.lcCD_PRODUTOClick(Sender: TObject);
 begin
-  lblDS_PRODUTO.Caption := qraProduto.FieldByName('DS_PRODUTO').AsString;
+  lblDS_PRODUTO.Caption := DM.qraProduto.FieldByName('DS_PRODUTO').AsString;
   edCIF.SetFocus;
 end;
 
@@ -613,70 +498,41 @@ end;
 
 procedure TDevolucoesFrm.btRelMensalClick(Sender: TObject);
 var
-  F: TextFile;
-  S, cSQL, cArq: string;
-  nPos, nFieldSize: Integer;
-  cFieldName, cFieldValue: string;
+  cSQL, cArq: string;
 
 begin
   bcopia := False;
   sMensagem :='';
+  cArq := DM.relatdir;
 
-  cArq := cPth;
-  cArq := cArq + 'RELATORIOS';
 
-  if not DirectoryExists(cArq) then
-     CreateDirectory(PAnsiChar(cArq),nil);
-  cArq := cArq + '\PROC'+FormatDateTime('YYYYMMDD', now)+ '\' ;
-
+  cArq := cArq + 'PROC' + FormatDateTime('YYYYMMDD', now) + '\' ;
   cArq := cArq + 'RELATORIO_MENSAL_PRODUTOS_';
-//  cArq := cArq + StrTran(DateToStr(cbDT_INICIAL.Date), '/', '_');
   cArq := cArq + '_A_';
- // cArq := cArq + StrTran(DateToStr(cbDT_FINAL.Date), '/', '_');
   cArq := cArq + '.TXT';
 
   qrForm_RelMensal := TqrForm_RelMensal.Create(Self);
   try
-    with qrForm_RelMensal.qraRelMensal do
+    with DM.qraRelMensal do
     begin
       Close;
       SQL.Clear;
-      cSQL := '';
-{          cSQL := cSQL + 'SELECT  M.DS_MOTIVO, C.DESCRICAO, C.NUM_ORG, count(C.Descricao)  as TOTAL ';
-          cSQL := cSQL + 'FROM CEA_CONTROLE_DEVOLUCOES D, CEA_ORG_DESCRICAO C, CEA_MOTIVOS_DEVOLUCOES M ';
-          cSQL := cSQL + 'WHERE ';
-          cSQL := cSQL + '(D.DT_DEVOLUCAO BETWEEN ';
-//          cSQL := cSQL + DtSQL_Ini( cbDT_INICIAL.Date );
-          cSQL := cSQL + QuotedStr(FormatDateTime('yyyy-mm-dd', cbDT_INICIAL.Date) + ' 00:00.000 ' ) ;
-          cSQL := cSQL + ' AND ';
-  //        cSQL := cSQL + DtSQL_Fim( cbDT_FINAL.Date   );
-          cSQL := cSQL + QuotedStr(FormatDateTime('yyyy-mm-dd', cbDT_FINAL.Date +1 ) + ' 00:00:00.000 )' );
-          cSQL := cSQL + ' AND ';
-          cSQL := cSQL + '(D.NUM_ORG = C.NUM_ORG)';
-          cSQL := cSQL + ' AND ';
-          cSQL := cSQL + '(D.CD_MOTIVO = M.CD_MOTIVO) ';
-          cSQL := cSQL + 'GROUP BY M.DS_MOTIVO, C.DESCRICAO, C.NUM_ORG ';
-          cSQL := cSQL + 'ORDER BY C.DESCRICAO, M.DS_MOTIVO, C.NUM_ORG';}
 
-      cSQL := cSQL + 'SELECT M.DS_MOTIVO, D.CD_PRODUTO, P.DS_PRODUTO, count(D.CD_PRODUTO)  as Total ';
-      cSQL := cSQL + 'FROM CEA_CONTROLE_DEVOLUCOES D, CEA_MOTIVOS_DEVOLUCOES M, CEA_PRODUTOS P ';
-      cSQL := cSQL + 'WHERE ';
-      cSQL := cSQL + '(d.dt_devolucao BETWEEN '+QuotedStr(FormatDateTime('yyyy/mm/dd', cbDT_INICIAL.Date)) ;
-//      cSQL := cSQL + DtSQL_Ini(cbDT_INICIAL.Date);
-      cSQL := cSQL + ' AND ';
-      cSQL := cSQL +QuotedStr(FormatDateTime('yyyy/mm/dd',cbDT_FINAL.Date))+') ';
-      //      cSQL := cSQL + 'd.dt_devolucao <= ';
-//      cSQL := cSQL + DtSQL_Fim(cbDT_FINAL.Date);
-      cSQL := cSQL + ' AND (D.CD_PRODUTO = P.CD_PRODUTO) ';
-      cSQL := cSQL + ' AND (D.CD_MOTIVO = M.CD_MOTIVO) ';
-      cSQL := cSQL + 'GROUP BY M.DS_MOTIVO, D.CD_PRODUTO, P.DS_PRODUTO ';
-      cSQL := cSQL + 'ORDER BY D.CD_PRODUTO, P.DS_PRODUTO, M.DS_MOTIVO ';
-      //inputbox('','',csql);
+      cSQL := 'SELECT M.DS_MOTIVO, D.CD_PRODUTO, P.DS_PRODUTO, ' +
+          'count(D.CD_PRODUTO) as Total ' + #13#10 +
+          'FROM CEA_CONTROLE_DEVOLUCOES D ' + #13#10 +
+          '    INNER JOIN CEA_MOTIVOS_DEVOLUCOES M ON (D.CD_MOTIVO = M.CD_MOTIVO) ' + #13#10 +
+          '    INNER JOIN CEA_PRODUTOS P ON (D.CD_PRODUTO = P.CD_PRODUTO) ' + #13#10 +
+          'WHERE D.dt_devolucao BETWEEN :dtini AND :dtfim ' + #13#10 +
+          'GROUP BY M.DS_MOTIVO, D.CD_PRODUTO, P.DS_PRODUTO ' + #13#10 +
+          'ORDER BY D.CD_PRODUTO, P.DS_PRODUTO, M.DS_MOTIVO';
       SQL.Add(cSQL);
+      ParamByName('dtini').AsDate := cbDT_INICIAL.Date;
+      ParamByName('dtfim').AsDate := cbDT_FINAL.Date;
       Open;
     end;
 
-    if qrForm_RelMensal.qraRelMensal.IsEmpty then
+    if DM.qraRelMensal.IsEmpty then
     begin
       Application.MessageBox('Não existe dados para a data selecionada.', 'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
       Exit;
@@ -685,18 +541,8 @@ begin
     pMsg.Caption := 'Gerando arquivo. Aguarde!';
     pMsg.Refresh;
     Application.CreateForm(TqrForm_RelMensal,qrForm_RelMensal);
-//    qrForm_RelMensal.RLPeriodo.Caption := DateToStr(cbDT_INICIAL.Date) + ' A ' + DateToStr(cbDT_FINAL.Date);
-    qrForm_RelMensal.RLRelMensal.PreviewModal ;//.ex ExportToFilter (TQRAsciiExportFilter.create(cArq));
+    qrForm_RelMensal.RLRelMensal.PreviewModal ;
     qrForm_RelMensal.RLRelMensal.Destroy;
-
-    //if qrForm_RelMensal.qraRelMensal.IsEmpty then
-    //  bCopia:= CopyFile(pchar(cArq),pchar('\\192.168.100.4\ibisis\CEA_RETORNO\'+ExtractFileName(cArq)),false);
-
-    //if not bCopia  then
-    //begin
-//      sMensagem := 'Não foi possível copiar o(s) arquivo(s): ' + bCopia;
-      //Application.MessageBox(pchar(sMensagem),'Aviso',MB_OK+MB_ICONERROR+MB_SYSTEMMODAL)
-    //end;
 
   finally
     qrForm_RelMensal.Free;
@@ -705,12 +551,7 @@ begin
   bcopia := False;
   sMensagem :='';
 
-  cArq := cPth;
-  cArq := cArq + 'RELATORIOS\';
-//  cArq := cArq + 'ADDRESS2ACC.FATURA.'+FormatDateTime('YYYYMMDD', now)+ '.TXT' ;
-
-  if not DirectoryExists(cArq) then
-     CreateDirectory(PAnsiChar(cArq),nil);
+  cArq := DM.relatdir;
   cArq := cArq + 'RELATORIO_MENSAL_MOTIVOS_';
   cArq := cArq + FormatDateTime('dd-mm-yyyy', cbDT_INICIAL.Date);
   cArq := cArq + '_A_';
@@ -729,8 +570,6 @@ begin
       cSQL := cSQL + 'WHERE ';
       cSQL := cSQL + '(d.dt_devolucao between '+QuotedStr(FormatDateTime('yyyy/mm/dd', cbDT_INICIAL.Date));
       cSQL := cSQL + ' AND '+QuotedStr(FormatDateTime('yyyy/mm/dd',cbDT_FINAL.Date));
-//      cSQL := cSQL + 'd.dt_devolucao <= ';
-//      cSQL := cSQL + DtSQL_Fim(cbDT_FINAL.Date);
       cSQL := cSQL + ') AND (D.CD_MOTIVO = M.CD_MOTIVO) ';
       cSQL := cSQL + 'GROUP BY D.CD_MOTIVO, M.DS_MOTIVO ';
       cSQL := cSQL + 'ORDER BY M.DS_MOTIVO ';
@@ -739,19 +578,7 @@ begin
       Open;
     end;
     qrForm_RelMotivos.qlPeriodo.Caption := DateToStr(cbDT_INICIAL.Date) + ' A ' + DateToStr(cbDT_FINAL.Date);
-//    qrForm_RelMotivos.ExportToFilter(TQRAsciiExportFilter.create(cArq));
     qrForm_RelMotivos.qraMotivosTot.Close;
-
-//    if qrForm_RelMotivos.qraMotivos .RecordCount > 0 then
-//      bCopia:= CopyFile(pchar(cArq),pchar('\\192.168.11.10\CEA_ret\'+ExtractFileName(cArq)),false);
-
-    {if not bCopia  then
-    begin
-      sMensagem := 'Não foi possível copiar o(s) arquivo(s): ' + ExtractFileName(cArq);
-      Application.MessageBox(pchar(sMensagem),'Aviso',MB_OK+MB_ICONERROR+MB_SYSTEMMODAL)
-    end;}
-
-
     pMsg.Caption := 'Final da Geração';
     pMsg.Refresh;
   finally
@@ -761,21 +588,14 @@ end;
 
 procedure TDevolucoesFrm.cbDT_DEVOLUCAOEnter(Sender: TObject);
 begin
-  SqlAux.Connection  :=  ADOConnection2;
-  SqlAux.Close;
-  SqlAux.SQL.Clear;
-  SqlAux.SQL.Add('select current_date');
-  SqlAux.Open;
-  cbDT_DEVOLUCAO.DateTime :=  SqlAux.Fields[0].AsDateTime;
-
-end;
-
-procedure TDevolucoesFrm.FormCreate(Sender: TObject);
-var
-  FileName: string;
-begin
-//  ConectaSQL(ADOConnection2, 'Devolucao');
-    ADOConnection2.Connected  :=  true;
+  With DM do
+    begin
+      SqlAux.Close;
+      SqlAux.SQL.Clear;
+      SqlAux.SQL.Add('SELECT CURRENT_DATE');
+      SqlAux.Open;
+      cbDT_DEVOLUCAO.DateTime :=  SqlAux.Fields[0].AsDateTime;
+    end;
 end;
 
 procedure TDevolucoesFrm.btnProdutoClick(Sender: TObject);
@@ -802,42 +622,37 @@ end;
 procedure TDevolucoesFrm.BitBtn1Click(Sender: TObject);
 var
   Arq: TextFile;
-  S, cSQL, cArq: string;
+  S, cArq: string;
   nPos: Integer;
 begin
   bCopia := False;
   sMensagem := '';
-//  with qraRetorno as TADOQuery do
 
-  with qraRetorno do
-  begin
-    Close;
-    SQL.Clear;
-    cSQL := 'SELECT * FROM CEA_CONTROLE_DEVOLUCOES WHERE ';
-    cSQL := cSQL + '(DT_DEVOLUCAO between ' + chr(39)+ FormatDateTime('yyyy/mm/dd',cbDT_INICIAL.Date)+chr(39)+ ' AND ';
-    cSQL := cSQL + chr(39)+ FormatDateTime('yyyy/mm/dd',cbDT_FINAL.Date)+chr(39)+') ';
-    cSQL := cSQL + 'ORDER BY DT_CADASTRO';
-    SQL.Add(cSQL);
-    Open;
-  end;
+  with DM.qraRetorno do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM CEA_CONTROLE_DEVOLUCOES');
+      SQL.Add('WHERE DT_DEVOLUCAO between :dti AND :dtf ');
+      SQL.Add('ORDER BY DT_CADASTRO');
+      ParamByName('dti').AsDate := cbDT_INICIAL.Date;
+      ParamByName('dtf').AsDate := cbDT_FINAL.Date;
+      Open;
+    end;
 
-  if qraRetorno.IsEmpty then
-  begin
-    Application.MessageBox('Não existe dados para a data selecionada.', 'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
-    Abort;
-    Exit;
-  end;
+  if DM.qraRetorno.IsEmpty then
+    begin
+      Application.MessageBox('Não existe dados para a data selecionada.', 'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
+      Abort;
+      Exit;
+    end;
 
   pMsg.Caption := 'Gerando arquivo. Aguarde!';
   pMsg.Refresh;
 
   try
-    cArq := cPth;
-    cArq := cPth;
-    cArq := cArq + 'retorno';
-    if (not(DirectoryExists(cArq))) then
-      MkDir(cArq);
-    cArq := cArq + '\PROC';
+    cArq := DM.retdir;
+    cArq := cArq + 'PROC';
     cArq := cArq + FormatDateTime('ddmmyyyy', now)+ '\' ;
 
     if not DirectoryExists(cArq) then
@@ -851,37 +666,29 @@ begin
     AssignFile(Arq, cArq);
     ReWrite(Arq);
 
-    while not qraRetorno.Eof do
-    begin
-      S := '';
-      for nPos := 0 to (qraRetorno.FieldCount - 1) do
+    With DM do
       begin
-          S := S  + qraRetorno.FieldByName(qraRetorno.Fields[nPos].FieldName).AsString + ';';
+        while not qraRetorno.Eof do
+          begin
+            S := '';
+            for nPos := 0 to (qraRetorno.FieldCount - 1) do
+              begin
+                S := S  + qraRetorno.FieldByName(qraRetorno.Fields[nPos].FieldName).AsString + ';';
+              end;
+            WriteLn(Arq, S);
+            qraRetorno.Next;
+          end;
+
       end;
+    pMsg.Caption := 'Processamento concluído!';
+    pMsg.Refresh;
 
-      WriteLn(Arq, S);
-      qraRetorno.Next;
-    end;
-
-  pMsg.Caption := 'Processamento concluído!';
-  pMsg.Refresh;
-
-  except
-    on Msg: Exception do
+  except on Msg: Exception do
     begin
       MessageDlg(Msg.Message, mtInformation, [mbOK], 0)
     end;
   end;
   CloseFile(Arq);
-
-//  if qraRetorno.RecordCount > 0 then
- //   bCopia:= CopyFile(pchar(cArq),pchar('\\192.168.11.10\CEA_ret\'+ExtractFileName(cArq)),false);
-
-//  if not bCopia  then
-//  begin
-//    sMensagem := 'Não foi possível copiar o(s) arquivo(s): ' + ExtractFileName(cArq);
-//    Application.MessageBox(pchar(sMensagem),'Aviso',MB_OK+MB_ICONERROR+MB_SYSTEMMODAL)
-//  end;
 
 end;
 

@@ -85,10 +85,9 @@ end;
 
 function TfrmRelFAC.GerarArquivo: boolean;
 var
-  F: TextFile;
-  s, sDir, sDev: string;
+  s, sDir : string;
   ListaSLP: TStringList;
-  SalvaSLP, sCartao: string;
+  sCartao: string;
   iAux: integer;
   ListaArq: TStringList;
 begin

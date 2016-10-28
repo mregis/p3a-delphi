@@ -1,7 +1,7 @@
 object DM: TDM
   OldCreateOrder = False
   OnCreate = DataModuleCreate
-  Height = 291
+  Height = 392
   Width = 516
   object dtsMotivo: TDataSource
     DataSet = qMotivo
@@ -18,7 +18,7 @@ object DM: TDM
     Database = 'dbdevibi'
     User = 'valdires'
     Password = 'valdir!50#'
-    Protocol = 'postgresql-7'
+    Protocol = 'postgresql-9'
     Left = 40
     Top = 8
   end
@@ -777,5 +777,178 @@ object DM: TDM
       FieldName = 'qtde'
       ReadOnly = True
     end
+  end
+  object dsMotivos: TDataSource
+    DataSet = qraMotivo
+    Left = 7
+    Top = 280
+  end
+  object dsProdutos: TDataSource
+    DataSet = qraProduto
+    Left = 39
+    Top = 280
+  end
+  object dsOrg: TDataSource
+    DataSet = qraOrg
+    Left = 71
+    Top = 280
+  end
+  object dsControle: TDataSource
+    Left = 103
+    Top = 281
+  end
+  object qraRelatorioTOT: TZReadOnlyQuery
+    Connection = CtrlDvlDBConn
+    SQL.Strings = (
+      'SELECT count(*) AS TOTAL FROM CEA_CONTROLE_DEVOLUCOES'
+      'WHERE'
+      'DT_DEVOLUCAO BETWEEN '#39'2004-08-03 00:00'#39' AND '#39'2004-08-04 00:00'#39
+      '')
+    Params = <>
+    Properties.Strings = (
+      'SELECT count(*) AS TOTAL FROM CEA_CONTROLE_DEVOLUCOES'
+      'WHERE'
+      'DT_DEVOLUCAO BETWEEN '#39'2004-08-03 00:00'#39' AND '#39'2004-08-04 00:00'#39)
+    Left = 136
+    Top = 280
+  end
+  object qraRelatorioQtde: TZReadOnlyQuery
+    Connection = CtrlDvlDBConn
+    SQL.Strings = (
+      'SELECT CD.CD_MOTIVO, MD.DS_MOTIVO, COUNT(*) AS QTDE '
+      'FROM CEA_CONTROLE_DEVOLUCOES CD, CEA_MOTIVOS_DEVOLUCOES MD'
+      'WHERE CD.CD_MOTIVO = MD.CD_MOTIVO'
+      'GROUP BY CD.CD_MOTIVO, MD.DS_MOTIVO'
+      'ORDER BY CD.CD_MOTIVO'
+      '')
+    Params = <>
+    Properties.Strings = (
+      'SELECT CD.CD_MOTIVO, MD.DS_MOTIVO, COUNT(*) AS QTDE '
+      'FROM CEA_CONTROLE_DEVOLUCOES CD, CEA_MOTIVOS_DEVOLUCOES MD'
+      'WHERE CD.CD_MOTIVO = MD.CD_MOTIVO'
+      'GROUP BY CD.CD_MOTIVO, MD.DS_MOTIVO'
+      'ORDER BY CD.CD_MOTIVO')
+    Left = 168
+    Top = 280
+  end
+  object qraRetorno: TZReadOnlyQuery
+    Connection = CtrlDvlDBConn
+    Params = <>
+    Left = 208
+    Top = 280
+  end
+  object qraControle: TZQuery
+    Connection = CtrlDvlDBConn
+    SQL.Strings = (
+      'SELECT * FROM CEA_CONTROLE_DEVOLUCOES'
+      'WHERE NR_CONTA = :NR_CONTA'
+      '')
+    Params = <
+      item
+        DataType = ftUnknown
+        Name = 'NR_CONTA'
+        ParamType = ptUnknown
+      end>
+    Properties.Strings = (
+      'SELECT * FROM CEA_CONTROLE_DEVOLUCOES'
+      'WHERE NR_CONTA = :NR_CONTA')
+    Left = 240
+    Top = 280
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'NR_CONTA'
+        ParamType = ptUnknown
+      end>
+  end
+  object qAux: TZTable
+    Connection = CtrlDvlDBConn
+    ReadOnly = True
+    Left = 272
+    Top = 280
+  end
+  object qraMotivo: TZReadOnlyQuery
+    Connection = CtrlDvlDBConn
+    SQL.Strings = (
+      'SELECT * FROM cea_motivos_devolucoes'
+      '')
+    Params = <>
+    Left = 312
+    Top = 280
+  end
+  object qraProduto: TZReadOnlyQuery
+    Connection = CtrlDvlDBConn
+    SQL.Strings = (
+      'SELECT * FROM CEA_PRODUTOS'
+      '')
+    Params = <>
+    Properties.Strings = (
+      'SELECT * FROM CEA_MOTIVOS_DEVOLUCOES')
+    Left = 344
+    Top = 280
+  end
+  object qraOrg: TZQuery
+    Connection = CtrlDvlDBConn
+    SQL.Strings = (
+      'select * from cea_org'
+      '')
+    Params = <>
+    Properties.Strings = (
+      'select * from cea_org')
+    Left = 376
+    Top = 280
+  end
+  object ZQuery1: TZQuery
+    Connection = CtrlDvlDBConn
+    Params = <>
+    Left = 416
+    Top = 280
+  end
+  object DataSource1: TDataSource
+    Left = 449
+    Top = 281
+  end
+  object qraRelMensal: TZQuery
+    Connection = CtrlDvlDBConn
+    SQL.Strings = (
+      'select '
+      
+        '  m.ds_motivo, D.CD_PRODUTO, P.DS_PRODUTO, count(D.CD_PRODUTO)  ' +
+        'as Total'
+      
+        'from  cea_controle_devolucoes d, cea_org_descricao c, CEA_MOTIVO' +
+        'S_DEVOLUCOES m, CEA_PRODUTOS P'
+      'where (1=0)'
+      'group by m.ds_motivo, D.CD_PRODUTO, P.DS_PRODUTO'
+      'order by D.CD_PRODUTO, P.DS_PRODUTO, m.ds_motivo'
+      ''
+      '')
+    Params = <>
+    Left = 48
+    Top = 336
+    object qraRelMensalds_motivo: TStringField
+      FieldName = 'ds_motivo'
+      Required = True
+      Size = 40
+    end
+    object qraRelMensalcd_produto: TStringField
+      FieldName = 'cd_produto'
+      Required = True
+      Size = 6
+    end
+    object qraRelMensalds_produto: TStringField
+      FieldName = 'ds_produto'
+      Required = True
+      Size = 60
+    end
+    object qraRelMensaltotal: TLargeintField
+      FieldName = 'total'
+      ReadOnly = True
+    end
+  end
+  object DtSRelMensal: TDataSource
+    DataSet = qraRelMensal
+    Left = 8
+    Top = 336
   end
 end

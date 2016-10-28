@@ -64,8 +64,8 @@ begin
   dm.SqlAux.SQL.Clear;
   dm.SqlAux.SQL.Add('select current_date,localtime(0)');
   dm.SqlAux.Open;
-  DTPinicial.Date :=  dm.SqlAux.Fields[0].AsDateTime;
-  DTPFinal.Date   :=  dm.SqlAux.Fields[0].AsDateTime;
+  DTPinicial.Date := dm.SqlAux.Fields[0].AsDateTime;
+  DTPFinal.Date := dm.SqlAux.Fields[0].AsDateTime;
 
 end;
 
@@ -85,7 +85,7 @@ end;
 procedure TfrmRelAnAR.GerarRelCourier;
 begin
 
-  sArq := 'F:\ibisis\RELATORIOS\' + 'RelatorioAnalicoAR_COURIER' + FormatDateTime('DD_MM_YYYY', DTPinicial.DateTime) + '_A_' + FormatDateTime('DD_MM_YYYY', DTPFinal.DateTime) + '.TXT';
+  sArq := DM.relatdir + 'RelatorioAnalicoAR_COURIER' + FormatDateTime('DD_MM_YYYY', DTPinicial.DateTime) + '_A_' + FormatDateTime('DD_MM_YYYY', DTPFinal.DateTime) + '.TXT';
   dt_ini := FormatDateTime('MM-DD-YYYY', DTPinicial.Date);
   dt_fim := FormatDateTime('MM-DD-YYYY', DTPFinal.Date);
   dt_ini_edt := FormatDateTime('DD/MM/YYYY', DTPinicial.DateTime);
@@ -178,16 +178,14 @@ end;
 
 procedure TfrmRelAnAR.GerarRelRE;
 begin
-  sArq := 'F:\ibisis\RELATORIOS\' + 'RelatorioAnalitico.AR.' + FormatDateTime('DDMMYYYY', dm.SqlAux.Fields[0].AsDateTime) +FormatDateTime('HHMMSS',dm.SqlAux.Fields[1].AsDateTime) + '.TMP';
+  sArq := DM.relatdir + 'RelatorioAnalitico.AR.' + FormatDateTime('DDMMYYYY', dm.SqlAux.Fields[0].AsDateTime) + FormatDateTime('hhnnss', dm.SqlAux.Fields[1].AsDateTime) + '.TMP';
   dt_ini := FormatDateTime('MM-DD-YYYY', DTPinicial.Date);
   dt_fim := FormatDateTime('MM-DD-YYYY', DTPFinal.Date);
   dt_ini_edt := FormatDateTime('DD/MM/YYYY', DTPinicial.DateTime);
   dt_fim_edt := FormatDateTime('DD/MM/YYYY', DTPFinal.DateTime);
   qryRelRE.Close;
-//  qryRelRE.Parameters.ParamByName('DT_INI').Value := dt_ini;
-//  qryRelRE.Parameters.ParamByName('DT_FIM').Value := dt_fim;
-  qryRelRE.ParamByName('DT_INI').Value := dt_ini;
-  qryRelRE.ParamByName('DT_FIM').Value := dt_fim;
+  qryRelRE.ParamByName('DT_INI').AsDate := DTPinicial.Date;
+  qryRelRE.ParamByName('DT_FIM').AsDate := DTPFinal.Date;
   qryRelRE.Open;
   qryRelRE.First;
   if qryRelRE.RecordCount = 0 then

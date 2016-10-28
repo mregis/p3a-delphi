@@ -27,7 +27,7 @@ var
 
 implementation
 
-uses Devolucoes;
+uses Devolucoes, CDDM;
 
 {$R *.DFM}
 

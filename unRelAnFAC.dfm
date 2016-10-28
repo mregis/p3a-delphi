@@ -215,7 +215,7 @@ object frmRelAnFAC: TfrmRelAnFAC
     NumGlyphs = 2
   end
   object qryRel: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'select '
       

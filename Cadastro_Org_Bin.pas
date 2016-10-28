@@ -27,7 +27,7 @@ var
   OrgBinFrm: TOrgBinFrm;
 
 implementation
-uses Devolucoes;
+uses Devolucoes, CDDM;
 
 {$R *.DFM}
 

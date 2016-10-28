@@ -1,7 +1,7 @@
 unit U_FrmRelTot;
 
 interface
-
+{$WARN UNIT_PLATFORM OFF}
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, DB,Types, ExtCtrls, ZAbstractRODataset, ZDataset, StdCtrls, Buttons,
@@ -32,9 +32,7 @@ type
 
   private
     { Private declarations }
-      linha,coluna : integer;
-      arquivo,cab :string;
-      excel: variant;
+      cab :string;
       valor : string;
 
   public
@@ -60,10 +58,10 @@ begin
     0:  Application.MessageBox(PChaR('Registro Encontrado: '+IntToStr(qryRelTot.RecordCount)),'IBISIS',IDOK);
     else
       begin
-      EdArq.Text  :=  DM.unidade+'ibisis\RELATORIOS\analitico';
+      EdArq.Text  :=  DM.relatdir + 'analitico';
       if (Not(DirectoryExists(EdArq.Text)))  then
         MkDir(EdArq.Text);
-      EdArq.Text :=  EdArq.Text+'\Total'+FormatDateTime('mmyyyy',TRUNC(DTPFinal.Date))+'.xls';;
+      EdArq.Text :=  EdArq.Text + '\Total' + FormatDateTime('mmyyyy',TRUNC(DTPFinal.Date))+'.xls';;
       XL := TDataSetToExcel.Create(qryRelTot,EdArq.Text,cab);
       XL.WriteFile;
       XL.Free;
@@ -141,10 +139,10 @@ begin
     0:  Application.MessageBox(PChaR('Registro Encontrado: '+IntToStr(qryRelTot.RecordCount)),'IBISIS',IDOK);
     else
       begin
-      EdArq.Text  :=  DM.unidade+'ibisis\RELATORIOS\sintetico';
+      EdArq.Text  :=  DM.relatdir + 'sintetico';
       if (Not(DirectoryExists(EdArq.Text)))  then
         MkDir(EdArq.Text);
-      EdArq.Text :=  EdArq.Text+'\Total'+FormatDateTime('mmyyyy',TRUNC(DTPFinal.Date))+'.xls';;
+      EdArq.Text :=  EdArq.Text + '\Total' + FormatDateTime('mmyyyy',TRUNC(DTPFinal.Date))+'.xls';;
       XL := TDataSetToExcel.Create(ZQRel,EdArq.Text,cab);
       XL.WriteFile;
       XL.Free;

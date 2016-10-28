@@ -85,7 +85,6 @@ object frmExcel: TfrmExcel
     Top = 104
   end
   object qryDatasREM: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       
         'select distinct cast(dt_devolucao as VARCHAR(10)) as dt_devoluca' +
@@ -128,7 +127,6 @@ object frmExcel: TfrmExcel
     end
   end
   object qryDatasCour: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       
         'select distinct cast(dt_devolucao as VARCHAR(10)) as dt_devoluca' +
@@ -171,7 +169,6 @@ object frmExcel: TfrmExcel
     end
   end
   object qryDatasFAC: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       
         'select distinct cast(dt_devolucao as VARCHAR(10)) as dt_devoluca' +
@@ -212,7 +209,6 @@ object frmExcel: TfrmExcel
     end
   end
   object qryDevolARRem: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -279,7 +275,6 @@ object frmExcel: TfrmExcel
     end
   end
   object qryDevolFAC: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -366,7 +361,6 @@ object frmExcel: TfrmExcel
     end
   end
   object qryDatas: TZQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'select '
       
@@ -392,7 +386,6 @@ object frmExcel: TfrmExcel
     end
   end
   object qryConsolidado: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT TEMP.FAMILIA, TEMP.DS_MOTIVO, SUM(TEMP.QTD) AS QTD '
       'FROM ('
@@ -547,7 +540,6 @@ object frmExcel: TfrmExcel
     end
   end
   object qryFamilia: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'select distinct(familia) from ibi_cadastro_familia '
       'ORDER BY FAMILIA'
@@ -572,7 +564,6 @@ object frmExcel: TfrmExcel
     Top = 16
   end
   object qryDevolARCou: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -647,7 +638,6 @@ object frmExcel: TfrmExcel
     end
   end
   object qryDevolFat: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -724,7 +714,6 @@ object frmExcel: TfrmExcel
     end
   end
   object qryDatasFAT: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       
         'select distinct cast(dt_devolucao as VARCHAR(10)) as dt_devoluca' +

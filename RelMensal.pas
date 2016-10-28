@@ -36,12 +36,6 @@ type
     RLBand5: TRLBand;
     RLLabel11: TRLLabel;
     RLDTotGer: TRLDBResult;
-    DtSRelMensal: TDataSource;
-    qraRelMensal: TZQuery;
-    qraRelMensalds_motivo: TStringField;
-    qraRelMensalcd_produto: TStringField;
-    qraRelMensalds_produto: TStringField;
-    qraRelMensaltotal: TLargeintField;
     procedure RLBand1BeforePrint(Sender: TObject; var PrintIt: Boolean);
   private
     { Private declarations }
@@ -60,8 +54,11 @@ uses CDDM, Devolucoes;
 
 procedure TqrForm_RelMensal.RLBand1BeforePrint(Sender: TObject; var PrintIt: Boolean);
 begin
-  RLLabel2.Caption  :=  RLLabel2.Caption+ FormatDateTime('dd/mm/yyyy',Date);
-  RLPeriodo.Caption :=  'Perído: '+FormatDateTime('dd/mm/yyyy',DevolucoesFrm.cbDT_INICIAL.Date)+' à '+FormatDateTime('dd/mm/yyyy',DevolucoesFrm.cbDT_FINAL.Date);
+  RLLabel2.Caption  :=  RLLabel2.Caption +
+    FormatDateTime('dd/mm/yyyy',Date);
+  RLPeriodo.Caption :=  'Perído: ' +
+    FormatDateTime('dd/mm/yyyy', DevolucoesFrm.cbDT_INICIAL.Date) +
+    ' à ' + FormatDateTime('dd/mm/yyyy', DevolucoesFrm.cbDT_FINAL.Date);
 end;
 
 end.

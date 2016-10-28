@@ -145,40 +145,39 @@ object fGeraExcelDev: TfGeraExcelDev
       item
         Width = 50
       end>
-    ExplicitTop = 199
   end
   object TBLIMITE: TZQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     Params = <>
     Left = 8
     Top = 46
   end
   object TBDATAS: TZQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     Params = <>
     Left = 64
     Top = 46
   end
   object TBDEV: TZQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     Params = <>
     Left = 216
     Top = 46
   end
   object TBDEVFAC: TZQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     Params = <>
     Left = 320
     Top = 46
   end
   object TBDEVAR: TZQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     Params = <>
     Left = 264
     Top = 46
   end
   object TBFAMILIA: TZQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT FAMILIA'
       'FROM '
@@ -207,7 +206,7 @@ object fGeraExcelDev: TfGeraExcelDev
     Top = 46
   end
   object TBMOTIVO: TZQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT'
       '   COALESCE(OM.POSICAO, 0) AS POSICAO, M.*'
@@ -221,7 +220,7 @@ object fGeraExcelDev: TfGeraExcelDev
     Top = 46
   end
   object TBCONSOLIDA: TZQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     Params = <>
     Left = 296
     Top = 14
@@ -234,7 +233,7 @@ object fGeraExcelDev: TfGeraExcelDev
     Top = 14
   end
   object TB_AUX: TZQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     Params = <>
     Left = 176
   end

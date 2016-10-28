@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Menus, ExtCtrls, ComCtrls;
+  Dialogs, Menus, ExtCtrls, ComCtrls, StdCtrls, Buttons;
 
 type
   TfrmMain = class(TForm)
@@ -35,6 +35,8 @@ type
     RelSin: TMenuItem;
     GerarArqDevoluo1: TMenuItem;
     GerarPlanilhadeDevoluo1: TMenuItem;
+    BitBtnConfig: TBitBtn;
+    procedure BitBtnConfigClick(Sender: TObject);
     procedure GerarPlanilhadeDevoluo1Click(Sender: TObject);
     procedure GerarArqDevoluo1Click(Sender: TObject);
     procedure RelSinClick(Sender: TObject);
@@ -66,7 +68,7 @@ var
 implementation
 uses unRelFAC, unRelAR, CDFac, CDAR, Devolucoes, unFamila, unRelAnFAC, unRelAnAR, unExcel,
   CDDM, U_Frmdevcrtsnh, unRelAnFat, U_FrmRelTot, U_FrmCadUsuario, RelMotivos,
-  U_frmAcesso, uGeraArqDev, uGeraExcelDev;
+  U_frmAcesso, uGeraArqDev, uGeraExcelDev, U_FrmConfig;
 
 {$R *.dfm}
 
@@ -106,12 +108,13 @@ end;
 
 procedure TfrmMain.SairClick(Sender: TObject);
 begin
-  Close;
+  Application.Terminate;
 end;
 
 procedure TfrmMain.TimerMenuTimer(Sender: TObject);
 begin
-  StatusBar.Panels[2].Text  :=  FormatDateTime('dd/mm/yyyy',DM.dtatu)+' : '+TimeToStr(Time);
+  StatusBar.Panels[2].Text := FormatDateTime('dd/mm/yyyy', DM.dtatu) +
+      ' : ' + TimeToStr(Time);
 end;
 
 procedure TfrmMain.CorrespondenciasClick(Sender: TObject);
@@ -162,6 +165,14 @@ begin
   frmRelAnAR := TfrmRelAnAR.Create(Self);
   frmRelAnAR.ShowModal;
   frmRelAnAR.Free;
+end;
+
+procedure TfrmMain.BitBtnConfigClick(Sender: TObject);
+begin
+  frmConfig := TfrmConfig.Create(self);
+  frmConfig.ShowModal;
+  SetFocus;
+  frmConfig.Free;
 end;
 
 procedure TfrmMain.FAC3Click(Sender: TObject);

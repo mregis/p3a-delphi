@@ -101,7 +101,6 @@ var
   SdataList: TStringList;
   ano, ano_ant, mes, mes_ant, dia: word;
 begin
-  coluna_anterior := 0;
   sum_outros := 0;
   sum_info := 0;
   sum_cep_zerado := 0;
@@ -118,8 +117,6 @@ begin
   col_atual := 3;
   linha   :=  2;
   ZLINHA  :=  2;
-  subtot  :=0;
-  totger  :=0;
   totdia  :=0;
   pMSG.Caption := 'Aguarde ..... Gerando Planilhas ';
   pMSG.Refresh;
@@ -146,7 +143,6 @@ begin
     end;
 
     try
-      coluna_anterior   := 0;
       sum_outros        := 0;
       sum_info          := 0;
       sum_cep_zerado    := 0;
@@ -698,8 +694,6 @@ begin
         DecodeDate(datasql, ano, mes, dia);
         excel.columns.autofit;
 
-        ano_ant := ano;
-        mes_ant := mes;
         excel.cells[1, 1] := 'Data';
         sheet.cells[1, 1].font.bold := true;
         excel.cells[2, 1] := 'Familia';
@@ -711,7 +705,6 @@ begin
         datas2 := inttostr(dia) + '/' + format('%2.2d',[mes]) + '/' + inttostr(ano);
         qryDevolFat.Close;
         qryDevolFat.SQL.Clear;
-        datasql := trunc(strtodate(datas2));
         qryDevolFat.SQL.Add('SELECT   SUM(QTD_DEVOL) AS QTDE, MOTIVO, DT_DEVOLUCAO, FAMILIA ');
         qryDevolFat.SQL.Add('FROM( ');
         qryDevolFat.SQL.Add('  SELECT  ');
@@ -939,8 +932,6 @@ begin
         datasql := StrToDateTime(datas);
         DecodeDate(datasql, ano, mes, dia);
         excel.columns.autofit;
-        ano_ant := ano;
-        mes_ant := mes;
         excel.cells[1, 1] := 'Data';
         excel.cells[2, 1] := 'Familia';
         sheet.cells[2, 1].font.bold := true;
@@ -1136,9 +1127,7 @@ begin
       sheet.cells[col_atual2+1, 2].font.color := clred;
       sheet.cells[col_atual2+1, 2].font.bold  :=  true;
       excel.cells[col_atual2+1, 2]            := IntToStr(totger);
-      totger  :=  0;
       totdia  :=  0;
-      subtot  :=  0;
 { TARJA-FAC}
       coluna_anterior := 0;
       col_atual := 3;
@@ -1161,12 +1150,10 @@ begin
       for linha := 0 to qryDatasFAC.RecordCount - 1 do
       begin
         datas := copy(qryDatasFACdt_devolucao.AsString, 6, 2) + '/' +copy(qryDatasFACdt_devolucao.AsString, 9, 2) + '/' +  copy(qryDatasFACdt_devolucao.AsString, 1, 4);
-//        datasql := StrToDateTime(datas);
+        datasql := StrToDateTime(datas);
         DecodeDate(datasql, ano, mes, dia);
         excel.columns.autofit;
 
-        ano_ant := ano;
-        mes_ant := mes;
         excel.cells[1, 1] := 'Data';
         excel.cells[2, 1] := 'Familia';
         sheet.cells[2, 1].font.bold := true;
@@ -1175,7 +1162,6 @@ begin
         icount := 1;
         qryFamilia.First;
         datas2 :=  inttostr(ano)+ '/' +  inttostr(mes) + '/' + inttostr(dia);
-        datasql :=  StrToInt(inttostr(ano)+  inttostr(mes) + inttostr(dia));
         qryDevolFAC.Close;
         qryDevolFAC.SQL.Clear;
         qryDevolFAC.SQL.Add('SELECT  SUM(QTD_DEVOL) AS QTDE,  MOTIVO, DT_DEVOLUCAO,  FAMILIA  FROM(  SELECT ');
@@ -1363,9 +1349,7 @@ begin
       sheet.cells[col_atual2+1, 2].font.color := clred;
       sheet.cells[col_atual2+1, 2].font.bold  :=  true;
       excel.cells[col_atual2+1, 2]            := IntToStr(totger);
-      totger  :=  0;
       totdia  :=  0;
-      subtot  :=  0;
 
       excel.columns.AutoFit;
       EdArq.Text  :=  'F:\ibisis\RELATORIOS';

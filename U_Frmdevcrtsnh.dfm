@@ -17,23 +17,6 @@ object Frmdevcrtsnh: TFrmdevcrtsnh
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object Label6: TLabel
-    Left = 0
-    Top = 0
-    Width = 447
-    Height = 32
-    Align = alTop
-    Alignment = taCenter
-    Caption = 'Banco IBI'
-    Font.Charset = ANSI_CHARSET
-    Font.Color = clBlue
-    Font.Height = -27
-    Font.Name = 'Arial'
-    Font.Pitch = fpFixed
-    Font.Style = [fsBold]
-    ParentFont = False
-    ExplicitWidth = 128
-  end
   object Bevel1: TBevel
     Left = 4
     Top = 40
@@ -307,40 +290,28 @@ object Frmdevcrtsnh: TFrmdevcrtsnh
     OnKeyPress = EdcodKeyPress
   end
   object SqlAux: TZQuery
-    Connection = dbdevibicon
+    Connection = DM.CtrlDvlDBConn
     Params = <>
-    Left = 344
-    Top = 40
+    Left = 376
+    Top = 432
   end
   object DtSAux: TDataSource
-    Left = 312
-    Top = 40
-  end
-  object dbdevibicon: TZConnection
-    Protocol = 'postgresql-7.4'
-    HostName = '192.168.100.20'
-    Port = 5432
-    Database = 'dbdevibi'
-    User = 'valdires'
-    Password = 'valdir!50#'
-    ReadOnly = True
-    Connected = True
-    Left = 216
-    Top = 40
+    Left = 344
+    Top = 432
   end
   object dsMotivos: TDataSource
     DataSet = qraMotivo
-    Left = 248
-    Top = 40
+    Left = 280
+    Top = 432
   end
   object qraMotivo: TZReadOnlyQuery
-    Connection = dbdevibicon
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT * FROM cea_motivos_devolucoes'
       '')
     Params = <>
-    Left = 280
-    Top = 40
+    Left = 312
+    Top = 432
     object qraMotivoid: TIntegerField
       FieldName = 'id'
       Required = True

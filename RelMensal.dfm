@@ -19,7 +19,7 @@ object qrForm_RelMensal: TqrForm_RelMensal
     Top = 8
     Width = 794
     Height = 1123
-    DataSource = DtSRelMensal
+    DataSource = DM.DtSRelMensal
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13
@@ -115,7 +115,6 @@ object qrForm_RelMensal: TqrForm_RelMensal
           Top = 0
           Width = 70
           Height = 16
-          DataSource = DtSRelMensal
         end
         object RLLabel8: TRLLabel
           Left = 3
@@ -130,7 +129,6 @@ object qrForm_RelMensal: TqrForm_RelMensal
           Width = 68
           Height = 16
           DataField = 'ds_produto'
-          DataSource = DtSRelMensal
         end
         object RLLabel9: TRLLabel
           Left = 528
@@ -159,7 +157,6 @@ object qrForm_RelMensal: TqrForm_RelMensal
           Width = 68
           Height = 16
           DataField = 'cd_produto'
-          DataSource = DtSRelMensal
         end
         object RLDraw4: TRLDraw
           Left = 0
@@ -175,7 +172,6 @@ object qrForm_RelMensal: TqrForm_RelMensal
           Width = 29
           Height = 16
           DataField = 'total'
-          DataSource = DtSRelMensal
         end
       end
       object RLBand4: TRLBand
@@ -196,7 +192,6 @@ object qrForm_RelMensal: TqrForm_RelMensal
           Width = 68
           Height = 16
           DataField = 'total'
-          DataSource = DtSRelMensal
           DisplayMask = '#,##0.00'
           Info = riSum
         end
@@ -219,54 +214,10 @@ object qrForm_RelMensal: TqrForm_RelMensal
           Width = 68
           Height = 16
           DataField = 'total'
-          DataSource = DtSRelMensal
           DisplayMask = '#,##0.00'
           Info = riSum
         end
       end
-    end
-  end
-  object DtSRelMensal: TDataSource
-    DataSet = qraRelMensal
-    Left = 152
-    Top = 16
-  end
-  object qraRelMensal: TZQuery
-    Connection = DM.ADOConnection1
-    SQL.Strings = (
-      'select '
-      
-        '  m.ds_motivo, D.CD_PRODUTO, P.DS_PRODUTO, count(D.CD_PRODUTO)  ' +
-        'as Total'
-      
-        'from  cea_controle_devolucoes d, cea_org_descricao c, CEA_MOTIVO' +
-        'S_DEVOLUCOES m, CEA_PRODUTOS P'
-      'where (1=0)'
-      'group by m.ds_motivo, D.CD_PRODUTO, P.DS_PRODUTO'
-      'order by D.CD_PRODUTO, P.DS_PRODUTO, m.ds_motivo'
-      ''
-      '')
-    Params = <>
-    Left = 192
-    Top = 16
-    object qraRelMensalds_motivo: TStringField
-      FieldName = 'ds_motivo'
-      Required = True
-      Size = 40
-    end
-    object qraRelMensalcd_produto: TStringField
-      FieldName = 'cd_produto'
-      Required = True
-      Size = 6
-    end
-    object qraRelMensalds_produto: TStringField
-      FieldName = 'ds_produto'
-      Required = True
-      Size = 60
-    end
-    object qraRelMensaltotal: TLargeintField
-      FieldName = 'total'
-      ReadOnly = True
     end
   end
 end

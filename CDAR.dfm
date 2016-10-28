@@ -115,6 +115,7 @@ object frmAR: TfrmAR
       Top = 73
       Width = 257
       Height = 21
+      MaxLength = 6
       TabOrder = 1
       OnChange = eBinChange
     end
@@ -337,6 +338,7 @@ object frmAR: TfrmAR
     OnEnter = cbDT_DEVOLUCAOEnter
   end
   object qryFamilia: TZReadOnlyQuery
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT CODBIN FROM IBI_CADASTRO_FAMILIA '
       'WHERE '
@@ -348,8 +350,8 @@ object frmAR: TfrmAR
         Name = 'COD_BIN'
         ParamType = ptUnknown
       end>
-    Left = 176
-    Top = 416
+    Left = 40
+    Top = 400
     ParamData = <
       item
         DataType = ftUnknown
@@ -358,13 +360,15 @@ object frmAR: TfrmAR
       end>
   end
   object qraRelatorioTOT: TZReadOnlyQuery
+    Connection = DM.CtrlDvlDBConn
     Params = <>
-    Left = 216
-    Top = 416
+    Left = 112
+    Top = 400
   end
   object qraRelatorioQtde: TZReadOnlyQuery
+    Connection = DM.CtrlDvlDBConn
     Params = <>
-    Left = 256
-    Top = 416
+    Left = 200
+    Top = 400
   end
 end

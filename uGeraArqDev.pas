@@ -276,8 +276,7 @@ begin
 
     if statusbar <> nil then
      statusbar.Panels[0].Text := '';
-  except
-    on E: Exception do
+  except on E: Exception do
     begin
       Result := '';
       Application.MessageBox(PCHAR('Ocorreu um problema durante a geração do arquivo! Erro:'+E.Message), 'ERRO', MB_OK+MB_ICONERROR);
@@ -300,9 +299,9 @@ procedure TfGeraArqDev.lbldataClick(Sender: TObject);
 var
   xDiretorio : String;
 begin
+  SaveDialog.InitialDir := DM.currdir;
   SaveDialog.Execute;
   xDiretorio := ExtractFilePath(SaveDialog.FileName);
-
   ShowMessage(xDiretorio);
 end;
 

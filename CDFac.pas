@@ -54,19 +54,14 @@ type
     s, sLinha1, sLinha2, sLinha3, sCDMotivo: string;
     k, i: integer;
     F,FA: TextFile;
-    tarj : TextFile;
-    mDir,sDir, sDev,srel,arqausente: string;
+    sDir, srel, arqausente : string;
     ListaSLP: TStringList;
     sCartao,cSQL: string;
     ListaArq: TStringList;
     flqsalva,bAusente: Boolean;
     cFieldValue : Variant;
     cFieldName  : string;
-    //nomarq  :
-
     function GerarArquivo: boolean;
-    procedure EnviarArquivo;
-    procedure lerBIN;
   public
     { Public declarations }
   end;
@@ -88,7 +83,6 @@ begin
   DM.qData.Open;
   cbDT_DEVOLUCAO.Date := DM.qDatadata.AsDateTime;
   i := 1;
-  dm.SqlAux.Connection  :=  dm.CtrlDvlDBConn;
   dm.SqlAux.Close;
   dm.SqlAux.SQL.Clear;
   dm.SqlAux.SQL.Add('select current_date,localtime(0)');
@@ -147,7 +141,7 @@ end;
 
 procedure TfrmCartao.btnSalvarClick(Sender: TObject);
 var
-  iCod, iCont: integer;
+  iCont: integer;
   sMensagem: string;
 begin
   if lcCD_MOTIVO.KeyValue = null then
@@ -158,7 +152,6 @@ begin
   end;
   DM.qCodFac.Close;
   DM.qCodFac.Open;
-  iCod := DM.qCodFaccodigo.AsInteger;
   try
 
   DM.qFac.Close;
@@ -173,7 +166,7 @@ begin
       sMensagem := '';
       DM.qBuscaFAC.Close;
       DM.qBuscaFAC.ParamByName('cartao').Value := mmCartoes.Lines[icont];
-      DM.qBuscaFAC.ParamByName('data').Value := FormatDateTime('YYYYMMDD', trunc(cbDT_DEVOLUCAO.Date));
+      DM.qBuscaFAC.ParamByName('data').AsDate := cbDT_DEVOLUCAO.Date;
       DM.qBuscaFAC.Open;
 
       if DM.qBuscaFAC.IsEmpty then
@@ -182,26 +175,8 @@ begin
         DM.SqlAux.SQL.Clear;
         DM.SqlAux.SQL.Add('insert into ibi_controle_devolucoes_fac (nro_cartao,cd_motivo,codbin,codusu) values ');
         DM.SqlAux.SQL.Add('('+chr(39)+mmCartoes.Lines[icont]+chr(39)+','+chr(39)+lcCD_MOTIVO.KeyValue+chr(39)+','+chr(39)+mmCodBin.Lines[icont]+chr(39)+','+IntToStr(DM.usuaces)+ ')');
-//        InputBox('','',DM.SqlAux.SQL.Text);
-        //DM.SqlAux.SQL.Add('(:cod,:motivo,:bin)');
-        //DM.SqlAux.ParamByName('cod').AsString := mmCodigo.Items[icont];
-        //DM.SqlAux.ParamByName('motivo').AsString := lcCD_MOTIVO.KeyValue;
-        //DM.SqlAux.ParamByName('bin').AsString := lBin.Items[icont];
-//        DM.SqlAux.ParamByName('data').AsString := FormatDateTime('YYYYMMDD', DM.qDatadata.Value );
-//        DM.qARDT_DEVOLUCAO.AsDateTime := trunc(cbDT_DEVOLUCAO.Date);
-//        DM.qARDT_CADASTRO.AsDateTime := DM.qDatadata.AsDateTime;
         DM.SqlAux.ExecSQL;
 
-        {DM.qFac.Append;
-        DM.qFacID.AsInteger := iCod;
-        DM.qFacNRO_CARTAO.AsString := mmCartoes.Lines[icont];
-        DM.qFacCODBIN.AsString := mmCodBin.Lines[icont];
-        DM.qFacCD_MOTIVO.AsString := lcCD_MOTIVO.KeyValue;
-        DM.qFacDATA.AsString := FormatDateTime('YYYYMMDD', DM.qDatadata.AsDateTime);
-        DM.qFacDT_DEVOLUCAO.AsDateTime := trunc(cbDT_DEVOLUCAO.Date);
-        DM.qFacDT_CADASTRO.AsDateTime := DM.qDatadata.AsDateTime;
-        DM.qFac.Post;
-        inc(iCod);}
       end
       else
       begin
@@ -237,7 +212,6 @@ end;
 
 procedure TfrmCartao.cbDT_DEVOLUCAOEnter(Sender: TObject);
 begin
-  dm.SqlAux.Connection  :=  dm.CtrlDvlDBConn;
   dm.SqlAux.Close;
   dm.SqlAux.SQL.Clear;
   dm.SqlAux.SQL.Add('select current_date');
@@ -256,7 +230,7 @@ begin
 end;
 Procedure TfrmCartao.montarel;
 var
-  nPos, nFieldSize,iObjetos: Integer;
+  nPos : Integer;
 
 begin
 //  bCopia := False;
@@ -305,20 +279,12 @@ begin
   end;
 
   try
-    sRel := dm.unidade+ 'RELATORIOS\';;
-//    cArq := cArq
-    //cArq := cArq + FormatDateTime('YYYYMMDD', now)+ '\' ;
+    sRel := dm.relatdir;
 
     if not DirectoryExists(sRel) then
        CreateDirectory(PAnsiChar(srel),nil);
 
     sRel := sRel + 'IBI_REL_'+FormatDateTime('ddmmyyyy',DM.qDatadata.AsDateTime)+FormatDateTime('hhmmss',Time) +'.txt';
-//    cArq := cArq + StrTran(DateToStr(cbDT_INICIAL.Date), '/', '_');
-//    cArq := cArq + '_A_';
-//    cArq := cArq + StrTran(DateToStr(cbDT_FINAL.Date), '/', '_');
-//    cArq := cArq + 'CEA_REL_'+FormatDateTime('ddmmyyyy',cbDT_FINAL.Date);
-//    sRel := sRel + '.TXT';
-
     AssignFile(F, sRel);
     ReWrite(F);
 
@@ -340,7 +306,6 @@ begin
       begin
         cFieldValue := FacRelQtde.FieldByName(FacRelQtde.Fields[nPos].FieldName).AsString;
         cFieldName := FacRelQtde.Fields[nPos].FieldName;
-        nFieldSize := FacRelQtde.Fields[nPos].Size;
 
         if UpperCase(cFieldName) = 'CD_MOTIVO' then
           S := S + Format('%2.2d',[StrToInt(cFieldValue)]) + Format('%-5.5s%',[''])
@@ -376,32 +341,18 @@ begin
   end;
   CloseFile(F);
 
-  if FacRelQtde.RecordCount > 0 then
-    //bCopia:= CopyFile(pchar(cArq),pchar('\\192.168.11.10\CEA_ret\'+ExtractFileName(cArq)),false);
-
-//  if not bCopia  then
-//  begin
-    //sMensagem := 'Não foi possível copiar o(s) arquivo(s): ' + ExtractFileName(cArq);
-    //Application.MessageBox(pchar(sMensagem),'Aviso',MB_OK+MB_ICONERROR+MB_SYSTEMMODAL)
-//  end;
-
-//  pMsg.Caption := 'Total de Objetos: ' + IntToStr(iObjetos);
-//  pMsg.Refresh;
 end;
 
 procedure TfrmCartao.btnArquivoClick(Sender: TObject);
 begin
   DM.qArqFac.Close;
-  DM.qArqFac.Params[0].AsString  := FormatDateTime('mm/dd/yyyy',trunc(cbDT_DEVOLUCAO.Date));
-  DM.qArqFac.Params[1].AsString  := FormatDateTime('mm/dd/yyyy',trunc(cbDT_DEVOLUCAO.Date));
-//  DM.qArqFac.ParamByName('dt_devolucao').AsString := FormatDateTime('mm/dd/yyyy',cbDT_DEVOLUCAO.Date);
+  DM.qArqFac.ParamByName('dt1').AsDate := cbDT_DEVOLUCAO.Date;
+  DM.qArqFac.ParamByName('dt2').AsDate := cbDT_DEVOLUCAO.Date;
   DM.qArqFac.Open;
-
   if not DM.qArqFac.IsEmpty then
   begin
     if GerarArquivo then
     begin
-      //EnviarArquivo;
       montarel;
       Application.MessageBox('Arquivo gerado com sucesso.', 'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
     end;
@@ -419,33 +370,15 @@ begin
   Result := True;
   ListaArq := TStringList.Create;
   ListaSLP := TStringList.Create;
-  sDir  :=  'F:\ibisis\retorno\';
-  if (not(DirectoryExists(SDir))) then
-    MkDir(sDir);
-//  sDir  :=  sDir+'\cartao';
- // if (not(DirectoryExists(sDir))) then
-  //  MkDir(sDir);
+  sDir  :=  DM.retdir;
 
-//  sDir := ExtractFilePath(Application.ExeName) +  mDir
-  // '\Dev';
- // sDev := + '\'+FormatDateTime('YYYYMMDD', cbDT_DEVOLUCAO.Date);
+  Edarq.Text := sDir + 'ADDRESS2ACC.CARTAO.IBI.FAC.' + FormatDateTime('DDMMYYYY.hhnnss', dm.dtatu) + '.TMP';
+  arqausente := sDir + 'ADDRESS2ACC.CARTAOA.USR.IBI.FAC.' + FormatDateTime('DDMMYYYY.hhnnss', dm.dtatu) + '.TMP';
+  sRel := DM.relatdir + 'ADDRESS2ACC.CARTAO.IBI.FAC.' + FormatDateTime('DDMMYYYY', cbDT_DEVOLUCAO.Date)+ '.SLP';
+  AssignFile(FA, arqausente);
+  Rewrite(FA);
 
- // sDir := sDir + sDev;
-  //try
-  //  if not DirectoryExists(sDir) then
-  //  begin
-  //    CreateDirectory(PAnsiChar(sDir), nil);
-  //  end;
-//    sDir  :=   sDir+'\TARJ' + FormatDateTime('DDMMYYYY', cbDT_DEVOLUCAO.Date);// + '.TXT';
-    Edarq.Text  :=  sDir+'ADDRESS2ACC.CARTAO.IBI.FAC.' + FormatDateTime('DDMMYYYY.', dm.dtatu) + FormatDateTime('hhmmss',Time) +'.TMP';
-    arqausente  :=  sDir+'ADDRESS2ACC.CARTAOA.USR.IBI.FAC.' + FormatDateTime('DDMMYYYY.', dm.dtatu) + FormatDateTime('hhmmss',Time) +'.TMP';
-    sRel  :=  DM.unidade+'ibisis\RELATORIOS\ADDRESS2ACC.CARTAO.IBI.FAC.'+FormatDateTime('DDMMYYYY', cbDT_DEVOLUCAO.Date)+ '.SLP';
-    AssignFile(FA, arqausente);
-    Rewrite(FA);
-
-//    if Not(FileExists(sDir)) then
-//      MkDir(Edarq.Text);
-    AssignFile(F,Edarq.Text);
+  AssignFile(F,Edarq.Text);
     Rewrite(F);
     DM.qArqFac.First;
     sCartao := '';
@@ -459,7 +392,7 @@ begin
       DM.ZqAusFac.Close;
  //     DM.qAusente.Parameters.ParamByName('data').Value := FormatDateTime('YYYYMMDD', trunc(cbDT_DEVOLUCAO.Date));
 //      DM.qAusente.Parameters.ParamByName('cd_motivo').Value := DM.qParamCD_MOTIVO.AsString;
-      DM.ZqAusFac.ParamByName('data').AsString := FormatDateTime('YYYYMMDD', trunc(cbDT_DEVOLUCAO.Date));
+      DM.ZqAusFac.ParamByName('data').AsDate := cbDT_DEVOLUCAO.Date;
       DM.ZqAusFac.ParamByName('cd_motivo').AsString := DM.qParamCD_MOTIVO.AsString;
       DM.ZqAusFac.Open;
 
@@ -533,7 +466,7 @@ begin
     ListaSLP.Add(sCartao);
     ListaSLP.Add(StringOfChar('-', 88));
     ListaSLP.Add(format('%-10.10s%',['© ' + FormatDateTime('YYYY', DM.qdatadata.AsDateTime)])
-    +   format('%-57.57s%',['ADDRESS SA'])+ FormatDateTime('DD/MM/YYYY',DM.qDatadata.AsDateTime)+ ' - '+dm.hratu);
+    +   format('%-57.57s%',['ADDRESS SA'])+ FormatDateTime('DD/MM/YYYY - hh:nn:ss',DM.qDatadata.AsDateTime));
 //    +   format('%-56.56s%',['ADDRESS SA'])+ FormatDateTime('DD/MM/YYYY',DM.qDatadata.AsDateTime)+ ' - HH:MM:SS',dm.hratu));
 
 //    ListaSLP.Add('© ' + FormatDateTime('YYYY', DM.qdatadata.AsDateTime) + format('%-20.20s%',['ADDRESS SA'])+FormatDateTime('DD/MM/YYYY', DM.qDatadata.AsDateTime)+' - '+ dm.hratu);
@@ -570,50 +503,6 @@ begin
     if Application.MessageBox('Existe devolução não salva. As informações serão perdidas. Deseja continuar?', 'Aviso', MB_YESNO + MB_ICONWARNING + MB_SYSTEMMODAL) = id_no then
       CanClose := False;
   end;
-end;
-
-procedure TfrmCartao.EnviarArquivo;
-var
-  j: integer;
-  sDir, sDev, sMensagem: string;
-  bCopia: boolean;
-  Lista: TStringList;
-begin
-  Lista := TStringList.Create;
-  sDir := 'F:\ibisis\retorno\dev';
-  if Not(DirectoryExists(sDir))   then
-    MkDir(sDir);
-  sDir  :=  sDir+'\cartao';
-  if Not(DirectoryExists(sDir))   then
-    MkDir(sDir );
-  sDev := sDev+'\ADDRESS2ACC.CARTAO.IBI.'+FormatDateTime('yymmdddd.', cbDT_DEVOLUCAO.Date) + FormatDateTime('hhmmss',Time)+'.TMP';
-
-  //sDir := sDir + sDev;
-{  for j := 0 to ListaArq.Count - 1 do
-  begin
-    if FileExists('F:\ibisis\cartoes\' + ListaArq[j]) then
-      DeleteFile('F:\ibisis\cartoes\' + ListaArq[j]);
-    bCopia := CopyFile(pchar(sdir + ListaArq[j]), pchar('F:\ibisis\cartoes\' + ListaArq[j]), false);
-    bCopia := CopyFile(pchar(sdir + ListaArq[j]), pchar(ListaArq[j]), false);
-    if not bCopia then
-      Lista.Add(ListaArq[j]);
-  end;}
-
-  {if Lista.Count > 0 then
-  begin
-    sMensagem := 'Não foi possível copiar o(s) arquivo(s):';
-    for j := 0 to Lista.Count - 1 do
-      sMensagem := sMensagem + '#10#13' + Lista[j];
-    Application.MessageBox(pchar(sMensagem), 'Aviso', MB_OK + MB_ICONERROR + MB_SYSTEMMODAL)
-  end;
-  Lista.Free;
-  ListaArq.Free;}
-end;
-
-procedure TfrmCartao.lerBIN;
-begin
-  edtBIN.SetFocus;
-
 end;
 
 procedure TfrmCartao.edtBINChange(Sender: TObject);

@@ -9,10 +9,8 @@ uses
 
 type
   TFrmdevcrtsnh = class(TForm)
-    Label6: TLabel;
     SqlAux: TZQuery;
     DtSAux: TDataSource;
-    dbdevibicon: TZConnection;
     dsMotivos: TDataSource;
     qraMotivo: TZReadOnlyQuery;
     qraMotivoid: TIntegerField;
@@ -57,7 +55,7 @@ var
 
 implementation
 
-uses Main, U_Func;
+uses Main, U_Func, CDDM;
 
 {$R *.dfm}
 
@@ -105,7 +103,6 @@ end;
 
 procedure TFrmdevcrtsnh.FormCreate(Sender: TObject);
 begin
-  dbdevibicon.Connected :=  true;
   self.qraMotivo.Open;
 end;
 

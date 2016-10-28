@@ -215,7 +215,7 @@ object frmRelAnFAT: TfrmRelAnFAT
     TabOrder = 4
   end
   object qryRelFAT: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'select '
       

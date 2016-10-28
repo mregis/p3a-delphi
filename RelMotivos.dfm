@@ -234,7 +234,7 @@ object qrForm_RelMotivos: TqrForm_RelMotivos
     end
   end
   object qraMotivosTot: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT D.CD_MOTIVO, M.DS_MOTIVO, count(*)  as Total '
       'FROM CEA_CONTROLE_DEVOLUCOES_TEMP D, CEA_MOTIVOS_DEVOLUCOES M'
@@ -246,7 +246,6 @@ object qrForm_RelMotivos: TqrForm_RelMotivos
     Top = 8
   end
   object DtsMotivosTot: TDataSource
-    DataSet = DevolucoesFrm.qraMotivo
     Left = 184
     Top = 8
   end

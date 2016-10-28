@@ -386,7 +386,6 @@ object frmRelFAC: TfrmRelFAC
     TabOrder = 4
   end
   object qryTotaisFAC: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT  '
       #9'FM.FAMILIA,'
@@ -448,7 +447,6 @@ object frmRelFAC: TfrmRelFAC
     end
   end
   object qryFamilaFAC: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT  '
       'distinct'#9'FM.FAMILIA'
@@ -497,7 +495,6 @@ object frmRelFAC: TfrmRelFAC
     end
   end
   object ADOQuery1: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -566,7 +563,6 @@ object frmRelFAC: TfrmRelFAC
     end
   end
   object qryResumo: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT'
       'SUM(QTD_DEVOL) AS QTDE,'
@@ -612,7 +608,6 @@ object frmRelFAC: TfrmRelFAC
     end
   end
   object qryDevolFAC: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -681,7 +676,6 @@ object frmRelFAC: TfrmRelFAC
     end
   end
   object qryFamilia: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'select distinct familia from ibi_cadastro_familia'
       'ORDER BY FAMILIA'
@@ -696,7 +690,6 @@ object frmRelFAC: TfrmRelFAC
     end
   end
   object qryDatas: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       
         'select distinct CAST(dt_devolucao AS VARCHAR(10)) as dt_devoluca' +
@@ -714,7 +707,6 @@ object frmRelFAC: TfrmRelFAC
     end
   end
   object qryTotais: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
     SQL.Strings = (
       'SELECT'
       '   SUM(QTD_DEVOL) AS QTDE,'

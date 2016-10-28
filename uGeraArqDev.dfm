@@ -149,15 +149,16 @@ object fGeraArqDev: TfGeraArqDev
       end>
   end
   object TB_AUX: TZQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     Params = <>
-    Left = 176
+    Left = 32
+    Top = 16
   end
   object SaveDialog: TSaveDialog
     DefaultExt = '.TMP'
     FileName = 'arquivos_ibis'
     Title = 'Salvar arquivos'
-    Left = 224
-    Top = 8
+    Left = 88
+    Top = 16
   end
 end

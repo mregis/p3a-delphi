@@ -50,23 +50,19 @@ var
   dt_ini_edt, dt_ini, dt_fim_edt, dt_fim: string;
   rel: TextFile;
   sRel, sArq: string;
-  contador: integer;
   totalgeral, subtotal: integer;
-  tipo_prod_atual, tipo_prod_ant: string;
+  tipo_prod_ant : string;
 begin
 
-  sArq := 'F:\ibisis\Relatorios\RelatorioAnaliticoFAC_' + FormatDateTime('DD_MM_YYYY', DTPinicial.DateTime) + '_A_' + FormatDateTime('DD_MM_YYYY', DTPFinal.DateTime) + '.TXT';
+  sArq := DM.relatdir + 'RelatorioAnaliticoFAC_' + FormatDateTime('DD_MM_YYYY', DTPinicial.DateTime) + '_A_' + FormatDateTime('DD_MM_YYYY', DTPFinal.DateTime) + '.TXT';
   dt_ini := FormatDateTime('YYYY-MM-DD', DTPinicial.Date);
   dt_fim := FormatDateTime('YYYY-MM-DD', DTPFinal.Date);
   dt_ini_edt := FormatDateTime('DD/MM/YYYY', DTPinicial.DateTime);
   dt_fim_edt := FormatDateTime('DD/MM/YYYY', DTPFinal.DateTime);
 
   qryRel.Close;
-
-//  qryRel.Parameters.ParamByName('DT_INI').Value := dt_ini;
-//  qryRel.Parameters.ParamByName('DT_FIM').Value := dt_fim;
-  qryRel.Params[0].AsString  :=  FormatDateTime('mm/dd/yyyy/',DTPinicial.Date);//Trunc(DTPinicial.DateTime);
-  qryRel.Params[1].AsString  :=  FormatDateTime('mm/dd/yyyy/',DTPFinal.Date);//Trunc(DTPFinal.DateTime);
+  qryRel.ParamByName('DT_INI').AsDate := DTPinicial.Date;
+  qryRel.ParamByName('DT_FIM').AsDate := DTPFinal.Date;
   qryRel.Open;
 
   qryRel.First;
@@ -74,7 +70,6 @@ begin
     0:  ShowMessage('Sem Registros para Relatório');
     else
       begin
-        contador := 0;
         subtotal := 0;
         totalgeral := 0;
         AssignFile(rel, sArq);
@@ -89,8 +84,6 @@ begin
         Writeln(rel, format('%-72.72s%',[StringOfChar('_',72)]));
         Writeln(Rel, format('%-32.32s%',['Tipo Prod'])+format('%-5.5s%',['QTDE'])+format('%-28.28s%',['Motivo'])+ format('%-7.7s%',['Cod Mot']));
         Writeln(Rel, format('%-72.72s%',[StringOfChar('_',72)]));
-
-        //ShowMessage('REL');
 
         qryRel.First;
         tipo_prod_ant := qryRelFAMILIA.AsString;
@@ -118,12 +111,8 @@ begin
             sRel := sRel+format('%-33.33s%',[UpperCase(qryRelDS_MOTIVO.AsString)]);
             sRel := sRel+format('%2.2d',[StrToInt(UpperCase(qryRelCD_MOTIVO.AsString))]);
             Writeln(Rel, sRel);
-            inc(contador);
             totalgeral := totalgeral + qryRelQTD_REG.AsInteger;
             subtotal := subtotal + qryRelQTD_REG.AsInteger;
-//            tipo_prod_ant := qryRelFAMILIA.AsString;
-//            qryRel.Next;
-//            tipo_prod_atual := qryRelFAMILIA.AsString;
           end
           else
           begin
@@ -137,8 +126,6 @@ begin
             sRel := sRel+format('%-33.33s%',[UpperCase(qryRelDS_MOTIVO.AsString)]);
             sRel := sRel+format('%2.2d',[StrToInt(UpperCase(qryRelCD_MOTIVO.AsString))]);
             Writeln(Rel, sRel);
-//            Writeln(Rel, sRel);
-            inc(contador);
             totalgeral := totalgeral + qryRelQTD_REG.AsInteger;
             subtotal := qryRelQTD_REG.AsInteger + subtotal;
             tipo_prod_ant := qryRelFAMILIA.AsString;

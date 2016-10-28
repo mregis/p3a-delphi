@@ -31,7 +31,6 @@ type
     qryTotais: TZReadOnlyQuery;
     qryDevolAR: TZReadOnlyQuery;
     qryResumo: TZReadOnlyQuery;
-    qryFamilia: TZReadOnlyQuery;
     qryDatas: TZReadOnlyQuery;
     qryDatasCour: TZReadOnlyQuery;
     qryTotaisCorrierfamilia: TStringField;
@@ -76,8 +75,9 @@ type
     qryDevolARfamilia: TStringField;
     qryDatasCourdt_devolucao: TStringField;
     qryDatasdt_devolucao: TStringField;
-    qryFamiliafamilia: TStringField;
     qryDatasREMdt_devolucao: TStringField;
+    qryFamilia: TZReadOnlyQuery;
+    qryFamiliafamilia: TStringField;
     procedure BtnSairClick(Sender: TObject);
     procedure BtnImprimeClick(Sender: TObject);
     procedure SBtRelClick(Sender: TObject);
@@ -94,13 +94,11 @@ var
   frmRelAr: TfrmRelAr;
 
 implementation
-
+uses unexcel, CDDM;
 {$R *.dfm}
-uses CDDM,unexcel ;
 
 procedure TfrmRelAr.BtnSairClick(Sender: TObject);
 begin
-//  Application.Terminate;
   close;
 end;
 
@@ -111,8 +109,7 @@ begin
   ilinha := 1;
 
   qryDevolAR.Close;
-  qryDevolAR.Params.ParamByName('DT_DEVOL').AsDate   := cbDT_DEVOLUCAO.Date; //trunc(cbDT_DEVOLUCAO.Date);
-//  qryDevolAR.ParamByName('DT_DEVOL').Value := trunc(cbDT_DEVOLUCAO.Date);
+  qryDevolAR.Params.ParamByName('DT_DEVOL').AsDate   := cbDT_DEVOLUCAO.Date;
   qryDevolAR.Open;
   qryDevolAR.First;
   StringGrid1.ColWidths[0] := 100;
@@ -164,10 +161,8 @@ end;
 procedure TfrmRelAr.SBtRelClick(Sender: TObject);
 begin
   DM.qArqAR.Close;
-//  DM.qArqAR.ParamByName('dt_devolucao').AsDate  := cbDT_DEVOLUCAO.Date ;//trunc(cbDT_DEVOLUCAO.Date);
   DM.qArqAR.Params[0].AsDate  := trunc(cbDT_DEVOLUCAO.Date);
   DM.qArqAR.Params[1].AsDate  := trunc(cbDT_DEVOLUCAO.Date);
-//  inputbox('','',DM.qArqAR.SQL.Text);
   DM.qArqAR.Open;
 
   if not DM.qArqAR.IsEmpty then
@@ -182,7 +177,6 @@ end;
 
 function TfrmRelAr.GerarArquivo: boolean;
 var
-  F, A: TextFile;
   s, sAusente, sDir: string;
   bAusente: Boolean;
   ListaSLP: TStringList;
@@ -192,10 +186,7 @@ begin
 
   Result := True;
   ListaSLP := TStringList.Create;
-  sDir := 'F:\ibisis' ;
-  if (Not DirectoryExists(sDir))  then
-    MkDir(sDir);
-  sDir  :=  sDir  + '\RELATORIOS';
+  sDir  :=  DM.currdir  + '\RELATORIOS';
   if (Not DirectoryExists(sDir))  then
     MkDir(sDir);
   try
@@ -203,16 +194,6 @@ begin
     DM.qParam.Open;
 
     bAusente := False;
-    {if DM.qParamAUSENTE.AsString = 'S' then
-    begin
-      DM.qAusente.Close;
-      DM.qAusente.ParamByName('data').Value       := FormatDateTime('YYYYMMDD', trunc(cbDT_DEVOLUCAO.Date));
-      DM.qAusente.ParamByName('cd_motivo').Value  := DM.qParamCD_MOTIVO.AsString;
-      DM.qAusente.Open;
-
-      if not DM.qAusente.IsEmpty then
-        bAusente := True;
-    end;}
 
     ListaSLP.Add(StringOfChar('-', 108));
     ListaSLP.Add('                       Devolução IBI - ARs                      ');

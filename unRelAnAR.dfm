@@ -215,7 +215,7 @@ object frmRelAnAR: TfrmRelAnAR
     NumGlyphs = 2
   end
   object qryRelRE: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'select '
       
@@ -248,7 +248,7 @@ object frmRelAnAR: TfrmRelAnAR
         Name = 'DT_FIM'
         ParamType = ptUnknown
       end>
-    Left = 160
+    Left = 136
     Top = 120
     ParamData = <
       item
@@ -282,7 +282,7 @@ object frmRelAnAR: TfrmRelAnAR
     end
   end
   object qryRelCourier: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'select '
       

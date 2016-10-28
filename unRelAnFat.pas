@@ -25,12 +25,11 @@ type
     procedure btnProcClick(Sender: TObject);
     procedure BtnsairClick(Sender: TObject);
   private
-  dt_ini_edt, dt_ini, dt_fim_edt, dt_fim: string;
   rel: TextFile;
   sRel, sArq: string;
   contador: integer;
   totalgeral, subtotal: integer;
-  tipo_prod_atual, tipo_prod_ant: string;
+  tipo_prod_ant: string;
 
     { Private declarations }
   public
@@ -48,22 +47,12 @@ uses Main, CDDM;
 
 procedure TfrmRelAnFAT.btnProcClick(Sender: TObject);
 begin
-  sArq := 'F:\ibisis\RELATORIOS';
-  if (NOT(DirectoryExists(sArq))) then
-    MkDir(sArq);
-  sArq  :=  sArq+'\RelatorioAnaliticoFAT_' + FormatDateTime('DD_MM_YYYY', DTPinicial.DateTime) + '_A_' + FormatDateTime('DD_MM_YYYY', DTPFinal.DateTime) + '.TXT';
+  sArq := DM.relatdir;
+  sArq  :=  sArq + 'RelatorioAnaliticoFAT_' + FormatDateTime('DD_MM_YYYY', DTPinicial.DateTime) + '_A_' + FormatDateTime('DD_MM_YYYY', DTPFinal.DateTime) + '.TXT';
   qryRelFAT.Close;
-  qryRelFAT.Params[0].AsString  :=  FormatDateTime('mm/dd/yyyy/',DTPinicial.Date);
-  //  '06/01/2012' ;
-  qryRelFAT.Params[1].AsString  :=  FormatDateTime('mm/dd/yyyy/',DTPFinal.Date); //'06/25/2012';
+  qryRelFAT.ParamByName('DT_INI').AsDate := DTPinicial.Date;
+  qryRelFAT.ParamByName('DT_FIM').AsDate := DTPFinal.Date;
 
-//  qryRelFAT.Parameters.ParamByName('DT_INI').Value := dt_ini;
-//  qryRelFAT.Parameters.ParamByName('DT_FIM').Value := dt_fim;
-//  qryRelFAT.Params[0].Value :=  Trunc(DTPinicial.Date);
-//  qryRelFAT.Params[1].Value :=  Trunc(DTPFinal.Date);
-  //qryRelFAT.ParamByName('DT_INI').Value :=  Trunc(DTPinicial.DateTime);
-//  qryRelFAT.ParamByName('DT_FIM').Value :=  Trunc(DTPFinal.DateTime);
-  //inputbox('','',qryRelFAT.SQL.Text);
   qryRelFAT.Open;
 
   qryRelFAT.First;
@@ -173,10 +162,8 @@ end;
 
 procedure TfrmRelAnFAT.FormCreate(Sender: TObject);
 begin
-
   DTPinicial.Date := Now - 30;
   DTPFinal.Date := now;
-
 end;
 
 end.

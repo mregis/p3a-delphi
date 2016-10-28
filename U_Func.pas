@@ -34,7 +34,6 @@ Function Decodificar(Armazena: string; Chave:Integer):string;
 function encryptstr(const InString:string; StartKey,MultKey,AddKey:Integer): string;
 function decryptstr(const InString:string; StartKey,MultKey,AddKey:Integer): string;
 Function GeraCodigo(numero:string;tipo:integer):string;
-Function procarqconf(conf:string):String;
 Function CriaDirRelGera():string;
 Function VerificaDigito11(Valor: String; Base: Integer = 11; Resto: boolean = false) :String;
 Function VerificaValidade_Codigo(verifica: String) :String;
@@ -116,10 +115,9 @@ var
   campo3 : array[1..3,1..43] of integer;
   campo4 : array[1..3,1..10] of integer;
   i,peso : integer;
-  aux1,aux2,numerox: string;
+  numerox: string;
   multiplica : integer;
   resultadox : integer;
-  divide : double;
 begin
   case tipo of
     0:
@@ -176,7 +174,6 @@ begin
          begin
            multiplica := multiplica + campo1[3,i];
          end;
-        divide := StrToFloat(inttostr(multiplica));
         resultadox := multiplica mod 10;
         resultadox := 10 - resultadox;
         if resultadox = 10 then
@@ -207,7 +204,6 @@ begin
           begin
             multiplica := multiplica + campo2[3,i];
           end;
-        divide := StrToFloat(inttostr(multiplica));
         resultadox := multiplica mod 10;
         resultadox := 10 - resultadox;
         if resultadox = 10 then
@@ -238,9 +234,7 @@ begin
           begin
             multiplica := multiplica + campo4[3,i];
           end;
-        divide := StrToFloat(inttostr(multiplica));
-        //resultadox := multiplica mod 10;
-//        resultadox := 10 - resultadox;
+
         resultadox := 10 - (multiplica mod 10);
         if resultadox = 10 then
           resultadox := 0;
@@ -253,7 +247,6 @@ begin
           begin
             campo3[1,i] := strtoint(copy(numero,i,1));
             campo3[2,i] := peso;
-            multiplica := multiplica + campo3[1,i] * campo3[2,i];
             if peso = 2 then
               peso := 9
             else
@@ -265,7 +258,6 @@ begin
            campo3[3,i] := campo3[1,i] * campo3[2,i];
            multiplica := multiplica + campo3[3,i];
          end;
-        divide := StrToFloat(inttostr(multiplica));
         resultadox := multiplica mod 11;
         resultadox := 11 - resultadox;
         if (resultadox <= 1) or (resultadox > 9)then
@@ -704,77 +696,20 @@ Begin
       Digito := 0;
     Result := IntToStr(Digito);
  End;
-function procarqconf(conf:string):String;
-var
- configura : TStringList;
- indice,i  : integer;
- teste     : string;
-begin
-  indice :=0;
-  configura := TStringList.Create;
-  {$IFNDEF LINUX}
-    begin
-      try configura.LoadFromFile(Dm.currdir+'\ibisis.conf');
-      except on e:exception do
-        begin
-          Application.CreateForm(TFrmCadHost,FrmCadHost);
-          FrmCadHost.ShowModal;
-          configura.LoadFromFile(Dm.currdir+'\ibisis.conf');
-        end;
-      end;
-    end;
-  {$Else}
-    begin
-      try configura.LoadFromFile(DM.currdir);
-      except on e:exception do
-        begin
-          Application.CreateForm(TFrmCadHost,FrmCadHost);
-          FrmCadHost.ShowModal;
-          configura.LoadFromFile(DM.currdir+'/ibisis.conf');
-        end;
-      end;
-    end;
-  {$EndIf}
-  for i := 1 to configura.count - 1 do
-    begin
-      teste := AnsiUpperCase (copy(configura.Strings[i],1,length(conf)));
-      if AnsiUpperCase(conf) = teste then
-        begin
-          indice := i;
-        end;
-     end;
-   result := configura.Strings[indice];
-end;
 
-Function CriaDirRelGera():string;
+ Function CriaDirRelGera():string;
 var
   nomearquivo : string;
 begin
-  {$IFNDEF LINUX}
-    nomearquivo := DM.unidade + 'ibisis\relatorios\';
-  {$Else}
-    nomearquivo := DM.unidade + 'ibisis/relatorios/';
-  {$EndIf}
+    nomearquivo := GetCurrentDir + '\Relatorios\Geracao';
      If not DirectoryExists(nomearquivo) then
        begin
-         MkDir(nomearquivo);
-         Application.MessageBox(PChar('O Sistema criou a pasta '+nomearquivo+' esta é uma pasta de sistema e não pode ser deletada!!!'),'Criação de Pasta');
+         ForceDirectories(nomearquivo);
+         Application.MessageBox(PChar('O Sistema criou a pasta ' + nomearquivo +
+              ' esta é uma pasta de sistema e não pode ser excluída!'),
+            'Criação de Pasta');
        end;
-  {$IFNDEF LINUX}
-    nomearquivo := nomearquivo + 'ibisis\relatorios\geracao';
-  {$Else}
-    nomearquivo := nomearquivo + 'ibisis/relatorios/geracao';
-  {$EndIf}
-     If not DirectoryExists(nomearquivo) then
-       begin
-         MkDir(nomearquivo);
-         Application.MessageBox(PChar('O Sistema criou a pasta '+nomearquivo+' esta é uma pasta de sistema e não pode ser deletada!!!'),'Criação de Pasta');
-       end;
-  {$IFNDEF LINUX}
-    nomearquivo := nomearquivo+'\' ;
-  {$Else}
-    nomearquivo := nomearquivo+'/';
-  {$endIF}
+
    result := nomearquivo;
 end;
 
@@ -909,7 +844,7 @@ end;
 Function vernum(Str: string):boolean;
 Const Num = '0123456789';
 Var
-  X,digito,resto: Integer;
+  X : Integer;
   Aux : String;
   flag:boolean;
 Begin
@@ -1131,20 +1066,21 @@ begin
 
     // Column widths
     for i := 0 to FDataSet.FieldCount - 1 do
-    begin
-      wWidth := (FDataSet.Fields[i].DisplayWidth + 1) * 256;
-      if FDataSet.FieldDefs[i].DataType = ftDateTime then
-        inc(wWidth, 2000);
-      if FDataSet.FieldDefs[i].DataType = ftDate then
-        inc(wWidth, 1050);
-      if FDataSet.FieldDefs[i].DataType = ftTime then
-        inc(wWidth, 100);
-      WriteToken(XL_COLWIDTH, 4);
-      iColNum := i;
-      BlockWrite(FDataFile, iColNum, 1);
-      BlockWrite(FDataFile, iColNum, 1);
-      BlockWrite(FDataFile, wWidth, 2);
-    end;
+      begin
+        wWidth := (FDataSet.Fields[i].DisplayWidth + 1) * 256;
+        if FDataSet.FieldDefs[i].DataType = ftDateTime then
+          inc(wWidth, 2000);
+        if FDataSet.FieldDefs[i].DataType = ftDate then
+          inc(wWidth, 1050);
+        if FDataSet.FieldDefs[i].DataType = ftTime then
+          inc(wWidth, 100);
+
+        WriteToken(XL_COLWIDTH, 4);
+        iColNum := i;
+        BlockWrite(FDataFile, iColNum, 1);
+        BlockWrite(FDataFile, iColNum, 1);
+        BlockWrite(FDataFile, wWidth, 2);
+      end;
 
     // Column Formats
     WriteFormat('Text');
@@ -1167,6 +1103,7 @@ begin
     // Column Headers
     if (trim(fcab) <> '') then
       begin
+        i := FDataSet.FieldCount - 1;
         sStrData := Fcab;
         iDataLen := length(sStrData);
         WriteToken(XL_STRING, iDataLen + 8);
@@ -1180,113 +1117,90 @@ begin
         aAttributes[2] := 0;
         inc(FRow);
       end;
+
     for i := 0 to FDataSet.FieldCount - 1 do
-    begin
-      sStrData := FDataSet.Fields[i].DisplayName;
-      iDataLen := length(sStrData);
-      WriteToken(XL_STRING, iDataLen + 8);
-      WriteToken(FRow, i);
-      aAttributes[1] := XL_HEADBOLD;
+      begin
+        sStrData := FDataSet.Fields[i].DisplayName;
+        iDataLen := length(sStrData);
+        WriteToken(XL_STRING, iDataLen + 8);
+        WriteToken(FRow, i);
+        aAttributes[1] := XL_HEADBOLD;
 //  XL_HEADSHADE
-      aAttributes[2] := XL_HEADSHADE;
-      BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
-      BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
-      //if iDataLen > 0 then
+        aAttributes[2] := XL_HEADSHADE;
+        BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
+        BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
+        //if iDataLen > 0 then
         BlockWrite(FDataFile, sStrData[1], iDataLen);
       //  ;
-      aAttributes[2] := 0;
-    end;
+        aAttributes[2] := 0;
+      end;
+
+    i := FDataSet.FieldCount - 1;
       //Header par Seg de Registros;
-      if (trim(fcab) <> '') then
-        begin
-          sStrData := 'Seq. Registros';
-          iDataLen := length(sStrData);
-          WriteToken(XL_STRING, iDataLen + 8);
-          WriteToken(FRow, i);
-          aAttributes[1] := XL_HEADBOLD;
-          aAttributes[2] := XL_HEADSHADE;
-          BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
-          BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
-          BlockWrite(FDataFile, sStrData[1], iDataLen);
-          aAttributes[2] := 0;
+    if (trim(fcab) <> '') then
+      begin
+        sStrData := 'Seq. Registros';
+        iDataLen := length(sStrData);
+        WriteToken(XL_STRING, iDataLen + 8);
+        WriteToken(FRow, i);
+        aAttributes[1] := XL_HEADBOLD;
+        aAttributes[2] := XL_HEADSHADE;
+        BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
+        BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
+        BlockWrite(FDataFile, sStrData[1], iDataLen);
+        aAttributes[2] := 0;
         // Data Rows
-        end;
+      end;
+
     clin:=1;
     ctot:=0;
     while not FDataSet.Eof do
     begin
       inc(FRow);
       for i := 0 to FDataSet.FieldCount - 1 do
-      begin
-        case FDataSet.FieldDefs[i].DataType of
-          ftBoolean,
-            ftWideString,
-            ftFixedChar,
-            ftString,
-            ftUnknown,
-            ftMemo:
-            begin
-              sStrData := FDataSet.Fields[i].AsString;
-              iDataLen := length(sStrData);
-              WriteToken(XL_STRING, iDataLen + 8);
-              WriteToken(FRow, i);
-              aAttributes[1] := 0;
-              BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
-              BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
-              if iDataLen > 0 then
-                BlockWrite(FDataFile, sStrData[1], iDataLen);
-            end;
+        begin
+          case FDataSet.FieldDefs[i].DataType of
 
-          ftAutoInc,
-            ftSmallInt,
-            ftInteger,
-            ftWord,
-            ftLargeInt:
-            begin
-              if (trim(fcab) = '') then
+              ftBoolean, ftWideString, ftFixedChar, ftString, ftUnknown, ftMemo:
                 begin
-                  if i = 6 then
-                    begin
-                      sStrData := GeraNT(FDataSet.Fields[i].AsString,5);
-                      iDataLen := length(sStrData);
-                      WriteToken(XL_STRING, iDataLen + 8);
-                      WriteToken(FRow, i);
-                      aAttributes[1] := 0;
-                      BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
-                      BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
-                    BlockWrite(FDataFile, sStrData[1], iDataLen);
-                    end
-                  else
-                  begin
-                    fDblData := FDataSet.Fields[i].AsFloat;
-                    iDataLen := SizeOf(fDblData);
-                    WriteToken(XL_DOUBLE, 15);
-                    WriteToken(FRow, i);
-                    aAttributes[1] := XL_INTFORMAT;
-                    BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
-                    BlockWrite(FDataFile, fDblData, iDatalen);
-                  end;
-                end
-              else
-                begin
-                  sStrData := GeraNT(FDataSet.Fields[i].AsString,5);
+                  sStrData := FDataSet.Fields[i].AsString;
                   iDataLen := length(sStrData);
                   WriteToken(XL_STRING, iDataLen + 8);
                   WriteToken(FRow, i);
                   aAttributes[1] := 0;
                   BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
                   BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
-                BlockWrite(FDataFile, sStrData[1], iDataLen);
+                  if iDataLen > 0 then
+                    BlockWrite(FDataFile, sStrData[1], iDataLen);
                 end;
-            end;
 
-          ftFloat,
-            ftCurrency,
-            ftBcd:
-            begin
-              if (trim(fcab) <> '') then
+              ftAutoInc, ftSmallInt, ftInteger, ftWord, ftLargeInt:
                 begin
-                  if i = 3 then
+                  if (trim(fcab) = '') then
+                    begin
+                      if i = 6 then
+                        begin
+                          sStrData := GeraNT(FDataSet.Fields[i].AsString,5);
+                          iDataLen := length(sStrData);
+                          WriteToken(XL_STRING, iDataLen + 8);
+                          WriteToken(FRow, i);
+                          aAttributes[1] := 0;
+                          BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
+                          BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
+                          BlockWrite(FDataFile, sStrData[1], iDataLen);
+                        end
+                      else
+                        begin
+                          fDblData := FDataSet.Fields[i].AsFloat;
+                          iDataLen := SizeOf(fDblData);
+                          WriteToken(XL_DOUBLE, 15);
+                          WriteToken(FRow, i);
+                          aAttributes[1] := XL_INTFORMAT;
+                          BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
+                          BlockWrite(FDataFile, fDblData, iDatalen);
+                        end;
+                    end
+                  else
                     begin
                       sStrData := GeraNT(FDataSet.Fields[i].AsString,5);
                       iDataLen := length(sStrData);
@@ -1295,58 +1209,78 @@ begin
                       aAttributes[1] := 0;
                       BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
                       BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
-                    BlockWrite(FDataFile, sStrData[1], iDataLen);
-                    end
-                  else
-                    begin
-                      fDblData := FDataSet.Fields[i].AsFloat;
-                      iDataLen := SizeOf(fDblData);
-                      WriteToken(XL_DOUBLE, 15);
-                      WriteToken(FRow, i);
-                      aAttributes[1] := XL_DBLFORMAT;
-                      BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
-                      BlockWrite(FDataFile, fDblData, iDatalen);
+                      BlockWrite(FDataFile, sStrData[1], iDataLen);
                     end;
                 end;
-            end;
 
-          ftDateTime:
-            begin
-              fDblData := FDataSet.Fields[i].AsFloat;
-              iDataLen := SizeOf(fDblData);
-              WriteToken(XL_DOUBLE, 15);
-              WriteToken(FRow, i);
-              aAttributes[1] := XL_XDTFORMAT;
-              BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
-              BlockWrite(FDataFile, fDblData, iDatalen);
-            end;
+              ftFloat, ftCurrency, ftBcd:
+                begin
+                  if (trim(fcab) <> '') then
+                    begin
+                      if i = 3 then
+                        begin
+                          sStrData := GeraNT(FDataSet.Fields[i].AsString,5);
+                          iDataLen := length(sStrData);
+                          WriteToken(XL_STRING, iDataLen + 8);
+                          WriteToken(FRow, i);
+                          aAttributes[1] := 0;
+                          BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
+                          BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
+                          BlockWrite(FDataFile, sStrData[1], iDataLen);
+                        end
+                      else
+                        begin
+                          fDblData := FDataSet.Fields[i].AsFloat;
+                          iDataLen := SizeOf(fDblData);
+                          WriteToken(XL_DOUBLE, 15);
+                          WriteToken(FRow, i);
+                          aAttributes[1] := XL_DBLFORMAT;
+                          BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
+                          BlockWrite(FDataFile, fDblData, iDatalen);
+                        end;
+                    end;
+                end;
 
-          ftDate:
-            begin
-              fDblData := FDataSet.Fields[i].AsFloat;
-              iDataLen := SizeOf(fDblData);
-              WriteToken(XL_DOUBLE, 15);
-              WriteToken(FRow, i);
-              aAttributes[1] := XL_DTEFORMAT;
-              BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
-              BlockWrite(FDataFile, fDblData, iDatalen);
-            end;
+              ftDateTime:
+                begin
+                  fDblData := FDataSet.Fields[i].AsFloat;
+                  iDataLen := SizeOf(fDblData);
+                  WriteToken(XL_DOUBLE, 15);
+                  WriteToken(FRow, i);
+                  aAttributes[1] := XL_XDTFORMAT;
+                  BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
+                  BlockWrite(FDataFile, fDblData, iDatalen);
+                end;
 
-          ftTime:
-            begin
-              fDblData := FDataSet.Fields[i].AsFloat;
-              iDataLen := SizeOf(fDblData);
-              WriteToken(XL_DOUBLE, 15);
-              WriteToken(FRow, i);
-              aAttributes[1] := XL_TMEFORMAT;
-              BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
-              BlockWrite(FDataFile, fDblData, iDatalen);
-            end;
+              ftDate:
+                begin
+                  fDblData := FDataSet.Fields[i].AsFloat;
+                  iDataLen := SizeOf(fDblData);
+                  WriteToken(XL_DOUBLE, 15);
+                  WriteToken(FRow, i);
+                  aAttributes[1] := XL_DTEFORMAT;
+                  BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
+                  BlockWrite(FDataFile, fDblData, iDatalen);
+                end;
 
-        end;
-      end;
+              ftTime:
+                begin
+                  fDblData := FDataSet.Fields[i].AsFloat;
+                  iDataLen := SizeOf(fDblData);
+                  WriteToken(XL_DOUBLE, 15);
+                  WriteToken(FRow, i);
+                  aAttributes[1] := XL_TMEFORMAT;
+                  BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
+                  BlockWrite(FDataFile, fDblData, iDatalen);
+                end;
+
+          end; // end case
+
+        end;  // end loop for
+
       if (fcab<>'') then
         begin
+          i := FDataSet.FieldCount - 1;
           sStrData := GeraNT(inttostr(clin),7);
           iDataLen := length(sStrData);
           WriteToken(XL_STRING, iDataLen + 8);
@@ -1355,25 +1289,26 @@ begin
           BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
           BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
     //      if iDataLen > 0 then
-            BlockWrite(FDataFile, sStrData[1], iDataLen);
+          BlockWrite(FDataFile, sStrData[1], iDataLen);
           clin:=clin+1;
         end;
 //      if FRow > 3 then
 //        ctot  :=  ctot+FDataSet.Fields[2].AsInteger;
       FDataSet.Next;
-    end;
+    end; // end loop while
+
     if (ctot>0) then
-        begin
-          sStrData := format('%4.4d',[ctot]);
-          iDataLen := length(sStrData);
-          WriteToken(XL_STRING, iDataLen + 8);
-          WriteToken(FRow, i);
-          aAttributes[1] := 0;
-          BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
-          BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
+      begin
+        sStrData := format('%4.4d',[ctot]);
+        iDataLen := length(sStrData);
+        WriteToken(XL_STRING, iDataLen + 8);
+        WriteToken(FRow, i);
+        aAttributes[1] := 0;
+        BlockWrite(FDataFile, aAttributes, SizeOf(aAttributes));
+        BlockWrite(FDataFile, iDataLen, SizeOf(iDataLen));
     //      if iDataLen > 0 then
-          BlockWrite(FDataFile, sStrData[1], iDataLen);
-        end;
+        BlockWrite(FDataFile, sStrData[1], iDataLen);
+      end;
     // End of File
     WriteToken(XL_EOF, 0);
     CloseFile(FDataFile);
@@ -1383,6 +1318,7 @@ begin
 
   Result := bRetvar;
 end;
+
 function tamlookcbo(tipo:integer):integer;
 begin
   with dm do
@@ -1435,7 +1371,6 @@ end;
 function md5File(const fileName : string) : string;
 var  idmd5 : TIdHashMessageDigest5;
   fs : TFileStream;
-  hash : T4x4LongWordRecord;
 begin
   idmd5 := TIdHashMessageDigest5.Create;
   fs := TFileStream.Create(fileName, fmOpenRead OR fmShareDenyWrite);

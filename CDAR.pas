@@ -5,8 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, DBCtrls, ComCtrls, ExtCtrls, OleServer, DB,
-  ZAbstractRODataset, ZDataset; //ADODB;
-//  ADODB;
+  ZAbstractRODataset, ZDataset;
 
 type
   TfrmAR = class(TForm)
@@ -56,7 +55,7 @@ type
     sCDMotivo,cSQL: string;
     ListaArq: TStringList;
     F, A,FA: TextFile;
-    s, sAusente, sDir,arqausente,arqoutros, sDev,sRel: string;
+    s, sAusente, sDir, arqausente, arqoutros, sRel : string;
     bAusente: Boolean;
     ListaSLP: TStringList;
     sCartao: string;
@@ -66,7 +65,6 @@ type
 
     function GerarArquivo: boolean;
 
-    procedure EnviarArquivo;
   public
     { Public declarations }
   end;
@@ -81,42 +79,40 @@ uses CDDM, U_Func;
 {$R *.dfm}
 
 procedure TfrmAR.edtCodigoChange(Sender: TObject);
-
 begin
-  if length(trim(edtCodigo.Text)) = 13 then
-  begin
-    Panel1.Caption := '';
-    Panel1.Refresh;
-    if (validaNumObjCorreios(edtCodigo.Text) = true) then
-      begin
-        if mmCodigo.Items.IndexOf(edtCodigo.Text) = -1 then
-          begin
-            btnSalvar.Enabled := mmCodigo.Items.Count > 0;
-            eBin.SetFocus;
-            Inc(qtdAR);
-          end
-        else
-          begin
-            Panel1.Caption := 'Código AR já lido.';
-            Panel1.Refresh;
-            edtCodigo.Text := '';
-            Panel1.SetFocus;
-            edtCodigo.SetFocus;
-            abort;
-          end;
-      end
-    else
-      begin
-        Panel1.Caption := 'Código Inválido.';
-        Panel1.Refresh;
-        Panel1.SetFocus;
-        abort;
-      end;
+  if (Length(edtCodigo.Text) > 12) then
+    begin
+      if (validaNumObjCorreios(edtCodigo.Text) = true) then
+        begin
+          Panel1.Caption := '';
+          Panel1.Refresh;
+          if mmCodigo.Items.IndexOf(edtCodigo.Text) = -1 then
+            begin
+              btnSalvar.Enabled := mmCodigo.Items.Count > 0;
+              eBin.SetFocus;
+              Inc(qtdAR);
+            end
+          else
+            begin
+              Panel1.Caption := 'Código AR já lido.';
+              Panel1.Refresh;
+              edtCodigo.Text := '';
+              Panel1.SetFocus;
+              edtCodigo.SetFocus;
+              abort;
+            end;
+        end
+      else
+        begin
+          Panel1.Caption := 'Código Inválido.';
+          Panel1.Refresh;
+          Panel1.SetFocus;
+          abort;
+        end;
 
-    lblQtde.Caption := 'Quantidade de ARs lidos: ' + IntToStr(qtdAR);
-    lblQtde.Caption := 'Quantidade de ARs lidos: ' + IntToStr(mmCodigo.Items.Count);
+        lblQtde.Caption := 'Quantidade de ARs lidos: ' + IntToStr(qtdAR);
+//    lblQtde.Caption := 'Quantidade de ARs lidos: ' + IntToStr(mmCodigo.Items.Count);
   end;
-
 end;
 
 procedure TfrmAR.edtCodigoEnter(Sender: TObject);
@@ -128,7 +124,7 @@ end;
 
 procedure TfrmAR.btnSalvarClick(Sender: TObject);
 var
-  icod,iCont: integer;
+  iCont: integer;
   sMensagem: string;
 begin
   if lcCD_MOTIVO.KeyValue = null then
@@ -139,7 +135,6 @@ begin
   end;
   DM.qCodAR.Close;
   DM.qCodAR.Open;
-  iCod := DM.qCodARcodigo.AsInteger;
 
   DM.qAR.Close;
   DM.qAR.Open;
@@ -164,14 +159,6 @@ begin
         DM.SqlAux.SQL.Add('insert into ibi_controle_devolucoes_ar (cod_ar,cd_motivo,codbin,codusu) values ');
         DM.SqlAux.SQL.Add('('+chr(39)+mmCodigo.Items[icont]+chr(39)+','+chr(39)+lcCD_MOTIVO.KeyValue+chr(39)+','+chr(39)+lBin.Items[icont]+chr(39)+','+IntToStr(DM.usuaces)+ ')');
 
-        //InputBox('','',DM.SqlAux.SQL.Text);
-        //DM.SqlAux.SQL.Add('(:cod,:motivo,:bin)');
-        //DM.SqlAux.ParamByName('cod').AsString := mmCodigo.Items[icont];
-        //DM.SqlAux.ParamByName('motivo').AsString := lcCD_MOTIVO.KeyValue;
-        //DM.SqlAux.ParamByName('bin').AsString := lBin.Items[icont];
-//        DM.SqlAux.ParamByName('data').AsString := FormatDateTime('YYYYMMDD', DM.qDatadata.Value );
-//        DM.qARDT_DEVOLUCAO.AsDateTime := trunc(cbDT_DEVOLUCAO.Date);
-//        DM.qARDT_CADASTRO.AsDateTime := DM.qDatadata.AsDateTime;
         DM.SqlAux.ExecSQL;
       end
       else
@@ -239,7 +226,7 @@ begin
 end;
 Procedure TfrmAR.montarel;
 var
-  nPos, nFieldSize,iObjetos: Integer;
+  nPos : Integer;
 
 begin
 //  bCopia := False;
@@ -288,19 +275,9 @@ begin
   end;
 
   try
-    sRel := dm.unidade+ 'RELATORIOS\';;
-//    cArq := cArq
-    //cArq := cArq + FormatDateTime('YYYYMMDD', now)+ '\' ;
-
-    if not DirectoryExists(sRel) then
-       CreateDirectory(PAnsiChar(srel),nil);
+    sRel := dm.relatdir;
 
     sRel := sRel + 'IBI_REL_'+FormatDateTime('ddmmyyyy',DM.qDatadata.AsDateTime)+FormatDateTime('hhmmss',Time) +'.txt';
-//    cArq := cArq + StrTran(DateToStr(cbDT_INICIAL.Date), '/', '_');
-//    cArq := cArq + '_A_';
-//    cArq := cArq + StrTran(DateToStr(cbDT_FINAL.Date), '/', '_');
-//    cArq := cArq + 'CEA_REL_'+FormatDateTime('ddmmyyyy',cbDT_FINAL.Date);
-//    sRel := sRel + '.TXT';
 
     AssignFile(F, sRel);
     ReWrite(F);
@@ -323,7 +300,6 @@ begin
       begin
         cFieldValue := qraRelatorioQtde.FieldByName(qraRelatorioQtde.Fields[nPos].FieldName).AsString;
         cFieldName := qraRelatorioQtde.Fields[nPos].FieldName;
-        nFieldSize := qraRelatorioQtde.Fields[nPos].Size;
 
         if UpperCase(cFieldName) = 'CD_MOTIVO' then
           S := S + Format('%2.2d',[StrToInt(cFieldValue)]) + Format('%-5.5s%',[''])
@@ -374,11 +350,9 @@ end;
 procedure TfrmAR.btnArquivoClick(Sender: TObject);
 begin
   DM.qArqAR.Close;
-  DM.qArqAR.ParamByName('dt_devolucao').AsString  := FormatDateTime('yyyy/mm/dd',trunc(cbDT_DEVOLUCAO.Date));
-  DM.qArqAR.ParamByName('dt_devfim').AsString     := FormatDateTime('yyyy/mm/dd',trunc(DtDevFim.Date));
-///  DM.qArqAR.Parameters.ParamByName('dt_devolucao').Value := trunc(cbDT_DEVOLUCAO.Date);
+  DM.qArqAR.ParamByName('dt_devolucao').AsDate := cbDT_DEVOLUCAO.Date;
+  DM.qArqAR.ParamByName('dt_devfim').AsDate := DtDevFim.Date;
   DM.qArqAR.Open;
-
   if not DM.qArqAR.IsEmpty then
   begin
     if GerarArquivo then
@@ -401,12 +375,8 @@ begin
   Result := True;
   ListaArq := TStringList.Create;
   ListaSLP := TStringList.Create;
-  sDir := 'F:\ibisis\Retorno\';//\Dev';
-  //sDev := sDev +'\Dev'+FormatDateTime('YYYYMMDD', cbDT_DEVOLUCAO.Date) + '\';
-
-  //sDir := sDir + sDev;
+  sDir := DM.retdir;
   try
-
     if not DirectoryExists(sDir) then
     begin
       CreateDirectory(PAnsiChar(sDir), nil);
@@ -419,28 +389,14 @@ begin
     if DM.qParamAUSENTE.AsString = 'S' then
     begin
       DM.qAusente.Close;
- //     DM.qAusente.Parameters.ParamByName('data').Value := FormatDateTime('YYYYMMDD', trunc(cbDT_DEVOLUCAO.Date));
-//      DM.qAusente.Parameters.ParamByName('cd_motivo').Value := DM.qParamCD_MOTIVO.AsString;
-      DM.qAusente.ParamByName('data').AsString := FormatDateTime('YYYYMMDD', trunc(cbDT_DEVOLUCAO.Date));
+      DM.qAusente.ParamByName('data').AsDate := cbDT_DEVOLUCAO.Date;
       DM.qAusente.ParamByName('cd_motivo').AsString := DM.qParamCD_MOTIVO.AsString;
       DM.qAusente.Open;
 
       if not DM.qAusente.IsEmpty then
         bAusente := True;
     end;
-    //sDir := sDir + '/ADDRESS2ACC.CARTAO.IBI.AR.' + FormatDateTime('DDMMYYYY', cbDT_DEVOLUCAO.Date)+FormatDateTime('HHMMSS',Time ) + '.TMP';
-    //if FileExists(sDir ) then
-    //begin
-    //  if Application.MessageBox('O arquivo de retorno para a devolução selecionada já existe.Deseja continuar?', 'Aviso', MB_YESNO + MB_ICONQUESTION + MB_SYSTEMMODAL) = id_no then
-    //  begin
-    //    Result := False;
-    //    exit;
-    //  end;
-    //end;
-//    AssignFile(F, sDir);
-//    Rewrite(F);
-//    ListaArq.Add(sDir);
-    sRel  :=  DM.unidade+'ibisis\RELATORIOS\';
+    sRel  :=  DM.relatdir;
     ListaSLP.Add(StringOfChar('-', 73));
     ListaSLP.Add('                       Devolução IBI - ARs                       ');
     ListaSLP.Add(StringOfChar('-', 73));
@@ -548,9 +504,9 @@ begin
     ListaSLP.Add(StringOfChar('-', 73));
 //    ListaSLP.Add('©' + FormatDateTime('YYYY', DM.qdatadata.AsDateTime) + ' ADDRESS SA ' + '               ' + FormatDateTime('DD/MM/YYYY',DM.qDatadata.AsDateTime)+ ' - '+ DM.hratu);
     ListaSLP.Add(StringOfChar('-', 73));
-    ListaSLP.Add(format('%-10.10s%',['©' + FormatDateTime('YYYY', DM.qdatadata.AsDateTime)])+format('%-44.44s%',['ADDRESS SA'])+ FormatDateTime('DD/MM/YYYY',DM.qDatadata.AsDateTime)+ ' ' +dm.hratu);
+    ListaSLP.Add(format('%-10.10s%',['©' + FormatDateTime('YYYY', DM.qdatadata.AsDateTime)])+format('%-44.44s%',['ADDRESS SA'])+ FormatDateTime('DD/MM/YYYY hh:nn',DM.qDatadata.AsDateTime));
 //    ListaSLP.SaveToFile('F:\ibisis\RELATORIO\'+ 'ADDRESS2ACC.CARTAO.IBI.AR.'+FormatDateTime('DDMMYYYY', cbDT_DEVOLUCAO.Date) + FormatDateTime('HHMMSS', DM.qDatadata.AsDateTime) + '_AR.SLP');
-    ListaSLP.SaveToFile(srel+'ADDRESS2ACC.CARTAO.IBI.AR.'+FormatDateTime('DDMMYYYY', cbDT_DEVOLUCAO.Date) + FormatDateTime('hhmmss', StrToDateTime(DM.hratu)) + '.SLP');
+    ListaSLP.SaveToFile(srel+'ADDRESS2ACC.CARTAO.IBI.AR.'+FormatDateTime('DDMMYYYY', cbDT_DEVOLUCAO.Date) + FormatDateTime('hhnnss', DM.dtatu) + '.SLP');
 //    ListaSLP.SaveToFile(sdir + FormatDateTime('DDMM', cbDT_DEVOLUCAO.Date) + '_AR.SLP');
 
     //    pMsg.Caption := 'Aguarde. Enviando e-mail.';
@@ -620,7 +576,7 @@ begin
   begin
 
     iInd := mmCodigo.ItemIndex;
-    sMensagem := 'Confirma a execlusão do Código AR ' + mmCodigo.Items[iInd] + '?';
+    sMensagem := 'Confirma a exclusão do Código AR ' + mmCodigo.Items[iInd] + '?';
     if Application.MessageBox(pchar(sMensagem), 'Aviso', MB_YESNO + MB_ICONQUESTION + MB_SYSTEMMODAL) = id_yes then
     begin
       mmCodigo.Items.Delete(iInd);
@@ -636,81 +592,46 @@ begin
   end;
 end;
 
-procedure TfrmAR.EnviarArquivo;
-var
-  j: integer;
-  sDir, sDev, sMensagem: string;
-  bCopia: boolean;
-  Lista: TStringList;
-begin
-  Lista := TStringList.Create;
-  sDir := ExtractFilePath(Application.ExeName) + 'F:\ibisis\Retorno\Dev';
-  sDev := FormatDateTime('YYYYMMDD', cbDT_DEVOLUCAO.Date) + '\';
-
-  sDir := sDir + sDev;
-  for j := 0 to ListaArq.Count - 1 do
-  begin
-    if FileExists('\\192.168.11.10\cartoes\' + ListaArq[j]) then
-      DeleteFile('\\192.168.11.10\cartoes\' + ListaArq[j]);
-    if pos('AUSR', ListaArq[j]) = 0 then
-      bCopia := CopyFile(pchar(sdir + ListaArq[j]), pchar('\\192.168.11.10\cartoes\outros\' + ListaArq[j]), false)
-//      bCopia := CopyFile(pchar(sdir + ListaArq[j]), pchar(ListaArq[j]), false)
-    else
-      bCopia := CopyFile(pchar(sdir + ListaArq[j]), pchar('\\192.168.11.10\cartoes\ausentes\' + ListaArq[j]), false);
-//      bCopia := CopyFile(pchar(sdir + ListaArq[j]), pchar(ListaArq[j]), false);
-    if not bCopia then
-      Lista.Add(ListaArq[j]);
-  end;
-
-  if Lista.Count > 0 then
-  begin
-    sMensagem := 'Não foi possível copiar o(s) arquivo(s):';
-    for j := 0 to Lista.Count - 1 do
-      sMensagem := sMensagem + '#10#13' + Lista[j];
-    Application.MessageBox(pchar(sMensagem), 'Aviso', MB_OK + MB_ICONERROR + MB_SYSTEMMODAL)
-  end;
-
-  Lista.Free;
-  ListaArq.Free;
-end;
-
 procedure TfrmAR.eBinChange(Sender: TObject);
 
 begin
-  if (length(trim(eBin.Text)) = 6) or (length(trim(eBin.Text)) = 5) then
-  begin
-    Panel1.Caption := '';
-    Panel1.Refresh;
-    qryFamilia.Close;
-//    qryFamilia.Parameters.ParamByName('COD_BIN').Value := eBin.Text;
-    if (length(trim(eBin.Text)) = 5) and (trim(eBin.Text)='52743') then
-      eBin.Text :=  eBin.Text+'7'
-    else if (length(trim(eBin.Text)) = 5) and (trim(eBin.Text)='51854') then
-      eBin.Text :=  eBin.Text+'4'
-    else if (length(trim(eBin.Text)) = 5) and (trim(eBin.Text)='53133') then
-      eBin.Text :=  eBin.Text+'9';
-
-    qryFamilia.ParamByName('COD_BIN').AsString := eBin.Text;
-    qryFamilia.Open;
-
-    if qryFamilia.RecordCount > 0 then
+  eBin.Text := trim(eBin.Text);
+  if (length(eBin.Text) > 4) then
     begin
-      mmCodigo.Items.Add(edtCodigo.Text);
-      lBin.Items.Add(eBin.Text);
-      edtCodigo.Text := '';
-      eBin.Text := '';
-      edtCodigo.SetFocus;
-      if lBin.Items.Count > 0 then
-        btnSalvar.Enabled := true;
-    end
-    else
-    begin
-      ShowMessage('Codigo BIN inválido ignorando AR');
-      edtCodigo.Text := '';
-      eBin.Text := '';
-      edtCodigo.SetFocus;
+      if (eBin.Text = '52743') then
+        eBin.Text := eBin.Text + '7'
+      else if (eBin.Text = '51854') then
+        eBin.Text := eBin.Text + '4'
+      else if (eBin.Text = '53133') then
+        eBin.Text := eBin.Text + '9';
     end;
-  end;
+
+  if (length(eBin.Text) > 5) then
+    begin
+      Panel1.Caption := '';
+      Panel1.Refresh;
+      qryFamilia.Close;
+      qryFamilia.ParamByName('COD_BIN').AsString := eBin.Text;
+      qryFamilia.Open;
+
+      if qryFamilia.RecordCount > 0 then
+        begin
+          mmCodigo.Items.Add(edtCodigo.Text);
+          lBin.Items.Add(eBin.Text);
+          edtCodigo.Text := '';
+          eBin.Text := '';
+          edtCodigo.SetFocus;
+          btnSalvar.Enabled := true;
+        end
+      else
+        begin
+          Application.MessageBox(
+              PChar('Este BIN não está cadastrado! Verifique a informação.' + #13#10 +
+                'Caso esteja correto será necessário cadastrar a Família deste BIN'),
+                'Controle de Devoluções - AR', MB_OK + MB_ICONWARNING);
+          eBin.SetFocus;
+        end;
+    end;
 end;
 
 procedure TfrmAR.lBinKeyUp(Sender: TObject; var Key: Word;

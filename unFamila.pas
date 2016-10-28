@@ -40,8 +40,6 @@ type
     Label5: TLabel;
     Label6: TLabel;
     qryFamilia: TZTable;
-//    ZQuery1: TZQuery;
-//    ZReadOnlyQuery1: TZReadOnlyQuery;
     procedure Button1Click(Sender: TObject);
     procedure sbPrimeiroClick(Sender: TObject);
     procedure sbAnteriorClick(Sender: TObject);

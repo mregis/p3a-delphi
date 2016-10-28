@@ -235,7 +235,7 @@ object FrmRelTot: TFrmRelTot
       'Anual')
   end
   object qryRelTot: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       '(SELECT  '
       
@@ -295,7 +295,7 @@ object FrmRelTot: TFrmRelTot
         ParamType = ptUnknown
       end>
     Left = 152
-    Top = 114
+    Top = 98
     ParamData = <
       item
         DataType = ftUnknown
@@ -324,9 +324,9 @@ object FrmRelTot: TFrmRelTot
     end
   end
   object ZQRel: TZQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     Params = <>
-    Left = 192
-    Top = 114
+    Left = 208
+    Top = 98
   end
 end

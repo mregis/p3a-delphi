@@ -1397,7 +1397,7 @@ object FrmAcesso: TFrmAcesso
   end
   object Label5: TLabel
     Left = 253
-    Top = 77
+    Top = 80
     Width = 122
     Height = 16
     Caption = 'Nome de Usu'#225'rio'
@@ -1412,7 +1412,7 @@ object FrmAcesso: TFrmAcesso
     Transparent = True
   end
   object Image2: TImage
-    Left = 224
+    Left = 204
     Top = 98
     Width = 26
     Height = 29
@@ -1484,7 +1484,7 @@ object FrmAcesso: TFrmAcesso
   end
   object Label6: TLabel
     Left = 253
-    Top = 136
+    Top = 140
     Width = 45
     Height = 16
     Caption = 'Senha'
@@ -1499,7 +1499,7 @@ object FrmAcesso: TFrmAcesso
     Transparent = True
   end
   object Image3: TImage
-    Left = 224
+    Left = 204
     Top = 158
     Width = 24
     Height = 31
@@ -1575,11 +1575,12 @@ object FrmAcesso: TFrmAcesso
     ParentFont = False
   end
   object LblMsgs: TLabel
-    Left = 173
-    Top = 52
-    Width = 5
+    Left = 0
+    Top = 47
+    Width = 436
     Height = 19
     Alignment = taCenter
+    Caption = 'O sistema diferencia mai'#250'sculas de min'#250'sculas'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clYellow
     Font.Height = -16
@@ -1590,9 +1591,9 @@ object FrmAcesso: TFrmAcesso
     Visible = False
   end
   object EdLogin: TEdit
-    Left = 253
+    Left = 236
     Top = 97
-    Width = 172
+    Width = 189
     Height = 31
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -1604,9 +1605,9 @@ object FrmAcesso: TFrmAcesso
     OnKeyPress = EdLoginKeyPress
   end
   object EdSenha: TEdit
-    Left = 253
+    Left = 236
     Top = 158
-    Width = 172
+    Width = 189
     Height = 31
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText

@@ -1,10 +1,10 @@
 object FrmConfig: TFrmConfig
   Left = 0
   Top = 0
-  BorderStyle = bsSingle
+  BorderStyle = bsDialog
   Caption = 'Configura'#231#245'es'
-  ClientHeight = 377
-  ClientWidth = 444
+  ClientHeight = 384
+  ClientWidth = 532
   Color = clHotLight
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,12 +14,12 @@ object FrmConfig: TFrmConfig
   OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
-  OnShow = FormShow
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object BitBtnFechar: TBitBtn
-    Left = 252
-    Top = 327
+    Left = 348
+    Top = 335
     Width = 100
     Height = 34
     Caption = '&Fechar'
@@ -145,8 +145,8 @@ object FrmConfig: TFrmConfig
     NumGlyphs = 2
   end
   object BitBtnSalvar: TBitBtn
-    Left = 84
-    Top = 327
+    Left = 79
+    Top = 335
     Width = 100
     Height = 34
     Caption = '&Salvar'
@@ -212,206 +212,456 @@ object FrmConfig: TFrmConfig
       95834C0D0D0D0D780C0C0D0D0D0D0D0D0D0D0D0D0D0D0D0D0D0D0D0D0D0D0D78
       0C0C}
   end
-  object GroupBox1: TGroupBox
-    Left = 32
-    Top = 32
-    Width = 380
-    Height = 193
-    Caption = 'Conex'#227'o ao Banco de Dados'
+  object PageControlConfigs: TPageControl
+    Left = 0
+    Top = 0
+    Width = 532
+    Height = 313
+    ActivePage = TabSheetBD
+    Align = alTop
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -15
-    Font.Name = 'MS Sans Serif'
+    Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
     TabOrder = 2
-    object LabelDBHost: TLabel
-      Left = 85
-      Top = 27
-      Width = 31
-      Height = 16
-      Alignment = taRightJustify
-      Caption = 'Host:'
-      FocusControl = EditDBHost
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -15
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
+    object TabSheetBD: TTabSheet
+      Caption = 'Banco de Dados'
+      object GroupBox1: TGroupBox
+        Left = 12
+        Top = 12
+        Width = 501
+        Height = 253
+        Caption = 'Informa'#231#245'es de Conex'#227'o'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -15
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        object LabelDBHost: TLabel
+          Left = 122
+          Top = 27
+          Width = 31
+          Height = 16
+          Alignment = taRightJustify
+          Caption = 'Host:'
+          FocusControl = EditDBHost
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -15
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object LabelDBName: TLabel
+          Left = 48
+          Top = 61
+          Width = 105
+          Height = 16
+          Alignment = taRightJustify
+          Caption = 'Banco de Dados:'
+          FocusControl = EditDBName
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -15
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object LabelPort: TLabel
+          Left = 118
+          Top = 93
+          Width = 35
+          Height = 16
+          Alignment = taRightJustify
+          Caption = 'Porta:'
+          FocusControl = EditDBPort
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -15
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object LabelDBUsername: TLabel
+          Left = 44
+          Top = 126
+          Width = 109
+          Height = 16
+          Alignment = taRightJustify
+          Caption = 'Nome de Usu'#225'rio:'
+          FocusControl = EditDBUsername
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -15
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object LabelDBPassword: TLabel
+          Left = 111
+          Top = 158
+          Width = 42
+          Height = 16
+          Alignment = taRightJustify
+          Caption = 'Senha:'
+          FocusControl = EditDBPassword
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -15
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object EditDBHost: TEdit
+          Left = 159
+          Top = 24
+          Width = 250
+          Height = 27
+          Hint = 'Host do Banco de Dados'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -16
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 0
+        end
+        object EditDBName: TEdit
+          Left = 159
+          Top = 56
+          Width = 250
+          Height = 27
+          Hint = 'Nome do Banco de Dados'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -16
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 1
+        end
+        object EditDBPort: TEdit
+          Left = 159
+          Top = 88
+          Width = 66
+          Height = 27
+          Hint = 'Porta de Acesso ao Banco de Dados'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -16
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          MaxLength = 5
+          ParentFont = False
+          TabOrder = 2
+        end
+        object EditDBUsername: TEdit
+          Left = 159
+          Top = 121
+          Width = 250
+          Height = 27
+          Hint = 'Nome de Usu'#225'rio do Banco de Dados'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -16
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 3
+        end
+        object EditDBPassword: TEdit
+          Left = 159
+          Top = 153
+          Width = 250
+          Height = 27
+          Hint = 'Senha'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -16
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+          PasswordChar = '*'
+          TabOrder = 4
+        end
+        object BitBtnTesteConexao: TBitBtn
+          Left = 302
+          Top = 204
+          Width = 107
+          Height = 33
+          Caption = 'Testar'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -16
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 5
+          OnClick = BitBtnTesteConexaoClick
+          Glyph.Data = {
+            F6060000424DF606000000000000360000002800000018000000180000000100
+            180000000000C0060000120B0000120B00000000000000000000FF00FFFF00FF
+            FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+            FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+            00FF0369D20268D0FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+            FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+            FFFF00FFFF00FFFF00FF0770DB036AD30066CF0167D0FF00FFFF00FFFF00FFFF
+            00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+            FF00FFFF00FFFF00FFFF00FFFF00FFFF00FF0268D00267D01177DD117AE50168
+            D1FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+            00FFFF00FFFF00FFFF00FF11EEEDFF00FFFF00FFFF00FFFF00FF0067CF1072D7
+            48A0F93294F6127BE60168D20064CDFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+            FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF11EEEDFF00FFFF00FFFF00FFFF
+            00FFFF00FF0469D02886E44FA6FC2082E70369D21B7DE01377DC0A6ED6046AD2
+            0268D00268D00268D0FF00FFFF00FFFF00FFFF00FF11EEED11EEED11EEEDFF00
+            FFFF00FFFF00FFFF00FFFF00FFFF00FF0066CF1B7CDD0B6FD52987E8439EFA38
+            97F63191F3278AEF1E84EA0C72DA0268D00268D0FF00FFFF00FFFF00FF11EEED
+            FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF0062CC1F7F
+            E14AA2FB3E9AF73796F53392F42E91F51E84EA046AD20F78E20E79E50369D8FF
+            00FFFF00FF11EEEDFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+            FF00FFFF00FF1577DB469FF93F9AF73796F53494F52588ED046AD10F76DE1B86
+            F1117BEB046ADC00665F016401FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+            00FFFF00FFFF00FFFF00FFFF00FF046AD13995F2409CF73998F72D8EF1076CD3
+            0D73DB2189F11780EC056BE0006575026A00036C06006500FF00FFFF00FFFF00
+            FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF0065CE2685E6449EFA36
+            96F50C71D70C71D9258BF21E86F0086FE400658601670210861C118824026A05
+            006500FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF0065
+            CE1578DC3F9AF71275DA0A6FD62B8DF2258BF10B72E600659800660710861B19
+            97310E801B016802006600006400FF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+            FF00FFFF00FF0065CE086DD41578DC076DD42D8FF12E91F51076E80065AD0063
+            1011871B1DA03B11882300660008750F036C06006400FF00FFFF00FFFF00FFFF
+            00FFFF00FFFF00FFFF00FFFF00FFFF00FF0067CF076CD33090F13696F6167AE9
+            0066B600631A0F831721A54217922D02690408761110851F05700A006400FF00
+            FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF056AD225
+            86E81E81EC0066C00062260E811323AB481C9C37036D07087510138C270F841E
+            087610006500FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+            FFFF00FFFF00FF0267D30268CC0063360C7D0D26B14C21A84306720C06710B16
+            922D138B260F831D0B7A15016802FF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+            FF00FFFF00FFFF00FFFF00FFFF00FFFF00FF006551056F0027B24D28B6510A7A
+            15056F0A19973217932E128A250F831D0B7C16046D07006400FF00FFFF00FFFF
+            00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF11EEEDFF00FFFF00FF016701
+            108721108521056F091C9D381D9F3A17932E128B260F841E0B7C16026A040064
+            00006500FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF11EEEDFF
+            00FFFF00FFFF00FF00630000630007730D0E821D0F831E1085201085200E821C
+            046E08056F0A138B26046D07006400FF00FFFF00FFFF00FFFF00FFFF00FF11EE
+            ED11EEED11EEEDFF00FFFF00FFFF00FFFF00FF00640000640000620000630000
+            66000167010269030167021998321FA43F128A24036A05006500FF00FFFF00FF
+            FF00FFFF00FF11EEEDFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00
+            FFFF00FFFF00FFFF00FFFF00FFFF00FF0065010B7C181B9A36148C27036B0500
+            6500FF00FFFF00FFFF00FFFF00FF11EEEDFF00FFFF00FFFF00FFFF00FFFF00FF
+            FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF0063000672
+            0C05700A006601026A04FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+            00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF
+            FF00FFFF00FF00640000650001670105700AFF00FFFF00FFFF00FFFF00FFFF00
+            FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
+            00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF006500}
+        end
+      end
     end
-    object LabelDBName: TLabel
-      Left = 11
-      Top = 61
-      Width = 105
-      Height = 16
-      Alignment = taRightJustify
-      Caption = 'Banco de Dados:'
-      FocusControl = EditDBName
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -15
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
+    object TabSheetDirs: TTabSheet
+      Caption = 'Diret'#243'rios'
+      ImageIndex = 1
+      object GroupBox2: TGroupBox
+        Left = 12
+        Top = 23
+        Width = 501
+        Height = 250
+        Caption = 'Destinos para Arquivos Gerados'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -15
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        object LabelDirDest: TLabel
+          Left = 68
+          Top = 79
+          Width = 62
+          Height = 16
+          Alignment = taRightJustify
+          Caption = 'Relat'#243'rios'
+          FocusControl = EditDirRelat
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -15
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object LabelArqRetorno: TLabel
+          Left = 26
+          Top = 125
+          Width = 104
+          Height = 16
+          Alignment = taRightJustify
+          Caption = 'Arquivos Retorno'
+          FocusControl = EditDirRetorno
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -15
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object LabelWorkDir: TLabel
+          Left = 32
+          Top = 31
+          Width = 98
+          Height = 16
+          Alignment = taRightJustify
+          Caption = 'Diret'#243'rio padr'#227'o'
+          FocusControl = EditWorkDir
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -15
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object EditDirRelat: TEdit
+          Left = 136
+          Top = 74
+          Width = 322
+          Height = 27
+          Hint = 'Diret'#243'rio de Destino para Arquivos Gerados'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -16
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 0
+        end
+        object EditDirRetorno: TEdit
+          Left = 136
+          Top = 120
+          Width = 322
+          Height = 27
+          Hint = 'Diret'#243'rio de Destino para Arquivos Gerados'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -16
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 1
+        end
+        object EditWorkDir: TEdit
+          Left = 136
+          Top = 26
+          Width = 322
+          Height = 27
+          Hint = 
+            'Diret'#243'rio padr'#227'o de trabalho. Demais diret'#243'rio usar'#227'o este como ' +
+            'raiz'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -16
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 2
+        end
+        object BitBtnGetWorkDir: TBitBtn
+          Left = 464
+          Top = 27
+          Width = 26
+          Height = 25
+          Caption = '...'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -17
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 3
+          OnClick = BitBtnGetWorkDirClick
+        end
+        object BitBtnGetRelatDir: TBitBtn
+          Left = 464
+          Top = 75
+          Width = 26
+          Height = 25
+          Caption = '...'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -17
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 4
+          OnClick = BitBtnGetRelatDirClick
+        end
+        object BitBtnGetRetDir: TBitBtn
+          Left = 464
+          Top = 121
+          Width = 26
+          Height = 25
+          Caption = '...'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -17
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 5
+          OnClick = BitBtnGetRetDirClick
+        end
+      end
     end
-    object Label1: TLabel
-      Left = 81
-      Top = 93
-      Width = 35
-      Height = 16
-      Alignment = taRightJustify
-      Caption = 'Porta:'
-      FocusControl = EditDBPort
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -15
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
-    end
-    object LabelDBUsername: TLabel
-      Left = 7
-      Top = 126
-      Width = 109
-      Height = 16
-      Alignment = taRightJustify
-      Caption = 'Nome de Usu'#225'rio:'
-      FocusControl = EditDBUsername
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -15
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
-    end
-    object LabelDBPassword: TLabel
-      Left = 74
-      Top = 158
-      Width = 42
-      Height = 16
-      Alignment = taRightJustify
-      Caption = 'Senha:'
-      FocusControl = EditDBPassword
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -15
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
-    end
-    object EditDBHost: TEdit
-      Left = 122
-      Top = 24
-      Width = 199
-      Height = 26
-      Hint = 'Host do Banco de Dados'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -16
-      Font.Name = 'Arial'
-      Font.Style = []
-      ParentFont = False
-      TabOrder = 0
-    end
-    object EditDBName: TEdit
-      Left = 122
-      Top = 56
-      Width = 199
-      Height = 26
-      Hint = 'Nome do Banco de Dados'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -16
-      Font.Name = 'Arial'
-      Font.Style = []
-      ParentFont = False
-      TabOrder = 1
-    end
-    object EditDBPort: TEdit
-      Left = 122
-      Top = 88
-      Width = 55
-      Height = 26
-      Hint = 'Porta de Acesso ao Banco de Dados'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -16
-      Font.Name = 'Arial'
-      Font.Style = []
-      ParentFont = False
-      TabOrder = 2
-    end
-    object EditDBUsername: TEdit
-      Left = 122
-      Top = 121
-      Width = 199
-      Height = 26
-      Hint = 'Nome de Usu'#225'rio do Banco de Dados'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -16
-      Font.Name = 'Arial'
-      Font.Style = []
-      ParentFont = False
-      TabOrder = 3
-    end
-    object EditDBPassword: TEdit
-      Left = 122
-      Top = 153
-      Width = 199
-      Height = 26
-      Hint = 'Senha'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -16
-      Font.Name = 'Arial'
-      Font.Style = []
-      ParentFont = False
-      TabOrder = 4
+    object TabSheetGeral: TTabSheet
+      Caption = 'Geral'
+      ImageIndex = 2
+      object LabelMaxLoginErros: TLabel
+        Left = 61
+        Top = 29
+        Width = 127
+        Height = 16
+        Alignment = taRightJustify
+        Caption = 'M'#225'ximo Falhas Login'
+        FocusControl = EditMaxLoginErros
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -15
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+      end
+      object EditMaxLoginErros: TEdit
+        Left = 194
+        Top = 24
+        Width = 39
+        Height = 26
+        Hint = 
+          'Quantidade m'#225'xima de tentativas de tentativas de login incorreta' +
+          's'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Arial'
+        Font.Style = []
+        MaxLength = 1
+        ParentFont = False
+        TabOrder = 0
+      end
     end
   end
-  object GroupBox2: TGroupBox
-    Left = 32
-    Top = 240
-    Width = 380
-    Height = 65
-    Caption = 'Arquivos Gerados'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -15
-    Font.Name = 'MS Sans Serif'
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 3
-    object LabelDirDest: TLabel
-      Left = 15
-      Top = 29
-      Width = 101
-      Height = 16
-      Alignment = taRightJustify
-      Caption = 'Diret'#243'rio destino:'
-      FocusControl = EditDirDest
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -15
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
-    end
-    object EditDirDest: TEdit
-      Left = 122
-      Top = 24
-      Width = 199
-      Height = 26
-      Hint = 'Diret'#243'rio de Destino para Arquivos Gerados'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -16
-      Font.Name = 'Arial'
-      Font.Style = []
-      ParentFont = False
-      TabOrder = 0
-    end
+  object Conn4Test: TZConnection
+    ControlsCodePage = cGET_ACP
+    UTF8StringsAsWideField = False
+    AutoEncodeStrings = False
+    Port = 0
+    Protocol = 'postgresql-9'
+    Left = 296
+    Top = 328
+  end
+  object SaveDialogConfig: TSaveDialog
+    Left = 216
+    Top = 328
   end
 end

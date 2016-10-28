@@ -312,7 +312,7 @@ object frmRelAr: TfrmRelAr
     TabOrder = 4
   end
   object qryTotaisCorrier: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT  '
       #9'FM.FAMILIA,'
@@ -373,7 +373,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryFamilaCOR: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT  '
       'distinct'#9'FM.FAMILIA'
@@ -423,7 +423,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryTotaisRemessa: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT  '
       #9'FM.FAMILIA,'
@@ -484,7 +484,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryFamilaRE: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT  '
       'distinct'#9'FM.FAMILIA'
@@ -534,7 +534,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryResumoREM: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,  MOTIVO,COD_MOT,  DT_DEVOLUCAO'
@@ -587,7 +587,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryDatasREM: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'select distinct cast(dt_devolucao as  CHAR(10)) as dt_devolucao'
       'from ibi_controle_devolucoes_AR'
@@ -605,7 +605,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryTotaisREM: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -664,7 +664,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryDevolARRem: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -730,7 +730,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryResumoCour: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -777,7 +777,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryTotaisCour: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -836,7 +836,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryDevolARCou: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -903,7 +903,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryTotais: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -961,7 +961,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryDevolAR: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -1057,7 +1057,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryResumo: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT'
       '  SUM(QTD_DEVOL) AS QTDE,'
@@ -1102,23 +1102,8 @@ object frmRelAr: TfrmRelAr
       ReadOnly = True
     end
   end
-  object qryFamilia: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
-    SQL.Strings = (
-      'select distinct familia from ibi_cadastro_familia'
-      'ORDER BY FAMILIA'
-      '')
-    Params = <>
-    Left = 584
-    Top = 232
-    object qryFamiliafamilia: TStringField
-      FieldName = 'familia'
-      Required = True
-      Size = 60
-    end
-  end
   object qryDatas: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'select distinct cast(dt_devolucao as CHAR(10)) as dt_devolucao'
       'from ibi_controle_devolucoes_AR'
@@ -1135,7 +1120,7 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryDatasCour: TZReadOnlyQuery
-    Connection = DM.ADOConnection1
+    Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'select distinct cast(dt_devolucao as CHAR(10)) as dt_devolucao'
       'from ibi_controle_devolucoes_AR'
@@ -1159,8 +1144,22 @@ object frmRelAr: TfrmRelAr
     end
   end
   object qryDevolAR2: TZTable
-    Connection = DM.ADOConnection1
     Left = 520
     Top = 328
+  end
+  object qryFamilia: TZReadOnlyQuery
+    Connection = DM.CtrlDvlDBConn
+    SQL.Strings = (
+      'select distinct familia from ibi_cadastro_familia'
+      'ORDER BY FAMILIA'
+      '')
+    Params = <>
+    Left = 568
+    Top = 224
+    object qryFamiliafamilia: TStringField
+      FieldName = 'familia'
+      Required = True
+      Size = 60
+    end
   end
 end
