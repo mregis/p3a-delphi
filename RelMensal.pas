@@ -4,43 +4,44 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, RLReport, DB, ZAbstractRODataset, ZDataset, ZAbstractDataset;
+  Dialogs, RLReport, DB, ZAbstractRODataset, ZDataset, ZAbstractDataset,
+  ComCtrls, ExtCtrls;
 
 type
   TqrForm_RelMensal = class(TForm)
     RLRelMensal: TRLReport;
-    RLBand1: TRLBand;
-    RLLabel1: TRLLabel;
-    RLLabel2: TRLLabel;
-    RLLabel3: TRLLabel;
-    RLSystemInfo1: TRLSystemInfo;
+    RLBandCabecalho: TRLBand;
+    RLLabelTitulo: TRLLabel;
+    RLLabelData: TRLLabel;
+    RLLabelPagina: TRLLabel;
+    RLSystemInfoNumPag: TRLSystemInfo;
     RLPeriodo: TRLLabel;
-    RLLabel6: TRLLabel;
-    RLDraw1: TRLDraw;
-    RLDraw2: TRLDraw;
-    RLGroup1: TRLGroup;
-    RLBand2: TRLBand;
-    RLLabel7: TRLLabel;
-    RLDBText1: TRLDBText;
-    RLLabel8: TRLLabel;
-    RLDBText2: TRLDBText;
-    RLLabel9: TRLLabel;
-    RLDraw3: TRLDraw;
-    RLBand3: TRLBand;
-    RLDBText3: TRLDBText;
-    RLDraw4: TRLDraw;
-    RLBand4: TRLBand;
-    RLLabel10: TRLLabel;
-    RLDBText4: TRLDBText;
-    RLDTotGrupo: TRLDBResult;
-    RLBand5: TRLBand;
-    RLLabel11: TRLLabel;
-    RLDTotGer: TRLDBResult;
-    procedure RLBand1BeforePrint(Sender: TObject; var PrintIt: Boolean);
+    RLLabelSubTitulo: TRLLabel;
+    RLLabelDataRelatorio: TRLLabel;
+    RLGroupProdutos: TRLGroup;
+    RLDetailGridResumoLeituras: TRLDetailGrid;
+    RLDTotalProduto: TRLDBResult;
+    RLDBTextMotivo: TRLDBText;
+    RLBandTotalProduto: TRLBand;
+    RLLabelTotalGeral: TRLLabel;
+    RLDBResultTotalProduto: TRLDBResult;
+    RLBandColumHeader: TRLBand;
+    RLLabelMotivos: TRLLabel;
+    RLLabelQtde: TRLLabel;
+    RLBandHeaderProduto: TRLBand;
+    RLLabelProduto: TRLLabel;
+    RLDBTextCodProduto: TRLDBText;
+    RLDBTextDescricaoProduto: TRLDBText;
+    RLBand1: TRLBand;
+    RLDBResult1: TRLDBResult;
+    RLLabel1: TRLLabel;
+    procedure FormCreate(Sender: TObject);
+    procedure RLBandCabecalhoBeforePrint(Sender: TObject; var PrintIt: Boolean);
   private
     { Private declarations }
   public
     { Public declarations }
+    dt_inicial, dt_final : TDate;
   end;
 
 var
@@ -48,17 +49,21 @@ var
 
 implementation
 
-uses CDDM, Devolucoes;
+uses CDDM;
 
 {$R *.dfm}
 
-procedure TqrForm_RelMensal.RLBand1BeforePrint(Sender: TObject; var PrintIt: Boolean);
+procedure TqrForm_RelMensal.FormCreate(Sender: TObject);
 begin
-  RLLabel2.Caption  :=  RLLabel2.Caption +
-    FormatDateTime('dd/mm/yyyy',Date);
-  RLPeriodo.Caption :=  'Perído: ' +
-    FormatDateTime('dd/mm/yyyy', DevolucoesFrm.cbDT_INICIAL.Date) +
-    ' à ' + FormatDateTime('dd/mm/yyyy', DevolucoesFrm.cbDT_FINAL.Date);
+  dt_inicial := Date;
+  dt_final := Date;
+end;
+
+procedure TqrForm_RelMensal.RLBandCabecalhoBeforePrint(Sender: TObject; var PrintIt: Boolean);
+begin
+  RLLabelDataRelatorio.Caption  :=  FormatDateTime('dd/mm/yyyy', Date);
+  RLPeriodo.Caption :=  'Perído: ' + FormatDateTime('dd/mm/yyyy', dt_inicial) +
+    ' à ' + FormatDateTime('dd/mm/yyyy', dt_final);
 end;
 
 end.

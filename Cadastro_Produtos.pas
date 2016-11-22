@@ -33,8 +33,8 @@ uses Devolucoes, CDDM;
 
 procedure TProdutosFrm.FormCreate(Sender: TObject);
 begin
-//  qrProdutos.Close;
- // qrProdutos.Open;
+  qrProdutos.Close;
+  qrProdutos.Open;
 end;
 
 end.

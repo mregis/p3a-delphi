@@ -33,8 +33,8 @@ uses Devolucoes, CDDM;
 
 procedure TOrgBinFrm.FormCreate(Sender: TObject);
 begin
-  //qrBin.Close;
-  //qrBin.Open;
+  qrBin.Close;
+  qrBin.Open;
 end;
 
 end.

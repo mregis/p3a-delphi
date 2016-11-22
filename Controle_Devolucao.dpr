@@ -24,14 +24,15 @@ uses
   U_frmAcesso in 'U_frmAcesso.pas' {FrmAcesso},
   uGeraExcelDev in 'uGeraExcelDev.pas' {fGeraExcelDev},
   U_FrmConfig in 'U_FrmConfig.pas' {U_FrmConfig},
-  uGeraArqDev in 'uGeraArqDev.pas' {fGeraArqDev};
+  uGeraArqDev in 'uGeraArqDev.pas' {fGeraArqDev},
+  U_FrmLeituraCartao in 'U_FrmLeituraCartao.pas' {FormLeituraCartao};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.Title := 'DEVOLUÇÕES DE FATURAS E CARTÕES';
-  Application.CreateForm(TDM, Dm);
+  Application.CreateForm(TDm, Dm);
   if DM.CtrlDvlDBConn.Connected = true then
     begin
       Application.CreateForm(TFrmAcesso, FrmAcesso);

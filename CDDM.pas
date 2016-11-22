@@ -130,13 +130,23 @@ uses
     qraProduto: TZReadOnlyQuery;
     qraOrg: TZQuery;
     ZQuery1: TZQuery;
-    DataSource1: TDataSource;
     qraRelMensal: TZQuery;
     qraRelMensalds_motivo: TStringField;
     qraRelMensalcd_produto: TStringField;
     qraRelMensalds_produto: TStringField;
     qraRelMensaltotal: TLargeintField;
     DtSRelMensal: TDataSource;
+    qMotivodescricao: TStringField;
+    qraMotivoID: TIntegerField;
+    qraMotivoCd_Motivo: TStringField;
+    qraMotivoDs_motivo: TStringField;
+    qraProdutoIdProd: TIntegerField;
+    qraProdutoCdProduto: TStringField;
+    qraProdutoDs_Produto: TStringField;
+    qraProdutoCodbin: TStringField;
+    qraProdutoPrivBand: TStringField;
+    qraMotivomotivo: TStringField;
+    qraProdutodescricao: TStringField;
     procedure TimerTimer(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure envarq;
@@ -255,8 +265,9 @@ begin
     // Forçando o DateStyle a ser sempre o mesmo, independente do
     // que foi configurado no servidor, devido a Bug da Lib Zeos
     SqlAux.Close;
-    SqlAux.SQL.Clear;
-    SqlAux.SQL.Add(FORMAT('SET DATESTYLE TO %s', [QuotedStr('ISO, DMY')]));
+    SqlAux.SQL.Text := FORMAT('SET DATESTYLE TO %s', [QuotedStr('ISO, DMY')]);
+    SqlAux.Open;
+    SqlAux.SQL.Text := FORMAT('SET NAMES %s', [QuotedStr('WIN1252')]);
     SqlAux.Open;
 
     SqlAux.Close;

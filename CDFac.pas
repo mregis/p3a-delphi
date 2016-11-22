@@ -5,54 +5,53 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ExtCtrls, DBCtrls, ComCtrls, Buttons, DB, //ADODB,
-  ZAbstractRODataset, ZDataset;
+  ZAbstractRODataset, ZDataset, Grids;
 
 type
   TfrmCartao = class(TForm)
     pMsg: TPanel;
-    gbxCartao: TGroupBox;
-    Label2: TLabel;
-    cbDT_DEVOLUCAO: TDateTimePicker;
-    lcCD_MOTIVO: TDBLookupComboBox;
-    Label3: TLabel;
-    edtCartao: TEdit;
-    mmCartoes: TMemo;
     Timer1: TTimer;
-    lblQtde: TLabel;
     gbxProcessamento: TGroupBox;
-    btnSalvar: TBitBtn;
-    btnArquivo: TBitBtn;
-    btnFechar: TBitBtn;
-    Panel1: TPanel;
-    mmCodBin: TMemo;
-    edtBIN: TEdit;
-    Label1: TLabel;
     qryFamilia: TZReadOnlyQuery;
-    Edarq: TEdit;
-    DTPFinal: TDateTimePicker;
-    Label4: TLabel;
     FacRelQtde: TZReadOnlyQuery;
     FacRelTot: TZReadOnlyQuery;
-    procedure edtCartaoEnter(Sender: TObject);
+    LblDtInicio: TLabel;
+    cbDT_DEVOLUCAO: TDateTimePicker;
+    LblDtFinal: TLabel;
+    DTPFinal: TDateTimePicker;
+    LblMotivoDevol: TLabel;
+    lcCD_MOTIVO: TDBLookupComboBox;
+    GroupBox1: TGroupBox;
+    LabelCodBin: TLabel;
+    Label2: TLabel;
+    edtCartao: TEdit;
+    eBIN: TEdit;
+    StringGridFACsLidos: TStringGrid;
+    StatusBarMessages: TStatusBar;
+    BitBtnSalvar: TBitBtn;
+    BitBtnArquivo: TBitBtn;
+    Edarq: TEdit;
+    LblArq: TLabel;
+    btnFechar: TBitBtn;
+    procedure edtCartaoKeyPress(Sender: TObject; var Key: Char);
+    procedure BitBtnArquivoClick(Sender: TObject);
+    procedure BitBtnSalvarClick(Sender: TObject);
+    procedure StringGridFACsLidosKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure eBinChange(Sender: TObject);
     procedure cbDT_DEVOLUCAOEnter(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
-    procedure edtCartaoKeyPress(Sender: TObject; var Key: Char);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lcCD_MOTIVOClick(Sender: TObject);
-    procedure mmCartoesEnter(Sender: TObject);
     procedure lcCD_MOTIVOExit(Sender: TObject);
-    procedure btnSalvarClick(Sender: TObject);
-    procedure mmCartoesChange(Sender: TObject);
-    procedure btnArquivoClick(Sender: TObject);
     procedure btnFecharClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure edtBINChange(Sender: TObject);
     procedure montarel;
   private
     { Private declarations }
     s, sLinha1, sLinha2, sLinha3, sCDMotivo: string;
-    k, i: integer;
+    i: integer;
     F,FA: TextFile;
     sDir, srel, arqausente : string;
     ListaSLP: TStringList;
@@ -71,7 +70,7 @@ var
   ScartaoLido: string;
 
 implementation
-uses CDDM;//, Base;
+uses CDDM, U_Func;
 
 {$R *.dfm}
 
@@ -94,11 +93,12 @@ end;
 
 procedure TfrmCartao.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  if mmCartoes.Lines.Count>0 then
-      btnSalvarClick(self);
-  DM.qMotivo.Close;
-  DM.qData.Close;
-  DM.qFac.Close;
+  With DM do
+    begin
+      DM.qMotivo.Close;
+      DM.qData.Close;
+      DM.qFac.Close;
+    end;
   Action := caFree;
 end;
 
@@ -112,220 +112,128 @@ begin
   end;
 end;
 
-procedure TfrmCartao.mmCartoesEnter(Sender: TObject);
-begin
-  edtCartao.SetFocus;
-end;
-
 procedure TfrmCartao.lcCD_MOTIVOExit(Sender: TObject);
 begin
   if lcCD_MOTIVO.KeyValue <> null then
-  begin
-    if mmCartoes.Lines.Count > 0 then
     begin
-      if (sCDMotivo <> '') and (sCDMotivo <> lcCD_MOTIVO.KeyValue) then
-      begin
-        if Application.MessageBox('Existem leituras não salvas. Deseja alterar o motivo dessas leituras?', 'Aviso', MB_YESNO + MB_SYSTEMMODAL + MB_ICONWARNING) = id_no then
-          lcCD_MOTIVO.KeyValue := sCDMotivo
-        else
-          sCDMotivo := lcCD_MOTIVO.KeyValue;
-      end;
-    end
-    else
-    begin
-      sCDMotivo := lcCD_MOTIVO.KeyValue;
-      edtCartao.SetFocus;
+      if StringGridFACsLidos.RowCount > 1 then
+        begin
+          if (sCDMotivo <> '') and (sCDMotivo <> lcCD_MOTIVO.KeyValue) then
+            begin
+              if Application.MessageBox('Você está a prestes a alterar o Motivo de ' +
+                    'Devolução de todas as leituras efetuadas presentes na lista. ' + #13#10 +
+                    'Tem certeza que deseja continuar?', 'ATENÇÃO',
+                  MB_YESNO + MB_SYSTEMMODAL + MB_ICONWARNING) = id_no then
+                lcCD_MOTIVO.KeyValue := sCDMotivo
+              else
+                sCDMotivo := lcCD_MOTIVO.KeyValue;
+            end;
+        end
+          else
+            begin
+              sCDMotivo := lcCD_MOTIVO.KeyValue;
+              edtCartao.SetFocus;
+            end;
     end;
-  end;
-end;
-
-procedure TfrmCartao.btnSalvarClick(Sender: TObject);
-var
-  iCont: integer;
-  sMensagem: string;
-begin
-  if lcCD_MOTIVO.KeyValue = null then
-  begin
-    Application.MessageBox('Selecione o motivo.', 'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
-    lcCD_MOTIVO.SetFocus;
-    exit;
-  end;
-  DM.qCodFac.Close;
-  DM.qCodFac.Open;
-  try
-
-  DM.qFac.Close;
-  DM.qFac.Open;
-
-  DM.qData.Close;
-  DM.qData.Open;
-
-    //DM.ADOConnection1. //.BeginTrans;
-    for iCont := 0 to mmCartoes.Lines.Count - 1 do
-    begin
-      sMensagem := '';
-      DM.qBuscaFAC.Close;
-      DM.qBuscaFAC.ParamByName('cartao').Value := mmCartoes.Lines[icont];
-      DM.qBuscaFAC.ParamByName('data').AsDate := cbDT_DEVOLUCAO.Date;
-      DM.qBuscaFAC.Open;
-
-      if DM.qBuscaFAC.IsEmpty then
-      begin
-        DM.SqlAux.Close;
-        DM.SqlAux.SQL.Clear;
-        DM.SqlAux.SQL.Add('insert into ibi_controle_devolucoes_fac (nro_cartao,cd_motivo,codbin,codusu) values ');
-        DM.SqlAux.SQL.Add('('+chr(39)+mmCartoes.Lines[icont]+chr(39)+','+chr(39)+lcCD_MOTIVO.KeyValue+chr(39)+','+chr(39)+mmCodBin.Lines[icont]+chr(39)+','+IntToStr(DM.usuaces)+ ')');
-        DM.SqlAux.ExecSQL;
-
-      end
-      else
-      begin
-//        sMensagem := 'O cartão ' + mmCartoes.Lines[icont] + ' já foi salvo com o motivo ' + DM.qBuscaFACds_motivo.AsString + '. Deseja alterar o motivo?';
-//        if Application.MessageBox(pchar(sMensagem), 'Aviso', MB_YESNO + MB_ICONWARNING + MB_SYSTEMMODAL) = id_yes then
-//        begin
-          DM.ZQAux.Close;
-          DM.ZQAux.SQL.Clear;
-          DM.ZQAux.SQL.Add('update ibi_controle_devolucoes_fac set cd_motivo=:motivo where (nro_cartao=:cod) and (dt_cadastro=(select current_date))' );
-          DM.ZQAux.ParamByName('motivo').AsString := lcCD_MOTIVO.KeyValue;
-          DM.ZQAux.ParamByName('cod').AsString    :=  mmCartoes.Lines[icont];
-//          DM.ZQAux.ParamByName('.AsDateTime := DM.qDatadata.AsDateTime;
-//          DM.qBuscaAR.Post;
-          DM.ZQAux.ExecSQL;
-
-//          DM.qBuscaFAC.Edit;
-//          DM.qBuscaFACCD_MOTIVO.AsString := lcCD_MOTIVO.KeyValue;
-//          DM.qBuscaFAC.Post;
-//        end;
-      end;
-
-    end;
-    mmCartoes.Lines.Clear;
-    mmCodBin.Clear;
-    btnSalvar.Enabled := False;
-    lblQtde.Caption := 'Quantidade de Cartões lidos: 0';
-    //DM.ADOConnection1.CommitTrans;
-  except
-//    DM.ADOConnection1.RollbackTrans;
-    Application.MessageBox('Erro ao atualizar o banco de dados.', 'Aviso', MB_OK + MB_ICONERROR + MB_SYSTEMMODAL);
-  end;
 end;
 
 procedure TfrmCartao.cbDT_DEVOLUCAOEnter(Sender: TObject);
 begin
   dm.SqlAux.Close;
   dm.SqlAux.SQL.Clear;
-  dm.SqlAux.SQL.Add('select current_date');
+  dm.SqlAux.SQL.Add('SELECT CURRENT_DATE');
   dm.SqlAux.Open;
-  cbDT_DEVOLUCAO.DateTime :=  dm.SqlAux.Fields[0].AsDateTime;
-
+  cbDT_DEVOLUCAO.Date :=  dm.SqlAux.Fields[0].AsDateTime;
 end;
 
-procedure TfrmCartao.mmCartoesChange(Sender: TObject);
-begin
-  btnSalvar.Enabled := mmCartoes.Lines.Count > 0;
-  case mmCartoes.Lines.Count of
-    10  : frmCartao.btnSalvarClick(self);
-  end;
-
-end;
 Procedure TfrmCartao.montarel;
 var
   nPos : Integer;
-
 begin
-//  bCopia := False;
-//  sMensagem := '';
-//  with qraRelatorioQtde as TADOQuery do
   with FacRelQtde do
-  begin
-    Close;
-    SQL.Clear;
+    begin
+      Close;
+      SQL.Clear;
 
-    cSQL := '';
-    cSQL := cSQL + 'SELECT CD.CD_MOTIVO, MD.DS_MOTIVO, COUNT(*) AS QTDE FROM IBI_CONTROLE_DEVOLUCOES_AR CD, CEA_MOTIVOS_DEVOLUCOES MD ';
-    cSQL := cSQL + 'WHERE CD.CD_MOTIVO = MD.CD_MOTIVO ';
-    cSQL := cSQL + ' AND ';
-    cSQL := cSQL + '(CD.DT_DEVOLUCAO BETWEEN '+chr(39)+FormatDateTime('yyyy/mm/dd',cbDT_DEVOLUCAO.Date)+chr(39) ;
-//    cSQL := cSQL + DtSQL_Ini(cbDT_INICIAL.Date);
-//    cSQL := cSQL + ' AND ';
-    cSQL := cSQL + ' and '+chr(39) + FormatDateTime('yyyy/mm/dd',DTPFinal.Date)+chr(39)+') ';
-    cSQL := cSQL + 'GROUP BY CD.CD_MOTIVO, MD.DS_MOTIVO ';
-    cSQL := cSQL + 'ORDER BY CD.CD_MOTIVO';
-//    inputbox('','',cSQL);
+      cSQL := '';
+      cSQL := cSQL + 'SELECT CD.CD_MOTIVO, MD.DS_MOTIVO, COUNT(*) AS QTDE FROM IBI_CONTROLE_DEVOLUCOES_AR CD, CEA_MOTIVOS_DEVOLUCOES MD ';
+      cSQL := cSQL + 'WHERE CD.CD_MOTIVO = MD.CD_MOTIVO ';
+      cSQL := cSQL + ' AND ';
+      cSQL := cSQL + '(CD.DT_DEVOLUCAO BETWEEN '+chr(39)+FormatDateTime('yyyy/mm/dd',cbDT_DEVOLUCAO.Date)+chr(39) ;
+      cSQL := cSQL + ' and '+chr(39) + FormatDateTime('yyyy/mm/dd',DTPFinal.Date)+chr(39)+') ';
+      cSQL := cSQL + 'GROUP BY CD.CD_MOTIVO, MD.DS_MOTIVO ';
+      cSQL := cSQL + 'ORDER BY CD.CD_MOTIVO';
 
-    SQL.Add(cSQL);
-    Open;
-  end;
+      SQL.Add(cSQL);
+      Open;
+    end;
 
-//  with qraRelatorioTOT as TADOQuery do
   with FacRelTot do
-  begin
-    Close;
-    SQL.Clear;
-    cSQL := '';
-    cSQL := cSQL + 'SELECT COUNT(*) AS TOTAL FROM IBI_CONTROLE_DEVOLUCOES_AR ';
-    cSQL := cSQL + 'WHERE (DT_DEVOLUCAO BETWEEN '+chr(39)+FormatDateTime('yyyy/mm/dd',cbDT_DEVOLUCAO.Date)+chr(39);
-//    cSQL := cSQL + DtSQL_Ini(cbDT_INICIAL.Date);
-    cSQL := cSQL + ' AND '+chr(39)+FormatDateTime('yyyy/mm/dd',DTPFinal.Date)+chr(39)+') ';
-//    cSQL := cSQL + DtSQL_Fim(cbDT_FINAL.Date)+;
-    SQL.Add(cSQL);
-    Open;
-  end;
+    begin
+      Close;
+      SQL.Clear;
+      cSQL := '';
+      cSQL := cSQL + 'SELECT COUNT(*) AS TOTAL FROM IBI_CONTROLE_DEVOLUCOES_AR ';
+      cSQL := cSQL + 'WHERE DT_DEVOLUCAO BETWEEN :dti AND :dtf ';
+      SQL.Add(cSQL);
+      ParamByName('dti').AsDate := cbDT_DEVOLUCAO.Date;
+      ParamByName('dtf').AsDate := DTPFinal.Date;
+      Open;
+    end;
 
   if FacRelQtde.IsEmpty then
-  begin
-    Application.MessageBox('Não existe dados para a data selecionada.', 'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
-    Exit;
-  end;
+    begin
+      Application.MessageBox('Não existem dados para a data selecionada.',
+          'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
+      Exit;
+    end;
 
   try
     sRel := dm.relatdir;
-
-    if not DirectoryExists(sRel) then
-       CreateDirectory(PAnsiChar(srel),nil);
-
-    sRel := sRel + 'IBI_REL_'+FormatDateTime('ddmmyyyy',DM.qDatadata.AsDateTime)+FormatDateTime('hhmmss',Time) +'.txt';
+    sRel := sRel + 'IBI_REL_' + FormatDateTime('ddmmyyyy', DM.qDatadata.AsDateTime) +
+          FormatDateTime('hhnnss',Time) + '.txt';
     AssignFile(F, sRel);
     ReWrite(F);
-
-    WriteLn(F, format('%61.61s%',[StringOfChar('-',60)]));
+    WriteLn(F, format('%61.61s%', [StringOfChar('-',60)]));
     WriteLn(F, '');
-    WriteLn(F, format('%-51.51s%',[' ADDRESS SA -  IBI CARTÕES FAC'])+format('%-10.10s%',['PAGINA: 01']));
+    WriteLn(F, format('%-51.51s%', [' ADDRESS SA -  IBI CARTÕES FAC']) +
+          format('%-10.10s%', ['PAGINA: 01']));
     WriteLn(F, '');
-    WriteLn(F, ' PROCESSAMENTO DE: ' + DateToStr(cbDT_DEVOLUCAO.Date) + ' À ' + DateToStr(DTPFinal.Date));
+    WriteLn(F, ' PROCESSAMENTO DE: ' + DateToStr(cbDT_DEVOLUCAO.Date) +
+        ' À ' + DateToStr(DTPFinal.Date));
     WriteLn(F, '');
     WriteLn(F, '                  RESUMO DO CONTROLE DE DEVOLUCOES');
     WriteLn(F, ' ____________________________________________________________');
-    WriteLn(F, format('%-57.57s%',[' CODIGO DESCRICAO'])+format('%-04.04s%',['QTDE']));
-    WriteLn(F, format('%7.7s%',['------'])+ StringOfChar('-',49)+format('%5.5s%',['----']));
+    WriteLn(F, format('%-57.57s%', [' CODIGO DESCRICAO']) +
+        format('%-04.04s%', ['QTDE']));
+    WriteLn(F, format('%7.7s%',['------']) + StringOfChar('-', 49) +
+        format('%5.5s%', ['----']));
 
-    while not FacRelQtde.Eof do
-    begin
-      S := ' ';
-      for nPos := 0 to (FacRelQtde.FieldCount - 1) do
+    While not FacRelQtde.Eof do
       begin
-        cFieldValue := FacRelQtde.FieldByName(FacRelQtde.Fields[nPos].FieldName).AsString;
-        cFieldName := FacRelQtde.Fields[nPos].FieldName;
+        S := ' ';
+        for nPos := 0 to (FacRelQtde.FieldCount - 1) do
+          begin
+            cFieldValue := FacRelQtde.FieldByName(FacRelQtde.Fields[nPos].FieldName).AsString;
+            cFieldName := FacRelQtde.Fields[nPos].FieldName;
 
-        if UpperCase(cFieldName) = 'CD_MOTIVO' then
-          S := S + Format('%2.2d',[StrToInt(cFieldValue)]) + Format('%-5.5s%',[''])
+            if UpperCase(cFieldName) = 'CD_MOTIVO' then
+              S := S + Format('%2.2d',[StrToInt(cFieldValue)]) + Format('%-5.5s%',[''])
 
-        else if UpperCase(cFieldName) = 'DS_MOTIVO' then
-        begin
-//          S := S + cFieldValue;
-          S := S + Format('%-49.49s%',[trim(cFieldValue) ]);
-//          S := S + ' ';
-        end
+            else if UpperCase(cFieldName) = 'DS_MOTIVO' then
+              begin
+                S := S + Format('%-49.49s%',[trim(cFieldValue) ]);
+              end
+            else if UpperCase(cFieldName) = 'QTDE' then
+              begin
+                S := S +  Format('%4.4d',[StrToInt(cFieldValue)]);
+              end;
+          end;
 
-        else if UpperCase(cFieldName) = 'QTDE' then
-        begin
-//          S := S + Replicate(' ', (4 - Length(cFieldValue)));
-          S := S +  Format('%4.4d',[StrToInt(cFieldValue)]);
-        end;
+        WriteLn(F, S);
+        FacRelQtde.Next;
       end;
-      WriteLn(F, S);
-      FacRelQtde.Next;
-    end;
+
     cFieldValue := FacRelTot.FieldByName(FacRelTot.Fields[0].FieldName).AsString;
     cFieldName  := FacRelTot.Fields[0].FieldName;
     S := StringOfChar(' ', (4 - Length(cFieldValue)));
@@ -335,32 +243,151 @@ begin
 
   except
     on Msg: Exception do
-    begin
       MessageDlg(Msg.Message, mtInformation, [mbOK], 0)
-    end;
   end;
-  CloseFile(F);
 
+  CloseFile(F);
 end;
 
-procedure TfrmCartao.btnArquivoClick(Sender: TObject);
+procedure TfrmCartao.StringGridFACsLidosKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+  var j, srow : Integer;
+    sMensagem : String;
 begin
-  DM.qArqFac.Close;
-  DM.qArqFac.ParamByName('dt1').AsDate := cbDT_DEVOLUCAO.Date;
-  DM.qArqFac.ParamByName('dt2').AsDate := cbDT_DEVOLUCAO.Date;
-  DM.qArqFac.Open;
-  if not DM.qArqFac.IsEmpty then
-  begin
-    if GerarArquivo then
+  if Key = VK_DELETE then
     begin
-      montarel;
-      Application.MessageBox('Arquivo gerado com sucesso.', 'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
-    end;
-  end
-  else
-  begin
-    Application.MessageBox('Não existe devolução para a data selecionada.', 'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
+      srow := StringGridFACsLidos.Row;
+      if (srow < 1 ) then exit; // Não apagar cabeçalhos
+
+      sMensagem := 'Deseja remover o Objeto ' + StringGridFACsLidos.Cells[1, srow] +
+        ' da lista? Ele não será incluído nos arquivos.';
+    if Application.MessageBox(pchar(sMensagem), 'Aviso', MB_YESNO + MB_ICONQUESTION + MB_SYSTEMMODAL) = id_yes then
+      begin
+        for j := srow to StringGridFACsLidos.RowCount - 2 do
+          begin
+            if (StringGridFACsLidos.Cells[0, j + 1] = '') then
+              StringGridFACsLidos.Cells[0, j] := ''
+            else
+              StringGridFACsLidos.Cells[0, j] := IntToStr(i);
+
+            StringGridFACsLidos.Cells[1, j] := StringGridFACsLidos.Cells[1, j + 1];
+            StringGridFACsLidos.Cells[2, j] := StringGridFACsLidos.Cells[2, j + 1];
+          end;
+        StringGridFACsLidos.RowCount := StringGridFACsLidos.RowCount - 1;
+        StatusBarMessages.Panels.Items[1].Text := IntToStr(StringGridFACsLidos.RowCount - 1);
+        BitBtnSalvar.Enabled := StringGridFACsLidos.RowCount > 1;
+      end;
   end;
+end;
+
+procedure TfrmCartao.BitBtnArquivoClick(Sender: TObject);
+begin
+  With DM do
+    begin
+      qArqFac.Close;
+      qArqFac.ParamByName('dt1').AsDate := cbDT_DEVOLUCAO.Date;
+      qArqFac.ParamByName('dt2').AsDate := cbDT_DEVOLUCAO.Date;
+      qArqFac.Open;
+      if not DM.qArqFac.IsEmpty then
+        begin
+          if GerarArquivo then
+            begin
+              montarel;
+              Application.MessageBox('Arquivo gerado com sucesso.',
+                  'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
+            end;
+        end
+      else
+        begin
+          Application.MessageBox('Não existe devolução para a data selecionada.',
+                'Aviso', MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
+        end;
+    end;
+end;
+
+procedure TfrmCartao.BitBtnSalvarClick(Sender: TObject);
+var
+  iCont: integer;
+  sMensagem: string;
+begin
+  if lcCD_MOTIVO.KeyValue = null then
+    begin
+      Application.MessageBox('Selecione um Motivo de Devolução.', 'Aviso',
+          MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
+      lcCD_MOTIVO.SetFocus;
+      exit;
+    end;
+
+  With DM do
+    begin
+      try
+        qCodFac.Close;
+        qFac.Close;
+        qData.Close;
+
+        // Para evitar problemas de concorrencia no Banco,
+        // Sempre usar transações em bloco
+        CtrlDvlDBConn.StartTransaction;
+        qCodFac.Open;
+        qFac.Open;
+        qData.Open;
+        // Instrução de inclusão
+        SqlAux.Close;
+        SqlAux.SQL.Clear;
+        SqlAux.SQL.Add('INSERT INTO ibi_controle_devolucoes_fac ');
+        SqlAux.SQL.Add('(nro_cartao,cd_motivo,codbin,codusu)');
+        SqlAux.SQL.Add('VALUES :cartao, :motivo, :bin, :codusu');
+        // Instrução de atualização
+        ZQAux.Close;
+        ZQAux.SQL.Clear;
+        ZQAux.SQL.Add('UPDATE ibi_controle_devolucoes_fac ');
+        ZQAux.SQL.Add('SET cd_motivo=:motivo ');
+        ZQAux.SQL.Add('WHERE nro_cartao=:cartao AND dt_cadastro = :dt');
+
+        for iCont := 1 to StringGridFACsLidos.RowCount - 1 do
+          begin
+            sMensagem := '';
+            qBuscaFAC.Close;
+            qBuscaFAC.ParamByName('cartao').AsString := StringGridFACsLidos.Cells[1, iCont];
+            qBuscaFAC.ParamByName('data').AsDate := cbDT_DEVOLUCAO.Date;
+            qBuscaFAC.Open;
+
+            // Verificando se o cartao já foi lido na data passada
+            if qBuscaFAC.IsEmpty then
+              begin
+                // Não existe entrada, será criado uma
+                SqlAux.ParamByName('cartao').AsString := StringGridFACsLidos.Cells[1, iCont];
+                SqlAux.ParamByName('motivo').AsString := lcCD_MOTIVO.KeyValue;
+                SqlAux.ParamByName('bin').AsString := StringGridFACsLidos.Cells[2, iCont];
+                SqlAux.ParamByName('codusu').AsInteger := DM.usuaces;
+                SqlAux.ExecSQL;
+              end
+            else
+              begin
+                ZQAux.ParamByName('motivo').AsString := lcCD_MOTIVO.KeyValue;
+                ZQAux.ParamByName('cartao').AsString := StringGridFACsLidos.Cells[1, iCont];
+                ZQAux.ParamByName('dt').AsDateTime := qDatadata.AsDateTime;
+                ZQAux.ExecSQL;
+              end;
+          end; // for
+        CtrlDvlDBConn.Commit;
+        StringGridFACsLidos.RowCount := 1;
+        BitbtnSalvar.Enabled := False;
+        sMensagem := 'Informações salvas com sucesso!';
+        Application.MessageBox( PChar(sMensagem), 'Aviso',
+            MB_OK + MB_ICONINFORMATION);
+        StatusBarMessages.Panels.Items[4].Text := sMensagem;
+        StatusBarMessages.Panels.Items[1].Text := '0';
+
+      except
+        if CtrlDvlDBConn.InTransaction then
+          CtrlDvlDBConn.Rollback;
+        Application.MessageBox('Ocorreu um erro ao gravar as informações. ' +
+              'Nenhuma informação foi salva. Tente novamente ou entre em ' +
+              'contato com o Administrador', 'ATENÇÃO',
+            MB_OK + MB_ICONERROR + MB_SYSTEMMODAL);
+      end;
+    end;
 end;
 
 function TfrmCartao.GerarArquivo: boolean;
@@ -379,19 +406,17 @@ begin
   Rewrite(FA);
 
   AssignFile(F,Edarq.Text);
-    Rewrite(F);
-    DM.qArqFac.First;
-    sCartao := '';
-    iAux := 0;
-    DM.qParam.Close;
-    DM.qParam.Open;
+  Rewrite(F);
+  DM.qArqFac.First;
+  sCartao := '';
+  iAux := 0;
+  DM.qParam.Close;
+  DM.qParam.Open;
 
-    bAusente := False;
-    if DM.qParamAUSENTE.AsString = 'S' then
+  bAusente := False;
+  if DM.qParamAUSENTE.AsString = 'S' then
     begin
       DM.ZqAusFac.Close;
- //     DM.qAusente.Parameters.ParamByName('data').Value := FormatDateTime('YYYYMMDD', trunc(cbDT_DEVOLUCAO.Date));
-//      DM.qAusente.Parameters.ParamByName('cd_motivo').Value := DM.qParamCD_MOTIVO.AsString;
       DM.ZqAusFac.ParamByName('data').AsDate := cbDT_DEVOLUCAO.Date;
       DM.ZqAusFac.ParamByName('cd_motivo').AsString := DM.qParamCD_MOTIVO.AsString;
       DM.ZqAusFac.Open;
@@ -400,93 +425,75 @@ begin
         bAusente := True;
     end;
 
-//    sDir  :=  ;
-//    ListaArq.Add('F:\ibisis\Relatorio\SLIP.CARTAO.IBI.FAC.'+FormatDateTime('DDMMYYYY', cbDT_DEVOLUCAO.Date) + '.TMP');
     ListaSLP.Add(StringOfChar('-', 88));
     ListaSLP.Add('                       Devolução IBI - Cartões - FAC                      ');
     ListaSLP.Add(StringOfChar('-', 88));
-    //F:\IBISIS\RETORNO\XXX
-
     ListaSLP.Add('Arquivo          : '+'ADDRESS2ACC.CARTAO.IBI.FAC'+copy(Edarq.Text,length(Edarq.Text)-(18+1),length(Edarq.Text)-18));
-    //Edarq.Text);//+ copy(Edarq.Text,30,length(Edarq.Text)-29));
-
     ListaSLP.Add('Data da Devolução: ' + FormatDateTime('DD/MM/YYYY', cbDT_DEVOLUCAO.Date));
     if bAusente then
-    begin
-      ListaSLP.Add('Total de Objetos Outros   : ' + FormatFloat('##,##0;;', DM.qArqFac.RecordCount - DM.ZqAusFac.Fields.Fields[0].AsInteger));
-      ListaSLP.Add('Total de Objetos Ausentes : ' + FormatFloat('##,##0;;', DM.ZqAusFac.Fields.Fields[0].AsInteger));
-    end
+      begin
+        ListaSLP.Add('Total de Objetos Outros   : ' + FormatFloat('##,##0;;', DM.qArqFac.RecordCount - DM.ZqAusFac.Fields.Fields[0].AsInteger));
+        ListaSLP.Add('Total de Objetos Ausentes : ' + FormatFloat('##,##0;;', DM.ZqAusFac.Fields.Fields[0].AsInteger));
+      end
     else
-    begin
-      ListaSLP.Add('Total de Objetos Outros   : ' + FormatFloat('##,##0;;', DM.qArqFac.RecordCount));
-      ListaSLP.Add('Total de Objetos Ausentes : ' + FormatFloat('##,##0;;', 0));
-    end;
+      begin
+        ListaSLP.Add('Total de Objetos Outros   : ' + FormatFloat('##,##0;;', DM.qArqFac.RecordCount));
+        ListaSLP.Add('Total de Objetos Ausentes : ' + FormatFloat('##,##0;;', 0));
+      end;
 
     ListaSLP.Add('Total de Objetos : ' + FormatFloat('##,##0', DM.qArqFac.RecordCount));
     ListaSLP.Add(StringOfChar('-', 88));
     ListaSLP.Add('Cartões:');
-//    lblQtde.Caption := 'Qtde: '+ IntToStr(DM.qArqFac.RecordCount);
+
     while not DM.qArqFac.Eof do
-    begin
-      if  (DM.qArqFacCD_MOTIVO.AsInteger = 7) then
       begin
-        s := DM.qArqFacNRO_CARTAO.AsString + '005' + DM.qArqFacCD_MOTIVO.AsString + FormatDateTime('ddmmyyyy', DM.qArqFacDATA.AsDateTime);
-        Writeln(FA, s);
-      end
-      else
-      begin
-        s := DM.qArqFacNRO_CARTAO.AsString + '005' + DM.qArqFacCD_MOTIVO.AsString + FormatDateTime('ddmmyyyy', DM.qArqFacDATA.AsDateTime);
-        Writeln(F, s);
-      end;
-      if iAux < 5 then
-      begin
-        if iAux = 0 then
-        begin
-          sCartao := DM.qArqFacNRO_CARTAO.AsString;
-          inc(iAux);
-        end
-        else
-        begin
-          if iAux <> 4 then
+        if  (DM.qArqFacCD_MOTIVO.AsInteger = 7) then
           begin
-            sCartao := sCartao + '  ' + DM.qArqFacNRO_CARTAO.AsString;
-            inc(iAux);
+            s := DM.qArqFacNRO_CARTAO.AsString + '005' + DM.qArqFacCD_MOTIVO.AsString + FormatDateTime('ddmmyyyy', DM.qArqFacDATA.AsDateTime);
+            Writeln(FA, s);
           end
-          else
+        else
           begin
-            sCartao := sCartao + '  ' + DM.qArqFacNRO_CARTAO.AsString;
-            ListaSLP.Add(sCartao);
-            iAux := 0;
-            sCartao := '';
+            s := DM.qArqFacNRO_CARTAO.AsString + '005' + DM.qArqFacCD_MOTIVO.AsString + FormatDateTime('ddmmyyyy', DM.qArqFacDATA.AsDateTime);
+            Writeln(F, s);
           end;
-        end;
+
+        if iAux < 5 then
+          begin
+            if iAux = 0 then
+              begin
+                sCartao := DM.qArqFacNRO_CARTAO.AsString;
+                inc(iAux);
+              end
+            else
+              begin
+                if iAux <> 4 then
+                  begin
+                    sCartao := sCartao + '  ' + DM.qArqFacNRO_CARTAO.AsString;
+                    inc(iAux);
+                  end
+                else
+                  begin
+                    sCartao := sCartao + '  ' + DM.qArqFacNRO_CARTAO.AsString;
+                    ListaSLP.Add(sCartao);
+                    iAux := 0;
+                    sCartao := '';
+                  end;
+              end;
+          end;
+
+        DM.qArqFac.Next;
       end;
-      DM.qArqFac.Next;
-    end;
+
     ListaSLP.Add(sCartao);
     ListaSLP.Add(StringOfChar('-', 88));
     ListaSLP.Add(format('%-10.10s%',['© ' + FormatDateTime('YYYY', DM.qdatadata.AsDateTime)])
     +   format('%-57.57s%',['ADDRESS SA'])+ FormatDateTime('DD/MM/YYYY - hh:nn:ss',DM.qDatadata.AsDateTime));
-//    +   format('%-56.56s%',['ADDRESS SA'])+ FormatDateTime('DD/MM/YYYY',DM.qDatadata.AsDateTime)+ ' - HH:MM:SS',dm.hratu));
-
-//    ListaSLP.Add('© ' + FormatDateTime('YYYY', DM.qdatadata.AsDateTime) + format('%-20.20s%',['ADDRESS SA'])+FormatDateTime('DD/MM/YYYY', DM.qDatadata.AsDateTime)+' - '+ dm.hratu);
-    //;;sdir  :=
-//    sdir  :=  copy(sdir,1,length(sdir)-7)+'\Slip';
- //   if (not(DirectoryExists(sdir)))  then
-  //    MkDir(sdir);
-  //  sdir  :=  sdir;
-  //  Edarq.Text  :=  sdir+'Dev' + 'Slip'+FormatDateTime('DDMMYYYY', cbDT_DEVOLUCAO.Date) + '.TMP';
     ListaSLP.SaveToFile(sRel);
-//    +FormatDateTime('HHMMSS',dm.SqlAux.Fields[1].AsDateTime)  + '.SLP');
-    //pMsg.Caption := 'Aguarde. Enviando e-mail.';
     Application.ProcessMessages;
-//    DM.EnviarEmail(0, ExtractFilePath(Application.ExeName) + 'Slip\Dev' + FormatDateTime('DDMM', cbDT_DEVOLUCAO.Date) + '_TARJA.SLP');
     pMsg.Caption := '';
     CloseFile(F);
-  //finally
     ListaSLP.Free;
-  //end;
-
 end;
 
 procedure TfrmCartao.btnFecharClick(Sender: TObject);
@@ -497,56 +504,62 @@ end;
 procedure TfrmCartao.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
 begin
+  if (StringGridFACsLidos.RowCount > 1) then
+    if Application.MessageBox(pchar('A lista de FACs lidos não foi gravada! Deseja sair assim mesmo?'),
+        'Aviso', MB_YESNO + MB_ICONQUESTION + MB_SYSTEMMODAL) = ID_NO then
+        abort;
   CanClose := True;
-  if mmCartoes.Lines.Count > 0 then
-  begin
-    if Application.MessageBox('Existe devolução não salva. As informações serão perdidas. Deseja continuar?', 'Aviso', MB_YESNO + MB_ICONWARNING + MB_SYSTEMMODAL) = id_no then
-      CanClose := False;
-  end;
+
 end;
 
-procedure TfrmCartao.edtBINChange(Sender: TObject);
-
+procedure TfrmCartao.eBinChange(Sender: TObject);
+var r : Integer;
+  s : String;
 begin
-  if Length(edtBIN.Text) = 6 then
-  begin
-  { valida bin}
-
-    qryFamilia.Close;
-    qryFamilia.ParamByName('COD_BIN').Value := edtBIN.Text;
-    qryFamilia.Open;
-
-    if qryFamilia.RecordCount > 0 then
+  eBin.Text := trim(eBin.Text);
+  if (length(eBin.Text) > 4) then
     begin
-      if flqsalva=False then
-        flqsalva:=True;
-      mmCodBin.Lines.Add(edtBIN.Text);
-      edtBIN.Text := '';
-      edtCartao.Text := '';
-      //k :=  k+1;
-      lblQtde.Caption := 'Quantidade de Cartões lidos: ' + IntToStr(k);
-      edtCartao.SetFocus;
-    end
-    else
-    begin
-      mmCartoes.Lines.Delete(mmCartoes.Lines.IndexOf(ScartaoLido));
-      ShowMessage('Código BIN Inválido');
-      edtBIN.Text := '';
-      edtCartao.Text := '';
-      edtCartao.SetFocus;
-      k:= k -1;
-      lblQtde.Caption := 'Quantidade de Cartões lidos: ' + IntToStr(k);
+      if (eBin.Text = '52743') then
+        eBin.Text := eBin.Text + '7'
+      else if (eBin.Text = '51854') then
+        eBin.Text := eBin.Text + '4'
+      else if (eBin.Text = '53133') then
+        eBin.Text := eBin.Text + '9';
     end;
 
-  end;
-end;
+  if (length(eBin.Text) > 5) then
+    begin
+      StatusBarMessages.Panels.Items[4].Text := '';
+      qryFamilia.Close;
+      qryFamilia.ParamByName('COD_BIN').AsString := eBin.Text;
+      qryFamilia.Open;
 
-procedure TfrmCartao.edtCartaoEnter(Sender: TObject);
-begin
-  case  mmCodBin.Lines.Count of
-    1:  frmCartao.btnSalvarClick(self);
-  end;
-
+      if qryFamilia.RecordCount > 0 then
+        begin
+          BitbtnSalvar.Enabled := true;
+          r := StringGridFACsLidos.RowCount;
+          StringGridFACsLidos.RowCount := StringGridFACsLidos.RowCount + 1;
+          StringGridFACsLidos.Cells[0, r] := IntToStr(r);
+          StringGridFACsLidos.Cells[1, r] := edtCartao.Text;
+          StringGridFACsLidos.Cells[2, r] := eBin.Text;
+          StatusBarMessages.Panels.Items[1].Text := IntToStr(r);
+          StatusBarMessages.Panels.Items[3].Text := edtCartao.Text + ' | ' +
+              eBin.Text;
+          edtCartao.Clear;
+          eBin.Clear;
+          edtCartao.SetFocus;
+        end
+      else
+        begin
+          s := 'Este BIN não está cadastrado! Verifique a informação.' + #13#10 +
+                'Caso esteja correto será necessário cadastrar a Família deste BIN';
+          Application.MessageBox(
+              PChar(s),
+                'Controle de Devoluções - FAC', MB_OK + MB_ICONWARNING);
+          StatusBarMessages.Panels.Items[4].Text := 'ERRO!';
+          eBin.SetFocus;
+        end;
+    end;
 end;
 
 procedure TfrmCartao.edtCartaoKeyPress(Sender: TObject; var Key: Char);
@@ -555,30 +568,31 @@ begin
   pMsg.Caption := 'Lendo informações do Cartão';
   pMsg.Font.Color := clRed;
   try
+    // Evitando problema de teclado trocado?? 
     if (key = '?') or (key = 'ç') then
-    begin
-      s := s + ':';
-      if i = 1 then
       begin
-        sLinha1 := s;
-        if (Length(sLinha1) < 77) and (Length(sLinha1) > 78) then
-        begin
-          sLinha1 := '';
-        end;
-        inc(i);
-      end;
-      if i = 2 then
-      begin
-        sLinha2 := s;
-        inc(i);
-      end;
-      if i = 3 then
-      begin
-        sLinha3 := s;
-        inc(i);
-      end;
-      s := '=';
-    end
+        s := s + ':';
+        if i = 1 then
+          begin
+            sLinha1 := s;
+            if (Length(sLinha1) < 77) and (Length(sLinha1) > 78) then
+              begin
+                sLinha1 := '';
+              end;
+            inc(i);
+          end;
+        if i = 2 then
+          begin
+            sLinha2 := s;
+            inc(i);
+          end;
+        if i = 3 then
+          begin
+            sLinha3 := s;
+            inc(i);
+          end;
+        s := '=';
+      end
     else if s <> '=' then
       s := s + key
     else
@@ -589,62 +603,28 @@ begin
 end;
 
 procedure TfrmCartao.Timer1Timer(Sender: TObject);
-var
-  j: integer;
-  scartao: string;
-
-  bValida: boolean;
+var scartao: string;
 begin
 
   pMsg.Caption := 'Aguardando leitura do Cartão Magnético';
   pMsg.Font.Color := clBlue;
   if (sLinha1 <> '') then
-  begin
-    bValida := True;
-    scartao := copy(sLinha1, 3, 16);
-
-    for j := 1 to length(scartao) do
     begin
-      if not (scartao[j] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']) then
-        bValida := False;
-    end;
+      scartao := copy(sLinha1, 3, 16);
 
-    if bValida then
-      if length(trim(scartao)) <> 16 then
-        bValida := False;
-    if bValida then
-    begin
-      if mmCartoes.Lines.IndexOf(scartao) = -1 then
-      begin
-        k := k + 1;
-        Panel1.Caption := '';
-        Panel1.Refresh;
-        mmCartoes.Lines.Add(scartao);
-        sCartaoLido := scartao;
-        edtBIN.Text :=  copy(scartao,1,6);
-        //lerBIN;
-      end
+      if (validaNumCartaoCredito(trim(scartao))) then
+        begin
+          eBIN.Text :=  copy(scartao,1,6);
+          sCartaoLido := scartao;
+          eBIN.SetFocus;
+        end
       else
-      begin
-        Timer1.Enabled := False;
-        //Application.MessageBox('Cartão já incluído na lista.', 'Aviso', MB_OK + MB_SYSTEMMODAL + MB_ICONWARNING);
-        edtCartao.Text := '';
-        Timer1.Enabled := True;
-      end;
-    end
-    else
-    begin
-      pMsg.Caption := 'Cartão inválido';
-      pMsg.Font.Color := clRed;
+        begin
+          pMsg.Caption := 'Cartão inválido';
+          pMsg.Font.Color := clRed;
+          Timer1.Enabled := True;
+        end;
     end;
-    lblQtde.Caption := 'Quantidade de Cartões lidos: ' + IntToStr(k);
-    lblQtde.Caption := 'Quantidade de Cartões lidos: ' + IntToStr(mmCartoes.Lines.Count);
-    i := 1;
-    sLinha1 := '';
-    sLinha2 := '';
-    sLinha3 := '';
-    s := '';
-  end;
 end;
 
 

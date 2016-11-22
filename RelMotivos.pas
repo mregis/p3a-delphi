@@ -39,10 +39,14 @@ type
     RLBand5: TRLBand;
     RLLabel10: TRLLabel;
     RLDBResult2: TRLDBResult;
+    procedure RLRelMotivosBeforePrint(Sender: TObject; var PrintIt: Boolean);
+    procedure FormShow(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
     { Public declarations }
+    dt_inicial, dt_final : TDateTime; 
   end;
 
 var
@@ -50,8 +54,28 @@ var
 
 implementation
 
-uses CDDM, Devolucoes;
+uses CDDM;
 
 {$R *.dfm}
+
+procedure TqrForm_RelMotivos.FormCreate(Sender: TObject);
+begin
+  dt_inicial := Date;
+  dt_final := Date;
+end;
+
+procedure TqrForm_RelMotivos.FormShow(Sender: TObject);
+begin
+  qraMotivosTot.Close;
+  qraMotivosTot.ParamByName('dti').AsDate := dt_inicial;
+  qraMotivosTot.ParamByName('dtf').AsDate := dt_final;
+  qraMotivosTot.Open;
+end;
+
+procedure TqrForm_RelMotivos.RLRelMotivosBeforePrint(Sender: TObject;
+  var PrintIt: Boolean);
+begin
+    qlPeriodo.Caption := DateToStr(dt_inicial) + ' à ' + DateToStr(dt_final);
+end;
 
 end.
