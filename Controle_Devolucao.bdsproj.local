@@ -33,5 +33,9 @@
     <Transaction>2012/11/27 14:37:21.271.dfm,F:\nibi\Sistema\Unit1.dfm=F:\nibi\Sistema\uGeraArqDev.dfm</Transaction>
     <Transaction>2012/11/28 09:37:21.814.pas,F:\nibi\Sistema\uGeraArqDev.pas=F:\nibi\Sistema\uGeraExcelDev.pas</Transaction>
     <Transaction>2012/11/28 09:37:21.814.dfm,F:\nibi\Sistema\uGeraArqDev.dfm=F:\nibi\Sistema\uGeraExcelDev.dfm</Transaction>
+    <Transaction>2016/11/11 18:28:18.664.pas,C:\Documents and Settings\Valdir\Meus documentos\Borland Studio Projects\ibisys\Unit1.pas=C:\Documents and Settings\Valdir\Meus documentos\Borland Studio Projects\ibisys\U_FrmLeituraCartao.pas</Transaction>
+    <Transaction>2016/11/11 18:28:18.724.dfm,C:\Documents and Settings\Valdir\Meus documentos\Borland Studio Projects\ibisys\Unit1.dfm=C:\Documents and Settings\Valdir\Meus documentos\Borland Studio Projects\ibisys\U_FrmLeituraCartao.dfm</Transaction>
+    <Transaction>2016/11/23 18:37:40.406.pas,C:\Documents and Settings\Valdir\Meus documentos\Borland Studio Projects\ibisys\U_FrmLeituraCartao.pas=C:\Documents and Settings\Valdir\Meus documentos\Borland Studio Projects\ibisys\U_FrmLeituraFatura.pas</Transaction>
+    <Transaction>2016/11/23 18:37:40.406.dfm,C:\Documents and Settings\Valdir\Meus documentos\Borland Studio Projects\ibisys\U_FrmLeituraCartao.dfm=C:\Documents and Settings\Valdir\Meus documentos\Borland Studio Projects\ibisys\U_FrmLeituraFatura.dfm</Transaction>
   </Transactions>
 </BorlandProject>

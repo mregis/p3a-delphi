@@ -1,12 +1,12 @@
 object DM: TDM
   OldCreateOrder = False
   OnCreate = DataModuleCreate
-  Height = 392
-  Width = 516
+  Height = 457
+  Width = 699
   object dtsMotivo: TDataSource
     DataSet = qMotivo
-    Left = 104
-    Top = 8
+    Left = 169
+    Top = 118
   end
   object CtrlDvlDBConn: TZConnection
     ControlsCodePage = cGET_ACP
@@ -19,21 +19,22 @@ object DM: TDM
     User = 'valdires'
     Password = 'valdir!50#'
     Protocol = 'postgresql-9'
-    Left = 40
+    Left = 32
     Top = 8
   end
   object qMotivo: TZReadOnlyQuery
     Connection = CtrlDvlDBConn
     SQL.Strings = (
-      'select * from IBI_MOTIVO_DEVOLUCOES'
-      'order by cd_motivo'
-      '')
+      'SELECT id, cd_motivo, ds_motivo, '
+      'CAST (cd_motivo || '#39' - '#39' || ds_motivo AS VARCHAR) AS descricao'
+      'FROM ibi_motivo_devolucoes a'
+      'ORDER BY cd_motivo')
     Params = <>
     Properties.Strings = (
       'select * from ibi_motivo_devolucoes'
       'order by cd_motivo')
-    Left = 160
-    Top = 8
+    Left = 229
+    Top = 118
     object qMotivoid: TIntegerField
       FieldName = 'id'
       Required = True
@@ -48,6 +49,11 @@ object DM: TDM
       Required = True
       Size = 40
     end
+    object qMotivodescricao: TStringField
+      FieldName = 'descricao'
+      Required = True
+      Size = 45
+    end
   end
   object qFac: TZReadOnlyQuery
     Connection = CtrlDvlDBConn
@@ -59,8 +65,8 @@ object DM: TDM
     Properties.Strings = (
       'select * from ibi_controle_devolucoes_fac'
       'where id is null')
-    Left = 208
-    Top = 8
+    Left = 97
+    Top = 280
     object qFacid: TIntegerField
       FieldName = 'id'
       Required = True
@@ -111,8 +117,8 @@ object DM: TDM
       
         'select isnull(max(id),0) +1 as codigo from ibi_controle_devoluco' +
         'es_fac')
-    Left = 240
-    Top = 8
+    Left = 162
+    Top = 280
     object qCodFaccodigo: TIntegerField
       FieldName = 'codigo'
       ReadOnly = True
@@ -148,8 +154,8 @@ object DM: TDM
       '  F.cd_motivo = D.cd_motivo and'
       '  nro_cartao = :cartao and'
       '  data = :data')
-    Left = 296
-    Top = 8
+    Left = 292
+    Top = 280
     ParamData = <
       item
         DataType = ftUnknown
@@ -213,8 +219,8 @@ object DM: TDM
     Params = <>
     Properties.Strings = (
       'select current_date as data,localtime(0) as hratu')
-    Left = 344
-    Top = 8
+    Left = 422
+    Top = 280
     object qDatadata: TDateField
       FieldName = 'data'
       ReadOnly = True
@@ -240,8 +246,8 @@ object DM: TDM
     Properties.Strings = (
       'select * from ibi_controle_devolucoes_fac'
       'where dt_devolucao = :dt_devolucao')
-    Left = 22
-    Top = 64
+    Left = 244
+    Top = 338
     ParamData = <
       item
         DataType = ftUnknown
@@ -303,8 +309,8 @@ object DM: TDM
     Properties.Strings = (
       'select * from ibi_controle_devolucoes_AR'
       'where id is null')
-    Left = 102
-    Top = 64
+    Left = 456
+    Top = 338
     object qARid: TIntegerField
       FieldName = 'id'
       Required = True
@@ -356,8 +362,8 @@ object DM: TDM
     Params = <>
     Properties.Strings = (
       'select(max(id) +1 as codigo from ibi_controle_devolucoes_AR')
-    Left = 166
-    Top = 64
+    Left = 227
+    Top = 280
     object qCodARcodigo: TIntegerField
       FieldName = 'codigo'
       ReadOnly = True
@@ -371,8 +377,8 @@ object DM: TDM
     Params = <>
     Properties.Strings = (
       'select * from ibi_email')
-    Left = 214
-    Top = 64
+    Left = 488
+    Top = 280
     object qEmailid: TIntegerField
       FieldName = 'id'
       Required = True
@@ -391,13 +397,14 @@ object DM: TDM
   object qBuscaAR: TZReadOnlyQuery
     Connection = CtrlDvlDBConn
     SQL.Strings = (
+      'select A.*, D.ds_motivo, L.codigo'
+      'FROM ibi_controle_devolucoes_AR A'
       
-        'select A.*, D.ds_motivo from ibi_controle_devolucoes_AR A, ibi_m' +
-        'otivo_devolucoes D'
-      'where'
-      '  A.cd_motivo = D.cd_motivo and'
-      '  cod_ar = :cartao and'
-      '  data = :data'
+        '    INNER JOIN ibi_motivo_devolucoes D ON (  A.cd_motivo = D.cd_' +
+        'motivo)'
+      '    LEFT JOIN lote L ON (A.lote_id = L.id)'
+      'WHERE  cod_ar = :cartao AND'
+      '    data >= :data'
       '')
     Params = <
       item
@@ -418,8 +425,8 @@ object DM: TDM
       '  A.cd_motivo = D.cd_motivo and'
       '  cod_ar = :cartao and'
       '  data = :data')
-    Left = 262
-    Top = 64
+    Left = 32
+    Top = 338
     ParamData = <
       item
         DataType = ftUnknown
@@ -493,8 +500,8 @@ object DM: TDM
         Name = 'dt_devfim'
         ParamType = ptUnknown
       end>
-    Left = 304
-    Top = 64
+    Left = 102
+    Top = 338
     ParamData = <
       item
         DataType = ftUnknown
@@ -554,8 +561,8 @@ object DM: TDM
     Params = <>
     Properties.Strings = (
       'select * from ibi_parametros')
-    Left = 344
-    Top = 64
+    Left = 173
+    Top = 338
     object qParamid: TIntegerField
       FieldName = 'id'
       Required = True
@@ -592,8 +599,8 @@ object DM: TDM
       
         'select count(*) qtde from ibi_controle_devolucoes_ar where cd_mo' +
         'tivo = :cd_motivo and data = :data')
-    Left = 32
-    Top = 112
+    Left = 357
+    Top = 280
     ParamData = <
       item
         DataType = ftUnknown
@@ -611,31 +618,32 @@ object DM: TDM
     end
   end
   object DtSAux: TDataSource
-    Left = 96
-    Top = 112
+    Left = 313
+    Top = 173
   end
   object SqlAux: TZQuery
     Connection = CtrlDvlDBConn
     Params = <>
-    Left = 34
-    Top = 168
+    Left = 32
+    Top = 227
   end
   object ZQAux: TZQuery
+    Connection = CtrlDvlDBConn
     Params = <>
-    Left = 90
-    Top = 168
+    Left = 229
+    Top = 173
   end
   object DtSZqAux: TDataSource
-    Left = 152
-    Top = 112
+    Left = 169
+    Top = 173
   end
   object IdSMTP: TIdSMTP
     Host = 'mail.address.com.br'
     Password = 'env222'
     SASLMechanisms = <>
     Username = 'envio@address.com.br'
-    Left = 144
-    Top = 168
+    Left = 32
+    Top = 392
   end
   object IdMessage: TIdMessage
     AttachmentEncoding = 'UUE'
@@ -648,22 +656,22 @@ object DM: TDM
     Recipients = <>
     ReplyTo = <>
     ConvertPreamble = True
-    Left = 200
-    Top = 168
+    Left = 168
+    Top = 392
   end
   object Timer: TTimer
     Interval = 120000000
     OnTimer = TimerTimer
-    Left = 320
-    Top = 128
+    Left = 88
+    Top = 392
   end
   object ZQUsuario: TZQuery
     Connection = CtrlDvlDBConn
     SQL.Strings = (
       'select * from ibi_cadusuario where (1=1)')
     Params = <>
-    Left = 208
-    Top = 112
+    Left = 89
+    Top = 62
     object ZQUsuariocodusu: TIntegerField
       FieldName = 'codusu'
       Required = True
@@ -703,8 +711,8 @@ object DM: TDM
   end
   object DtUsuario: TDataSource
     DataSet = ZQUsuario
-    Left = 264
-    Top = 112
+    Left = 32
+    Top = 62
   end
   object ZqAusFac: TZQuery
     Connection = CtrlDvlDBConn
@@ -725,8 +733,8 @@ object DM: TDM
         Name = 'data'
         ParamType = ptUnknown
       end>
-    Left = 264
-    Top = 168
+    Left = 163
+    Top = 227
     ParamData = <
       item
         DataType = ftUnknown
@@ -760,8 +768,8 @@ object DM: TDM
         Name = 'data'
         ParamType = ptUnknown
       end>
-    Left = 320
-    Top = 168
+    Left = 229
+    Top = 227
     ParamData = <
       item
         DataType = ftUnknown
@@ -780,37 +788,58 @@ object DM: TDM
   end
   object dsMotivos: TDataSource
     DataSet = qraMotivo
-    Left = 7
-    Top = 280
+    Left = 169
+    Top = 62
   end
   object dsProdutos: TDataSource
     DataSet = qraProduto
-    Left = 39
-    Top = 280
+    Left = 313
+    Top = 62
   end
   object dsOrg: TDataSource
     DataSet = qraOrg
-    Left = 71
-    Top = 280
+    Left = 32
+    Top = 118
   end
   object dsControle: TDataSource
-    Left = 103
-    Top = 281
+    Left = 32
+    Top = 173
   end
   object qraRelatorioTOT: TZReadOnlyQuery
     Connection = CtrlDvlDBConn
     SQL.Strings = (
-      'SELECT count(*) AS TOTAL FROM CEA_CONTROLE_DEVOLUCOES'
-      'WHERE'
-      'DT_DEVOLUCAO BETWEEN '#39'2004-08-03 00:00'#39' AND '#39'2004-08-04 00:00'#39
+      'SELECT COUNT(*) AS TOTAL '
+      'FROM cea_controle_devolucoes '
+      'WHERE dt_devolucao BETWEEN :dti AND :dtf'
       '')
-    Params = <>
+    Params = <
+      item
+        DataType = ftUnknown
+        Name = 'dti'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'dtf'
+        ParamType = ptUnknown
+      end>
     Properties.Strings = (
       'SELECT count(*) AS TOTAL FROM CEA_CONTROLE_DEVOLUCOES'
       'WHERE'
       'DT_DEVOLUCAO BETWEEN '#39'2004-08-03 00:00'#39' AND '#39'2004-08-04 00:00'#39)
-    Left = 136
+    Left = 32
     Top = 280
+    ParamData = <
+      item
+        DataType = ftUnknown
+        Name = 'dti'
+        ParamType = ptUnknown
+      end
+      item
+        DataType = ftUnknown
+        Name = 'dtf'
+        ParamType = ptUnknown
+      end>
   end
   object qraRelatorioQtde: TZReadOnlyQuery
     Connection = CtrlDvlDBConn
@@ -828,64 +857,121 @@ object DM: TDM
       'WHERE CD.CD_MOTIVO = MD.CD_MOTIVO'
       'GROUP BY CD.CD_MOTIVO, MD.DS_MOTIVO'
       'ORDER BY CD.CD_MOTIVO')
-    Left = 168
-    Top = 280
+    Left = 314
+    Top = 338
   end
   object qraRetorno: TZReadOnlyQuery
     Connection = CtrlDvlDBConn
     Params = <>
-    Left = 208
-    Top = 280
+    Left = 385
+    Top = 338
   end
   object qraControle: TZQuery
     Connection = CtrlDvlDBConn
     SQL.Strings = (
-      'SELECT * FROM CEA_CONTROLE_DEVOLUCOES'
-      'WHERE NR_CONTA = :NR_CONTA'
+      'SELECT * FROM cea_controle_devolucoes '
+      'WHERE nro_conta = :nr_conta AND dt_cadastro = :dt_cadastro'
       '')
     Params = <
       item
-        DataType = ftUnknown
-        Name = 'NR_CONTA'
+        DataType = ftString
+        Name = 'nr_conta'
         ParamType = ptUnknown
+        Value = ''
+      end
+      item
+        DataType = ftDateTime
+        Name = 'dt_cadastro'
+        ParamType = ptUnknown
+        Value = 42653d
       end>
     Properties.Strings = (
       'SELECT * FROM CEA_CONTROLE_DEVOLUCOES'
       'WHERE NR_CONTA = :NR_CONTA')
-    Left = 240
-    Top = 280
+    Left = 89
+    Top = 173
     ParamData = <
       item
-        DataType = ftUnknown
-        Name = 'NR_CONTA'
+        DataType = ftString
+        Name = 'nr_conta'
         ParamType = ptUnknown
+        Value = ''
+      end
+      item
+        DataType = ftDateTime
+        Name = 'dt_cadastro'
+        ParamType = ptUnknown
+        Value = 42653d
       end>
   end
   object qAux: TZTable
     Connection = CtrlDvlDBConn
     ReadOnly = True
-    Left = 272
-    Top = 280
+    Left = 383
+    Top = 173
   end
   object qraMotivo: TZReadOnlyQuery
     Connection = CtrlDvlDBConn
     SQL.Strings = (
-      'SELECT * FROM cea_motivos_devolucoes'
-      '')
+      'SELECT id, cd_motivo, ds_motivo, '
+      'CAST(cd_motivo || '#39' - '#39' || ds_motivo AS VARCHAR) as descricao'
+      'FROM cea_motivos_devolucoes')
     Params = <>
-    Left = 312
-    Top = 280
+    Left = 229
+    Top = 62
+    object qraMotivoID: TIntegerField
+      FieldName = 'ID'
+    end
+    object qraMotivoCd_Motivo: TStringField
+      FieldName = 'cd_Motivo'
+      Size = 2
+    end
+    object qraMotivoDs_motivo: TStringField
+      FieldName = 'ds_motivo'
+      Size = 40
+    end
+    object qraMotivoDescricao: TStringField
+      DisplayLabel = 'Descricao'
+      FieldName = 'descricao'
+      Size = 45
+    end
   end
   object qraProduto: TZReadOnlyQuery
     Connection = CtrlDvlDBConn
     SQL.Strings = (
-      'SELECT * FROM CEA_PRODUTOS'
-      '')
+      'SELECT idprod, cd_produto, ds_produto, codbin, priv_band, '
+      
+        '    CAST(cd_produto || '#39' - '#39' || ds_produto AS VARCHAR) as descri' +
+        'cao'
+      'FROM cea_produtos')
     Params = <>
     Properties.Strings = (
       'SELECT * FROM CEA_MOTIVOS_DEVOLUCOES')
-    Left = 344
-    Top = 280
+    Left = 383
+    Top = 62
+    object qraProdutoIdProd: TIntegerField
+      FieldName = 'idprod'
+    end
+    object qraProdutoCdProduto: TStringField
+      FieldName = 'cd_produto'
+      Size = 3
+    end
+    object qraProdutoDs_Produto: TStringField
+      FieldName = 'ds_produto'
+      Size = 60
+    end
+    object qraProdutoCodbin: TStringField
+      FieldName = 'codbin'
+      Size = 6
+    end
+    object qraProdutoPrivBand: TStringField
+      FieldName = 'priv_band'
+      Size = 1
+    end
+    object qraProdutodescricao: TStringField
+      FieldName = 'descricao'
+      Size = 45
+    end
   end
   object qraOrg: TZQuery
     Connection = CtrlDvlDBConn
@@ -895,18 +981,14 @@ object DM: TDM
     Params = <>
     Properties.Strings = (
       'select * from cea_org')
-    Left = 376
-    Top = 280
+    Left = 89
+    Top = 118
   end
   object ZQuery1: TZQuery
     Connection = CtrlDvlDBConn
     Params = <>
-    Left = 416
-    Top = 280
-  end
-  object DataSource1: TDataSource
-    Left = 449
-    Top = 281
+    Left = 97
+    Top = 227
   end
   object qraRelMensal: TZQuery
     Connection = CtrlDvlDBConn
@@ -924,8 +1006,8 @@ object DM: TDM
       ''
       '')
     Params = <>
-    Left = 48
-    Top = 336
+    Left = 383
+    Top = 118
     object qraRelMensalds_motivo: TStringField
       FieldName = 'ds_motivo'
       Required = True
@@ -948,7 +1030,7 @@ object DM: TDM
   end
   object DtSRelMensal: TDataSource
     DataSet = qraRelMensal
-    Left = 8
-    Top = 336
+    Left = 313
+    Top = 118
   end
 end

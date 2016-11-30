@@ -55,6 +55,10 @@ Function VirgPonto2(Valor: string): string;
 function md5(const input : string) : string;
 function md5File(const fileName : string) : string;
 function validaNumObjCorreios(const numobj : string) : boolean;
+function validaNumCartaoCredito(const ncc: string) : boolean;
+Function LPad(const s: String; Pad: Integer; const c : String) : String;
+Function RPad(const s: String; Pad: Integer; const c : String) : String;
+function isValidLuhnn(const n: String) : Boolean;
 implementation
 
 uses CDDM, CDFac, U_FrmCadHost, IdHashMessageDigest, idHash;
@@ -917,21 +921,8 @@ Begin
     dv  := inttostr(11 - (aux mod base));
     result :=dv;
 
-{EXT.TEXTO(B2;1;1)*8+EXT.TEXTO(B2;2;1)*6+EXT.TEXTO(B2;3;1)*4+
-EXT.TEXTO(B2;4;1)*2+EXT.TEXTO(B2;5;1)*3+EXT.TEXTO(B2;6;1)*5+
-EXT.TEXTO(B2;7;1)*9+EXT.TEXTO(B2;8;1)*7)}
-{
-SE(MOD((EXT.TEXTO(B2;1;1)*8+EXT.TEXTO(B2;2;1)*6+EXT.TEXTO(B2;3;1)*4+
-EXT.TEXTO(B2;4;1)*2+EXT.TEXTO(B2;5;1)*3+EXT.TEXTO(B2;6;1)*5+
-EXT.TEXTO(B2;7;1)*9+EXT.TEXTO(B2;8;1)*7);11)=0;5;
-SE(MOD((EXT.TEXTO(B2;1;1)*8+EXT.TEXTO(B2;2;1)*6+EXT.TEXTO(B2;3;1)*4+
-EXT.TEXTO(B2;4;1)*2+EXT.TEXTO(B2;5;1)*3+EXT.TEXTO(B2;6;1)*5+
-EXT.TEXTO(B2;7;1)*9+EXT.TEXTO(B2;8;1)*7);11)=1;0;
-11-MOD((EXT.TEXTO(B2;1;1)*8+EXT.TEXTO(B2;2;1)*6+EXT.TEXTO(B2;3;1)*4
-+EXT.TEXTO(B2;4;1)*2+EXT.TEXTO(B2;5;1)*3+EXT.TEXTO(B2;6;1)*5+
-EXT.TEXTO(B2;7;1)*9+EXT.TEXTO(B2;8;1)*7);11)))}
-
 End;
+
 Function criadir(texto:String):String;
 var
 dir:string;
@@ -1400,9 +1391,9 @@ end;
   Função que valida um número de Objeto do Correios
   Um número de objeto completo é composto por
   [SIGLA OBJ] + [NUM OBJETO] + [DV] + [SIGLA PAIS]
-  Ex.: DQ080916102BR desmembra-se em [DG] + [08091610] + [2] + [BR]
-  O DV do número de objeto é calculado através do seguinte calculo
-  1 - multiplicase um dos 8 termos que o compõe por um multiplicador
+  Ex.: DG080916102BR desmembra-se em [DG] + [08091610] + [2] + [BR]
+  O DV do número de objeto é calculado através da seguinte fórumla
+  1 - multiplica-se um dos 8 termos que o compõe por um multiplicador
       seguindo a ordem abaixo
     TERMO | MULTIPLICADOR | EXEMPLO | RESULTADO
       1   |     8         |  0 * 8  |    0
@@ -1424,7 +1415,7 @@ end;
 }
 function validaNumObjCorreios(const numobj : string) : boolean;
 const STR_CALC = '86423597';
-var soma, i, resto: Integer;
+var soma, i, resto, t : Integer;
   dv : String;
 begin
    result := false;
@@ -1441,8 +1432,13 @@ begin
     begin
       soma := 0;
       for i := 1 to 8 do
-        soma:= soma + StrToInt(numobj[i+2]) * StrToInt(STR_CALC[i]);
-        
+        begin
+          if TryStrToInt(numobj[i+2], t) then
+            soma:= soma + StrToInt(numobj[i+2]) * StrToInt(STR_CALC[i])
+          else
+            exit;
+        end;
+
       resto := soma Mod 11;
       if resto = 0 then
         dv := '5'
@@ -1455,6 +1451,79 @@ begin
     end;
 end;
 
+{
+  Função que valida um número de Cartão de Crédito
+  Valida pelo tamanho e pelo Luhnn
+}
+function validaNumCartaoCredito(const ncc: string) : boolean;
+begin
+  result := false; // Falso por premissa
+  // Verificando o tamanho.
+  if (12 > Length(ncc)) and (Length(ncc) > 19) then
+    exit;
+  // Checando a sequencia
+  result := (isValidLuhnn(ncc) OR (Length(ncc) = 16));
+end;
+
+{
+  Função de Padding a esquerda [LEFT PADDING]
+  Preenche uma string 's' até o tamanho 'Pad' com a string 'c' pela esquerda
+}
+Function LPad(const s: String; Pad: Integer; const c : String) : String;
+var r : string;
+begin
+  r := s;
+  if ((c <> null) AND (Length(c) > 1)) then
+  else
+      while Length(r) < Pad do
+        r := c + r;
+  Result := r;
+end;
+
+{
+  Função de Padding a direita [RIGHT PADDING]
+  Preenche uma string 's' até o tamanho 'Pad' com a string 'c' pela direita
+}
+Function RPad(const s: String; Pad: Integer; const c : String) : String;
+var r : string;
+begin
+  r := s;
+  if ((c <> null) AND (Length(c) > 1)) then
+  else
+      while Length(r) < Pad do
+        r := r + c;
+  Result := r;
+end;
+
+
+{
+  Função que valida se uma sequencia numérica através do algoritmo de Luhnn
+  @See ver https://en.wikipedia.org/wiki/Luhn_algorithm para maiores detalhes
+}
+function isValidLuhnn(const n: String) : Boolean;
+var i, currentDigit, valSum, currentProcNum : Integer;
+begin
+  valSum := 0;
+  for i := Length(n) downto 1 do
+    begin
+      // parse to int the current rightmost digit, if fail return false (not-valid id)
+      if( TryStrToInt(n[i], currentDigit)) then
+        begin
+			  	currentProcNum := currentDigit shl (i and 1);
+				  //summarize the processed digits
+          if currentProcNum > 9  then
+            currentProcNum := currentProcNum - 9;
+
+			  	valSum :=  valSum + currentProcNum;
+        end
+      else
+        abort;
+    end; // for
+
+    // if digits sum is exactly divisible by 10, return true (valid), else false (not-valid)
+    // valSum must be greater than zero to avoid validate 0000000...00 value
+  result:= ((valSum > 0) AND (valSum mod 10 = 0)) ;
+end;
 end.
 
 

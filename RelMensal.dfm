@@ -3,7 +3,7 @@ object qrForm_RelMensal: TqrForm_RelMensal
   Top = 0
   BorderStyle = bsDialog
   Caption = 'qrForm_RelMensal'
-  ClientHeight = 353
+  ClientHeight = 486
   ClientWidth = 744
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -12,6 +12,7 @@ object qrForm_RelMensal: TqrForm_RelMensal
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object RLRelMensal: TRLReport
@@ -19,34 +20,47 @@ object qrForm_RelMensal: TqrForm_RelMensal
     Top = 8
     Width = 794
     Height = 1123
+    Background.AutoSize = False
     DataSource = DM.DtSRelMensal
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -13
     Font.Name = 'Arial'
     Font.Style = []
-    object RLBand1: TRLBand
+    PreviewOptions.Caption = 'Relat'#243'rio de Devolu'#231#245'es por Produto'
+    object RLBandCabecalho: TRLBand
       Left = 38
       Top = 38
       Width = 718
-      Height = 58
+      Height = 70
       BandType = btHeader
-      BeforePrint = RLBand1BeforePrint
-      object RLLabel1: TRLLabel
+      Borders.Sides = sdCustom
+      Borders.DrawLeft = True
+      Borders.DrawTop = True
+      Borders.DrawRight = True
+      Borders.DrawBottom = True
+      BeforePrint = RLBandCabecalhoBeforePrint
+      object RLLabelTitulo: TRLLabel
         Left = 3
         Top = 0
-        Width = 106
+        Width = 94
         Height = 16
-        Caption = 'ADDRESS - C&A'
+        Caption = 'ADDRESS - IBI'
       end
-      object RLLabel2: TRLLabel
+      object RLLabelData: TRLLabel
         Left = 151
         Top = 0
-        Width = 46
-        Height = 16
-        Caption = 'DATA: '
+        Width = 37
+        Height = 15
+        Caption = 'DATA:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -12
+        Font.Name = 'Arial'
+        Font.Style = [fsBold]
+        ParentFont = False
       end
-      object RLLabel3: TRLLabel
+      object RLLabelPagina: TRLLabel
         Left = 605
         Top = 0
         Width = 39
@@ -54,7 +68,7 @@ object qrForm_RelMensal: TqrForm_RelMensal
         AutoSize = False
         Caption = 'P'#225'g.: '
       end
-      object RLSystemInfo1: TRLSystemInfo
+      object RLSystemInfoNumPag: TRLSystemInfo
         Left = 643
         Top = 0
         Width = 39
@@ -68,155 +82,199 @@ object qrForm_RelMensal: TqrForm_RelMensal
         Width = 64
         Height = 16
       end
-      object RLLabel6: TRLLabel
-        Left = 132
-        Top = 37
+      object RLLabelSubTitulo: TRLLabel
+        Left = 169
+        Top = 39
         Width = 382
         Height = 16
+        Alignment = taCenter
         Caption = 'RESUMO DO CONTROLE DE DEVOLU'#199#213'ES POR PRODUTOS'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = [fsBold]
+        ParentFont = False
       end
-      object RLDraw1: TRLDraw
-        Left = 1
-        Top = 34
-        Width = 718
-        Height = 1
-        DrawKind = dkLine
-        Pen.Style = psDot
-      end
-      object RLDraw2: TRLDraw
-        Left = 0
-        Top = 55
-        Width = 718
-        Height = 1
-        DrawKind = dkLine
-        Pen.Style = psDot
+      object RLLabelDataRelatorio: TRLLabel
+        Left = 203
+        Top = 0
+        Width = 68
+        Height = 16
+        Caption = '10/11/2016'
       end
     end
-    object RLGroup1: TRLGroup
+    object RLGroupProdutos: TRLGroup
       Left = 38
-      Top = 96
+      Top = 108
       Width = 718
-      Height = 113
-      object RLBand2: TRLBand
+      Height = 141
+      Borders.Sides = sdCustom
+      Borders.DrawLeft = False
+      Borders.DrawTop = True
+      Borders.DrawRight = False
+      Borders.DrawBottom = False
+      Borders.Width = 2
+      DataFields = 'cd_produto;ds_produto'
+      object RLDetailGridResumoLeituras: TRLDetailGrid
         Left = 0
-        Top = 0
+        Top = 65
         Width = 718
-        Height = 36
+        Height = 32
+        Borders.Sides = sdCustom
+        Borders.DrawLeft = True
+        Borders.DrawTop = True
+        Borders.DrawRight = True
+        Borders.DrawBottom = True
+        Borders.Style = bsHorizontal
+        ColCount = 2
+        object RLDTotalProduto: TRLDBResult
+          Left = 269
+          Top = 9
+          Width = 81
+          Height = 16
+          Alignment = taRightJustify
+          DataField = 'total'
+          DataSource = DM.DtSRelMensal
+          DisplayMask = '######0'
+        end
+        object RLDBTextMotivo: TRLDBText
+          Left = 3
+          Top = 9
+          Width = 62
+          Height = 16
+          DataField = 'ds_motivo'
+          DataSource = DM.DtSRelMensal
+        end
+      end
+      object RLBandTotalProduto: TRLBand
+        Left = 0
+        Top = 97
+        Width = 718
+        Height = 32
+        BandType = btSummary
+        object RLLabelTotalGeral: TRLLabel
+          Left = 496
+          Top = 10
+          Width = 94
+          Height = 16
+          Caption = 'Total Produto:'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -13
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object RLDBResultTotalProduto: TRLDBResult
+          Left = 608
+          Top = 10
+          Width = 68
+          Height = 16
+          DataField = 'total'
+          DataSource = DM.DtSRelMensal
+          DisplayMask = '######0'
+          Info = riSum
+        end
+      end
+      object RLBandColumHeader: TRLBand
+        Left = 0
+        Top = 40
+        Width = 718
+        Height = 25
+        BandType = btColumnHeader
+        object RLLabelMotivos: TRLLabel
+          Left = 4
+          Top = 6
+          Width = 49
+          Height = 15
+          Caption = 'MOTIVO'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object RLLabelQtde: TRLLabel
+          Left = 301
+          Top = 6
+          Width = 34
+          Height = 15
+          Caption = 'QTDE'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+      end
+      object RLBandHeaderProduto: TRLBand
+        Left = 0
+        Top = 2
+        Width = 718
+        Height = 38
         BandType = btHeader
-        object RLLabel7: TRLLabel
+        object RLLabelProduto: TRLLabel
           Left = 3
-          Top = 0
-          Width = 119
+          Top = 6
+          Width = 57
           Height = 16
-          Caption = 'C'#243'digo do Produto: '
+          Caption = 'Produto: '
         end
-        object RLDBText1: TRLDBText
-          Left = 122
-          Top = 0
-          Width = 70
+        object RLDBTextCodProduto: TRLDBText
+          Left = 66
+          Top = 6
+          Width = 68
           Height = 16
+          Alignment = taRightJustify
+          DataField = 'cd_produto'
+          DataSource = DM.DtSRelMensal
         end
-        object RLLabel8: TRLLabel
-          Left = 3
-          Top = 16
-          Width = 70
-          Height = 16
-          Caption = 'Descri'#231#227'o: '
-        end
-        object RLDBText2: TRLDBText
-          Left = 73
-          Top = 16
+        object RLDBTextDescricaoProduto: TRLDBText
+          Left = 140
+          Top = 6
           Width = 68
           Height = 16
           DataField = 'ds_produto'
-        end
-        object RLLabel9: TRLLabel
-          Left = 528
-          Top = 16
-          Width = 70
-          Height = 16
-          Caption = 'Quantidade'
-        end
-        object RLDraw3: TRLDraw
-          Left = 0
-          Top = 32
-          Width = 718
-          Height = 1
-          DrawKind = dkLine
-          Pen.Style = psDot
+          DataSource = DM.DtSRelMensal
         end
       end
-      object RLBand3: TRLBand
-        Left = 0
-        Top = 36
-        Width = 718
-        Height = 21
-        object RLDBText3: TRLDBText
-          Left = 3
-          Top = 1
-          Width = 68
-          Height = 16
-          DataField = 'cd_produto'
-        end
-        object RLDraw4: TRLDraw
-          Left = 0
-          Top = 18
-          Width = 718
-          Height = 1
-          DrawKind = dkLine
-          Pen.Style = psDot
-        end
-        object RLDBText4: TRLDBText
-          Left = 528
-          Top = 1
-          Width = 29
-          Height = 16
-          DataField = 'total'
-        end
+    end
+    object RLBand1: TRLBand
+      Left = 38
+      Top = 249
+      Width = 718
+      Height = 40
+      BandType = btSummary
+      Borders.Sides = sdCustom
+      Borders.DrawLeft = False
+      Borders.DrawTop = True
+      Borders.DrawRight = False
+      Borders.DrawBottom = False
+      object RLDBResult1: TRLDBResult
+        Left = 608
+        Top = 18
+        Width = 68
+        Height = 16
+        DataField = 'total'
+        DataSource = DM.DtSRelMensal
+        DisplayMask = '######0'
+        Info = riSum
       end
-      object RLBand4: TRLBand
-        Left = 0
-        Top = 57
-        Width = 718
-        Height = 21
-        object RLLabel10: TRLLabel
-          Left = 416
-          Top = 2
-          Width = 97
-          Height = 16
-          Caption = 'Total do Grupo: '
-        end
-        object RLDTotGrupo: TRLDBResult
-          Left = 528
-          Top = 0
-          Width = 68
-          Height = 16
-          DataField = 'total'
-          DisplayMask = '#,##0.00'
-          Info = riSum
-        end
-      end
-      object RLBand5: TRLBand
-        Left = 0
-        Top = 78
-        Width = 718
-        Height = 21
-        object RLLabel11: TRLLabel
-          Left = 416
-          Top = 1
-          Width = 103
-          Height = 16
-          Caption = 'Total do Global:: '
-        end
-        object RLDTotGer: TRLDBResult
-          Left = 528
-          Top = 1
-          Width = 68
-          Height = 16
-          DataField = 'total'
-          DisplayMask = '#,##0.00'
-          Info = riSum
-        end
+      object RLLabel1: TRLLabel
+        Left = 496
+        Top = 18
+        Width = 79
+        Height = 16
+        Caption = 'Total Geral:'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = [fsBold]
+        ParentFont = False
       end
     end
   end

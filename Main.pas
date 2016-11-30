@@ -36,6 +36,11 @@ type
     GerarArqDevoluo1: TMenuItem;
     GerarPlanilhadeDevoluo1: TMenuItem;
     BitBtnConfig: TBitBtn;
+    BitBtnDevolucaoCartao: TBitBtn;
+    BitBtnDevolucaoFatura: TBitBtn;
+    procedure BitBtnDevolucaoFaturaClick(Sender: TObject);
+    procedure BitBtnDevolFACClick(Sender: TObject);
+    procedure BitBtnDevolucaoCartaoClick(Sender: TObject);
     procedure BitBtnConfigClick(Sender: TObject);
     procedure GerarPlanilhadeDevoluo1Click(Sender: TObject);
     procedure GerarArqDevoluo1Click(Sender: TObject);
@@ -66,9 +71,10 @@ var
   frmMain: TfrmMain;
 
 implementation
-uses unRelFAC, unRelAR, CDFac, CDAR, Devolucoes, unFamila, unRelAnFAC, unRelAnAR, unExcel,
-  CDDM, U_Frmdevcrtsnh, unRelAnFat, U_FrmRelTot, U_FrmCadUsuario, RelMotivos,
-  U_frmAcesso, uGeraArqDev, uGeraExcelDev, U_FrmConfig;
+uses unRelFAC, unRelAR, CDFac, CDAR, Devolucoes, unFamila, unRelAnFAC, unRelAnAR,
+  unExcel,CDDM, U_Frmdevcrtsnh, unRelAnFat, U_FrmRelTot, U_FrmCadUsuario,
+  RelMotivos, U_frmAcesso, uGeraArqDev, uGeraExcelDev, U_FrmConfig,
+  U_FrmLeituraCartao, U_FrmLeituraFatura;
 
 {$R *.dfm}
 
@@ -167,12 +173,35 @@ begin
   frmRelAnAR.Free;
 end;
 
+procedure TfrmMain.BitBtnDevolucaoFaturaClick(Sender: TObject);
+begin
+  FormLeituraFatura := TFormLeituraFatura.Create(self);
+  FormLeituraFatura.ShowModal;
+  SetFocus;
+  FormLeituraFatura.Free;
+end;
+
 procedure TfrmMain.BitBtnConfigClick(Sender: TObject);
 begin
   frmConfig := TfrmConfig.Create(self);
   frmConfig.ShowModal;
   SetFocus;
   frmConfig.Free;
+end;
+
+procedure TfrmMain.BitBtnDevolucaoCartaoClick(Sender: TObject);
+begin
+  FormLeituraCartao := TFormLeituraCartao.Create(self);
+  FormLeituraCartao.ShowModal;
+  SetFocus;
+  FormLeituraCartao.Free;
+end;
+
+procedure TfrmMain.BitBtnDevolFACClick(Sender: TObject);
+begin
+  frmCartao := TfrmCartao.Create(self);
+  frmCartao.ShowModal;
+  frmCartao.Free;
 end;
 
 procedure TfrmMain.FAC3Click(Sender: TObject);

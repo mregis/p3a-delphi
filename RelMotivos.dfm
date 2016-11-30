@@ -12,6 +12,8 @@ object qrForm_RelMotivos: TqrForm_RelMotivos
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object RLRelMotivos: TRLReport
@@ -24,6 +26,7 @@ object qrForm_RelMotivos: TqrForm_RelMotivos
     Font.Height = -13
     Font.Name = 'Arial'
     Font.Style = []
+    BeforePrint = RLRelMotivosBeforePrint
     object RLBand1: TRLBand
       Left = 38
       Top = 38
@@ -237,13 +240,42 @@ object qrForm_RelMotivos: TqrForm_RelMotivos
     Connection = DM.CtrlDvlDBConn
     SQL.Strings = (
       'SELECT D.CD_MOTIVO, M.DS_MOTIVO, count(*)  as Total '
-      'FROM CEA_CONTROLE_DEVOLUCOES_TEMP D, CEA_MOTIVOS_DEVOLUCOES M'
+      'FROM CEA_CONTROLE_DEVOLUCOES_TEMP D '
+      
+        '    INNER JOIN CEA_MOTIVOS_DEVOLUCOES M ON D.CD_MOTIVO = M.CD_MO' +
+        'TIVO'
+      'WHERE D.dt_devolucao between :dti AND :dtf '
       'GROUP BY D.CD_MOTIVO, M.DS_MOTIVO '
       'ORDER BY M.DS_MOTIVO '
       '')
-    Params = <>
+    Params = <
+      item
+        DataType = ftDateTime
+        Name = 'dti'
+        ParamType = ptUnknown
+        Value = 42684d
+      end
+      item
+        DataType = ftDateTime
+        Name = 'dtf'
+        ParamType = ptUnknown
+        Value = 42684d
+      end>
     Left = 152
     Top = 8
+    ParamData = <
+      item
+        DataType = ftDateTime
+        Name = 'dti'
+        ParamType = ptUnknown
+        Value = 42684d
+      end
+      item
+        DataType = ftDateTime
+        Name = 'dtf'
+        ParamType = ptUnknown
+        Value = 42684d
+      end>
   end
   object DtsMotivosTot: TDataSource
     Left = 184

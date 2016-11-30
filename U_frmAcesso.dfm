@@ -12,7 +12,7 @@ object FrmAcesso: TFrmAcesso
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poDesktopCenter
+  Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
@@ -1383,7 +1383,7 @@ object FrmAcesso: TFrmAcesso
   end
   object Label1: TLabel
     Left = 73
-    Top = 9
+    Top = 8
     Width = 290
     Height = 23
     Caption = 'IDENTIFICA'#199#195'O DO USU'#193'RIO'
@@ -1580,6 +1580,7 @@ object FrmAcesso: TFrmAcesso
     Width = 436
     Height = 19
     Alignment = taCenter
+    AutoSize = False
     Caption = 'O sistema diferencia mai'#250'sculas de min'#250'sculas'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clYellow
@@ -1618,6 +1619,7 @@ object FrmAcesso: TFrmAcesso
     PasswordChar = '*'
     TabOrder = 1
     OnKeyPress = EdSenhaKeyPress
+    OnKeyUp = EdSenhaKeyUp
   end
   object BtnSair: TBitBtn
     Left = 184

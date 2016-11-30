@@ -23,6 +23,7 @@ type
     BtnAcesso: TBitBtn;
     Label2: TLabel;
     LblMsgs: TLabel;
+    procedure EdSenhaKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EdLoginKeyPress(Sender: TObject; var Key: Char);
     procedure EdSenhaKeyPress(Sender: TObject; var Key: Char);
     procedure BtnSairClick(Sender: TObject);
@@ -106,6 +107,13 @@ procedure TFrmAcesso.EdSenhaKeyPress(Sender: TObject; var Key: Char);
 begin
   if key = #13 then
     EdSenha.SetFocus;
+end;
+
+procedure TFrmAcesso.EdSenhaKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+    if Key = VK_RETURN then
+      BtnAcesso.Click;
 end;
 
 procedure TFrmAcesso.FormClose(Sender: TObject; var Action: TCloseAction);
