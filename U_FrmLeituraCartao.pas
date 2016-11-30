@@ -131,7 +131,7 @@ begin
     Application.MessageBox(Pchar('Ocorreu um erro ao tentar finalizar a caixa.'),
           'Controle de Devoluções - Cartões', MB_OK + MB_ICONERROR);
   end;
-  
+
 end;
 
 procedure TFormLeituraCartao.BitBtnIniciarLeiturasClick(Sender: TObject);
@@ -142,38 +142,49 @@ begin
   res := ExisteLeituras(EditNumCaixa.Text);
   case res of
     1:
-      With Dm do
-        begin
-          SqlAux.Close;
-          SqlAux.SQL.Clear;
-          SqlAux.SQL.Add('INSERT INTO lote (codigo, qtde, dt_devolucao) ');
-          SqlAux.SQL.Add('VALUES (:codigo, :qtde, :dt_devolucao) ');
-          SqlAux.ParamByName('codigo').AsString := EditNumCaixa.Text;
-          SqlAux.ParamByName('qtde').AsInteger := int_temp;
-          SqlAux.ParamByName('dt_devolucao').AsDate := cbDT_DEVOLUCAO.Date;
-          SqlAux.ExecSQL;
-          if SqlAux.RowsAffected > 0 then
-            begin
-              EditNumCaixa.Enabled := False;
-              cbDT_DEVOLUCAO.Enabled := false;
-              EditQtde.Enabled := False;
-              // habilitando campos 
-              lcCD_MOTIVO.Enabled := True;
-              DM.qMotivo.Close;
-              DM.qMotivo.Open;
-              edtCodigo.Enabled := True;
-              eBin.Enabled := True;
-              EditQtdeRestante.Text := IntToStr(int_temp);
-            end
-          else
-            begin
-              Application.MessageBox( PChar('Erro ao abrir Lote de leitura.' + #13#10 +
-                   'Contate o Administrador do Sistema!'),
-                  'ERRO',
-                  MB_OK + MB_ICONERROR);
-              exit;
-            end;
-        end;
+      begin
+        if not TryStrToInt(EditQtde.Text, int_temp) then
+          begin
+            Application.MessageBox(PChar('Valor inválido para Quantidade!'), 'Controle de Devoluções - AR',
+                  MB_OK + MB_ICONWARNING);
+            StatusBarMessages.Panels.Items[4].Text := 'ERRO!';
+            EditQtde.SetFocus;
+          end;
+
+        With Dm do
+          begin
+            SqlAux.Close;
+            SqlAux.SQL.Clear;
+            SqlAux.SQL.Add('INSERT INTO lote (codigo, qtde, dt_devolucao) ');
+            SqlAux.SQL.Add('VALUES (:codigo, :qtde, :dt_devolucao) ');
+            SqlAux.ParamByName('codigo').AsString := EditNumCaixa.Text;
+            SqlAux.ParamByName('qtde').AsInteger := int_temp;
+            SqlAux.ParamByName('dt_devolucao').AsDate := cbDT_DEVOLUCAO.Date;
+            SqlAux.ExecSQL;
+            if SqlAux.RowsAffected > 0 then
+              begin
+                EditNumCaixa.Enabled := False;
+                cbDT_DEVOLUCAO.Enabled := false;
+                EditQtde.Enabled := False;
+                // habilitando campos
+                lcCD_MOTIVO.Enabled := True;
+                DM.qMotivo.Close;
+                DM.qMotivo.Open;
+                edtCodigo.Enabled := True;
+                eBin.Enabled := True;
+                EditQtdeRestante.Text := IntToStr(int_temp);
+              end
+            else
+              begin
+                Application.MessageBox( PChar('Erro ao abrir Lote de leitura.' + #13#10 +
+                     'Contate o Administrador do Sistema!'),
+                    'ERRO',
+                    MB_OK + MB_ICONERROR);
+                exit;
+              end;
+          end; // With
+      end;
+
     2:
       begin
         // Leituras ainda não foram fechadas
@@ -392,7 +403,7 @@ if Trim(eBin.Text) <> '' then
                   MB_YESNO + MB_ICONWARNING + MB_SYSTEMMODAL) = ID_YES then
                 begin
                   sql := 'UPDATE ibi_controle_devolucoes_ar SET codusu=:codusu,' +
-                         'cd_motivo=:motivo, codbin=:bin, ' +
+                         'cd_motivo=:motivo, dt_devolucao = :dt_devolucao, codbin=:bin, ' +
                          'lote_id=(SELECT b.id FROM lote b ' +
                          'WHERE b.codigo = :codigo) ' + #13#10 +
                          'WHERE cod_ar=:cod';
@@ -403,8 +414,8 @@ if Trim(eBin.Text) <> '' then
             end
           else
             sql := 'INSERT INTO ibi_controle_devolucoes_ar ' +
-                '(cod_ar,cd_motivo,codbin,codusu,lote_id) ' +
-                'SELECT :cod, :motivo, :bin, :codusu, b.id ' +
+                '(cod_ar,cd_motivo,dt_devolucao,codbin,codusu,lote_id) ' +
+                'SELECT :cod, :motivo, :dt_devolucao, :bin, :codusu, b.id ' +
                 'FROM lote b WHERE b.codigo = :codigo';
 
           SqlAux.Close;
@@ -419,6 +430,7 @@ if Trim(eBin.Text) <> '' then
           SqlAux.SQL.Add(sql);
           SqlAux.ParamByName('cod').AsString := edtCodigo.Text;
           SqlAux.ParamByName('motivo').AsString := lcCD_MOTIVO.KeyValue;
+          SqlAux.ParamByName('dt_devolucao').AsDateTime := cbDT_DEVOLUCAO.DateTime;
           SqlAux.ParamByName('bin').AsString := eBin.Text;
           SqlAux.ParamByName('codusu').AsInteger := usuaces;
           SqlAux.ParamByName('codigo').AsString := EditNumCaixa.Text;
@@ -532,7 +544,6 @@ end;
 
 procedure TFormLeituraCartao.EditNumCaixaKeyPress(Sender: TObject;
   var Key: Char);
-var res : Integer;
 begin
   if Key = #13 then
     cbDT_DEVOLUCAO.SetFocus;
@@ -548,6 +559,31 @@ begin
               MB_OK + MB_ICONWARNING);
         StatusBarMessages.Panels.Items[4].Text := 'ERRO!';
         EditQtde.SetFocus;
+      end
+    else
+      begin
+        With DM.SqlAux Do
+          begin
+            SQL.Text := 'SELECT COUNT(a.*) as qtde ' + #13#10 +
+                'FROM ibi_controle_devolucoes_ar a ' + #13#10 +
+                '   INNER JOIN lote b ON (a.lote_id = b.id) ' + #13#10 +
+                  'WHERE b.codigo = :codigo';
+            ParamByName('codigo').AsString := EditNumCaixa.Text;
+            Open;
+            if not IsEmpty then
+              if FieldByName('qtde').AsInteger > t then
+                begin
+                  Application.MessageBox(PChar('Existem ' + FieldByName('qtde').AsString +
+                        ' objetos lidos para esta caixa. Não é possível usar um ' +
+                        'valor menor do que esse para a quantidade.' + #13#10 +
+                        'Corrija a informação ou remova algumas leituras.'),
+                      'Controle de Devoluções - AR',
+                    MB_OK + MB_ICONERROR);
+                  StatusBarMessages.Panels.Items[4].Text := 'ERRO!';
+                  EditQtde.SetFocus;
+                end;
+          end;
+
       end;
 end;
 
@@ -632,7 +668,8 @@ begin
         Application.MessageBox(PChar(msgs), 'Aviso',
               MB_OK + MB_ICONWARNING);
         StatusBarMessages.Panels.Items[4].Text := msgs;
-        edtCodigo.SelectAll;
+        edtCodigo.Clear;
+        edtCodigo.SetFocus;
         exit;
       end;
 end;
@@ -663,6 +700,7 @@ begin
   StringGridARsLidos.Cells[3,0] := 'Motivo Devolução';
   StringGridResumoLeituras.Cells[0,0] := 'Motivo Devolução';
   StringGridResumoLeituras.Cells[1,0] := 'Qtde';
+  cbDT_DEVOLUCAO.DateTime := Date;
 end;
 
 procedure TFormLeituraCartao.FormShow(Sender: TObject);
@@ -700,6 +738,7 @@ begin
             'WHERE b.lote_id = :id';
       ParamByName('id').AsInteger := i;
       Open;
+      StringGridARsLidos.RowCount := 1;
       while not Eof do
         begin
           s := '';
@@ -742,19 +781,18 @@ begin
             BitBtnFinalizarLeituras.Click
           else
             BitBtnFinalizarLeituras.Enabled := True;
-        end
-      else
-        begin
-          BitBtnLimparLeituras.Enabled := StringGridARsLidos.RowCount > 1;
-          EditNumCaixa.Enabled := False;
-          cbDT_DEVOLUCAO.Enabled := false;
-          EditQtde.Enabled := False;
-          lcCD_MOTIVO.Enabled := True;
-          DM.qMotivo.Close;
-          DM.qMotivo.Open;
-          edtCodigo.Enabled := True;
-          eBin.Enabled := True;
         end;
+
+      BitBtnLimparLeituras.Enabled := StringGridARsLidos.RowCount > 1;
+      EditNumCaixa.Enabled := False;
+      cbDT_DEVOLUCAO.Enabled := false;
+      EditQtde.Enabled := False;
+      lcCD_MOTIVO.Enabled := True;
+      DM.qMotivo.Close;
+      DM.qMotivo.Open;
+      edtCodigo.Enabled := True;
+      eBin.Enabled := True;
+
       BitBtnLimparLeituras.Enabled := StringGridARsLidos.RowCount > 1;
     end;
 end;
@@ -781,7 +819,7 @@ end;
 procedure TFormLeituraCartao.StringGridARsLidosKeyUp(Sender: TObject;
   var Key: Word; Shift: TShiftState);
 var sMensagem : string;
-    i, srow : Integer;
+    i, j, srow : Integer;
 begin
   if Key = VK_DELETE then
     begin
@@ -807,8 +845,22 @@ begin
               begin
                 // Removendo a leitura do resumo
                 for i := 1 to StringGridResumoLeituras.RowCount - 1 do
-                  if (StringGridResumoLeituras.Cells[0, i] = StringGridARsLidos.Cells[3, srow]) then
-                    StringGridResumoLeituras.Cells[1, i] := IntToStr(StrToInt(StringGridResumoLeituras.Cells[1, i]) -1 );
+                  begin
+                    if (StringGridResumoLeituras.Cells[0, i] = StringGridARsLidos.Cells[3, srow]) then
+                      begin
+                        StringGridResumoLeituras.Cells[1, i] := IntToStr(StrToInt(StringGridResumoLeituras.Cells[1, i]) -1 );
+                        if (StringGridResumoLeituras.Cells[1, i] = '0') then
+                          // Se zerar um dos motivos devemos removê-lo da lista
+                          begin
+                            for j := i to StringGridResumoLeituras.RowCount - 2 do
+                              begin
+                                StringGridResumoLeituras.Cells[0, j] := StringGridResumoLeituras.Cells[0, j + 1];
+                                StringGridResumoLeituras.Cells[1, j] := StringGridResumoLeituras.Cells[1, j + 1];
+                              end; // for
+                            StringGridResumoLeituras.RowCount := StringGridResumoLeituras.RowCount - 1;
+                          end;
+                      end;
+                  end; // for
 
                 for i := srow to StringGridARsLidos.RowCount - 2 do
                   begin
@@ -822,7 +874,7 @@ begin
                   end; // for
                 StringGridARsLidos.RowCount := StringGridARsLidos.RowCount - 1;
                 StatusBarMessages.Panels.Items[1].Text := IntToStr(StringGridARsLidos.RowCount - 1);
-                EditQtdeRestante.Text := IntToStr(StrToInt(EditQtdeRestante.Text) - 1);
+                EditQtdeRestante.Text := IntToStr(StrToInt(EditQtdeRestante.Text) + 1);
                 BitBtnLimparLeituras.Enabled := StringGridARsLidos.RowCount > 1;
               end
             else

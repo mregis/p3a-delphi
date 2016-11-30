@@ -36,12 +36,11 @@ type
     GerarArqDevoluo1: TMenuItem;
     GerarPlanilhadeDevoluo1: TMenuItem;
     BitBtnConfig: TBitBtn;
-    BitBtnDevolAR: TBitBtn;
-    BitBtnDevolFAC: TBitBtn;
-    BitBtn1: TBitBtn;
-    procedure BitBtn1Click(Sender: TObject);
+    BitBtnDevolucaoCartao: TBitBtn;
+    BitBtnDevolucaoFatura: TBitBtn;
+    procedure BitBtnDevolucaoFaturaClick(Sender: TObject);
     procedure BitBtnDevolFACClick(Sender: TObject);
-    procedure BitBtnDevolARClick(Sender: TObject);
+    procedure BitBtnDevolucaoCartaoClick(Sender: TObject);
     procedure BitBtnConfigClick(Sender: TObject);
     procedure GerarPlanilhadeDevoluo1Click(Sender: TObject);
     procedure GerarArqDevoluo1Click(Sender: TObject);
@@ -72,9 +71,10 @@ var
   frmMain: TfrmMain;
 
 implementation
-uses unRelFAC, unRelAR, CDFac, CDAR, Devolucoes, unFamila, unRelAnFAC, unRelAnAR, unExcel,
-  CDDM, U_Frmdevcrtsnh, unRelAnFat, U_FrmRelTot, U_FrmCadUsuario, RelMotivos,
-  U_frmAcesso, uGeraArqDev, uGeraExcelDev, U_FrmConfig, U_FrmLeituraCartao;
+uses unRelFAC, unRelAR, CDFac, CDAR, Devolucoes, unFamila, unRelAnFAC, unRelAnAR,
+  unExcel,CDDM, U_Frmdevcrtsnh, unRelAnFat, U_FrmRelTot, U_FrmCadUsuario,
+  RelMotivos, U_frmAcesso, uGeraArqDev, uGeraExcelDev, U_FrmConfig,
+  U_FrmLeituraCartao, U_FrmLeituraFatura;
 
 {$R *.dfm}
 
@@ -173,11 +173,12 @@ begin
   frmRelAnAR.Free;
 end;
 
-procedure TfrmMain.BitBtn1Click(Sender: TObject);
+procedure TfrmMain.BitBtnDevolucaoFaturaClick(Sender: TObject);
 begin
-  DevolucoesFrm := TDevolucoesFrm.Create(self);
-  DevolucoesFrm.ShowModal;
-  DevolucoesFrm.Free;
+  FormLeituraFatura := TFormLeituraFatura.Create(self);
+  FormLeituraFatura.ShowModal;
+  SetFocus;
+  FormLeituraFatura.Free;
 end;
 
 procedure TfrmMain.BitBtnConfigClick(Sender: TObject);
@@ -188,7 +189,7 @@ begin
   frmConfig.Free;
 end;
 
-procedure TfrmMain.BitBtnDevolARClick(Sender: TObject);
+procedure TfrmMain.BitBtnDevolucaoCartaoClick(Sender: TObject);
 begin
   FormLeituraCartao := TFormLeituraCartao.Create(self);
   FormLeituraCartao.ShowModal;

@@ -914,7 +914,7 @@ object DM: TDM
     Connection = CtrlDvlDBConn
     SQL.Strings = (
       'SELECT id, cd_motivo, ds_motivo, '
-      'CAST(cd_motivo || '#39' - '#39' || ds_motivo AS VARCHAR) as motivo'
+      'CAST(cd_motivo || '#39' - '#39' || ds_motivo AS VARCHAR) as descricao'
       'FROM cea_motivos_devolucoes')
     Params = <>
     Left = 229
@@ -930,8 +930,9 @@ object DM: TDM
       FieldName = 'ds_motivo'
       Size = 40
     end
-    object qraMotivomotivo: TStringField
-      FieldName = 'motivo'
+    object qraMotivoDescricao: TStringField
+      DisplayLabel = 'Descricao'
+      FieldName = 'descricao'
       Size = 45
     end
   end

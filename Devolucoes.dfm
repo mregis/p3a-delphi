@@ -75,7 +75,7 @@ object DevolucoesFrm: TDevolucoesFrm
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     KeyField = 'cd_Motivo'
-    ListField = 'motivo'
+    ListField = 'descricao'
     ListSource = DM.dsMotivos
     ParentFont = False
     ParentShowHint = False
@@ -449,7 +449,6 @@ object DevolucoesFrm: TDevolucoesFrm
         Width = 295
       end>
     SimpleText = 'DFASD AsdDASF DASF'
-    ExplicitTop = 490
   end
   object btnFechar: TBitBtn
     Left = 542
@@ -975,8 +974,8 @@ object DevolucoesFrm: TDevolucoesFrm
   end
   object PanelProgress: TPanel
     AlignWithMargins = True
-    Left = 197
-    Top = 238
+    Left = 203
+    Top = 244
     Width = 315
     Height = 68
     Align = alCustom
@@ -996,8 +995,6 @@ object DevolucoesFrm: TDevolucoesFrm
     TabOrder = 7
     VerticalAlignment = taAlignTop
     Visible = False
-    ExplicitLeft = 191
-    ExplicitTop = 224
     object PanelProgressBar: TProgressBar
       AlignWithMargins = True
       Left = 24

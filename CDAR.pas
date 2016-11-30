@@ -641,6 +641,7 @@ procedure TfrmAR.cbDT_DEVOLUCAOEnter(Sender: TObject);
 begin
   With DM do
     begin
+      SqlAux.Connection  :=  dm.CtrlDvlDBConn;
       SqlAux.Close;
       SqlAux.SQL.Clear;
       SqlAux.SQL.Add('SELECT CURRENT_TIMESTAMP');

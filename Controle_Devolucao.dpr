@@ -25,7 +25,7 @@ uses
   uGeraExcelDev in 'uGeraExcelDev.pas' {fGeraExcelDev},
   U_FrmConfig in 'U_FrmConfig.pas' {U_FrmConfig},
   uGeraArqDev in 'uGeraArqDev.pas' {fGeraArqDev},
-  U_FrmLeituraCartao in 'U_FrmLeituraCartao.pas' {FormLeituraCartao};
+  U_FrmLeituraFatura in 'U_FrmLeituraFatura.pas' {FormLeituraFatura};
 
 {$R *.res}
 

@@ -145,7 +145,7 @@ uses
     qraProdutoDs_Produto: TStringField;
     qraProdutoCodbin: TStringField;
     qraProdutoPrivBand: TStringField;
-    qraMotivomotivo: TStringField;
+    qraMotivoDescricao: TStringField;
     qraProdutodescricao: TStringField;
     procedure TimerTimer(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
