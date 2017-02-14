@@ -160,9 +160,11 @@ uses
     Anexo : TIdCreateAttachmentEvent;
     dtatu : TDateTime;
     usuaces :  Int64;
+    operador: String;
     iniFile : TIniFile;
     iniFileName : String;
     max_login_erros: Integer;
+    siglas_validas: TStringList;
   end;
 
 var
@@ -193,6 +195,8 @@ begin
       iniFile := TIniFile.Create(iniFileName);
       // Maximo de tentativas de logins antes da aplicação encerrar
       max_login_erros := iniFile.ReadInteger('Geral', 'MaxLoginErros', 5);
+      siglas_validas := TStringList.Create;
+      siglas_validas.CommaText := iniFile.ReadString('Geral', 'SiglasSedexValidas', 'DQ');
 
       // Nome do Servidor onde se encontra a Base de Dados Postgres
       CtrlDvlDBConn.HostName := iniFile.ReadString('BD', 'Host', 'localhost');;
@@ -243,6 +247,8 @@ begin
       IniFile.WriteString('BD', 'Senha', encryptstr(CtrlDvlDBConn.Password, 9, 6, 9));
 
       IniFile.WriteInteger('Geral', 'MaxLoginErros', max_login_erros);
+      IniFile.WriteString('Geral', 'SiglasSedexValidas', siglas_validas.CommaText);
+
 
       // Diretório padrão da aplicação (Raiz)
       IniFile.WriteString('Diretorios', 'Raiz', currdir);
@@ -261,25 +267,28 @@ begin
 
   try
     CtrlDvlDBConn.Connected := True;
-    CtrlDvlDBConn.StartTransaction;
+
     // Forçando o DateStyle a ser sempre o mesmo, independente do
     // que foi configurado no servidor, devido a Bug da Lib Zeos
     SqlAux.Close;
     SqlAux.SQL.Text := FORMAT('SET DATESTYLE TO %s', [QuotedStr('ISO, DMY')]);
-    SqlAux.Open;
-    SqlAux.SQL.Text := FORMAT('SET NAMES %s', [QuotedStr('WIN1252')]);
-    SqlAux.Open;
+    SqlAux.ExecSQL;
 
+    // Pegando a data hora do servidor do Banco de Dados para evitar problemas
+    // com hora incorreta do computador onde está sendo executado a aplicação
     SqlAux.Close;
-    SqlAux.SQL.Clear;
-    SqlAux.SQL.Add('SELECT CURRENT_TIMESTAMP as dthr');
+    SqlAux.SQL.Text := 'SELECT CURRENT_TIMESTAMP as dthr';
     SqlAux.Open;
     dtatu := SqlAux.FieldByName('dthr').AsDateTime;
-    Except on e: exception do
-      begin
-        CtrlDvlDBConn.Rollback;
-      end;
-    end;
+
+    // Forçando aos caracteres serem tratados como WIN1252 no lado do cliente
+    SqlAux.SQL.Text := FORMAT('SET NAMES %s', [QuotedStr('WIN1252')]);
+    SqlAux.ExecSQL;
+
+
+  Except on e: exception do
+    dtatu := Date;
+  end;
 end;
 
 procedure TDM.envarq;
@@ -309,11 +318,14 @@ begin
 end;
 procedure TDM.TimerTimer(Sender: TObject);
 begin
-    SqlAux.Close;
-    SqlAux.SQL.Clear;
-    SqlAux.SQL.Add('SELECT CURRENT_TIMESTAMP');
-    SqlAux.Open;
-    dtatu :=  SqlAux.Fields[0].AsDateTime;
+  if (not SqlAux.Active) then
+    begin
+      SqlAux.Close;
+      SqlAux.SQL.Clear;
+      SqlAux.SQL.Add('SELECT CURRENT_TIMESTAMP');
+      SqlAux.Open;
+      dtatu :=  SqlAux.Fields[0].AsDateTime;
+    end;
 end;
 
 end.

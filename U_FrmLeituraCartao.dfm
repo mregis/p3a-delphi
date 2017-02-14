@@ -4,7 +4,7 @@ object FormLeituraCartao: TFormLeituraCartao
   BorderStyle = bsSingle
   Caption = 'Controle de Devolu'#231#245'es - Leitura de Cart'#245'es Devolvidos'
   ClientHeight = 507
-  ClientWidth = 717
+  ClientWidth = 844
   Color = clHotLight
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,10 +17,10 @@ object FormLeituraCartao: TFormLeituraCartao
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object gbxCartao: TGroupBox
+  object GroupBoxDadosLote: TGroupBox
     Left = 8
     Top = 4
-    Width = 689
+    Width = 828
     Height = 81
     Caption = 'Caixa'
     Font.Charset = DEFAULT_CHARSET
@@ -36,6 +36,7 @@ object FormLeituraCartao: TFormLeituraCartao
       Width = 96
       Height = 14
       Caption = 'Data Devolu'#231#227'o'
+      FocusControl = cbDT_DEVOLUCAO
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -12
@@ -49,6 +50,7 @@ object FormLeituraCartao: TFormLeituraCartao
       Width = 83
       Height = 14
       Caption = 'Numero Caixa'
+      FocusControl = EditNumCaixa
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -12
@@ -62,6 +64,7 @@ object FormLeituraCartao: TFormLeituraCartao
       Width = 30
       Height = 14
       Caption = 'Qtde'
+      FocusControl = EditQtde
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -12
@@ -119,6 +122,7 @@ object FormLeituraCartao: TFormLeituraCartao
       MaxLength = 4
       ParentFont = False
       TabOrder = 2
+      OnDblClick = EditQtdeDblClick
       OnExit = EditQtdeExit
       OnKeyPress = EditQtdeKeyPress
     end
@@ -210,10 +214,10 @@ object FormLeituraCartao: TFormLeituraCartao
       NumGlyphs = 2
     end
   end
-  object GroupBox1: TGroupBox
+  object GroupBoxLeituras: TGroupBox
     Left = 8
     Top = 86
-    Width = 689
+    Width = 828
     Height = 346
     Caption = 'Leituras ARs'
     Font.Charset = DEFAULT_CHARSET
@@ -224,7 +228,7 @@ object FormLeituraCartao: TFormLeituraCartao
     ParentFont = False
     TabOrder = 1
     object LabelCodBin: TLabel
-      Left = 513
+      Left = 640
       Top = 14
       Width = 21
       Height = 14
@@ -237,13 +241,13 @@ object FormLeituraCartao: TFormLeituraCartao
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object Label1: TLabel
-      Left = 333
+    object LabelNumObjeto: TLabel
+      Left = 432
       Top = 14
       Width = 93
       Height = 14
       Caption = 'Numero Objeto'
-      FocusControl = eBin
+      FocusControl = edtCodigo
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -12
@@ -251,12 +255,13 @@ object FormLeituraCartao: TFormLeituraCartao
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object Label3: TLabel
+    object LabelMotivo: TLabel
       Left = 13
       Top = 18
       Width = 43
       Height = 14
       Caption = 'Motivo'
+      FocusControl = lcCD_MOTIVO
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -12
@@ -264,12 +269,13 @@ object FormLeituraCartao: TFormLeituraCartao
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object Label2: TLabel
-      Left = 544
+    object LabelQtdeRestante: TLabel
+      Left = 592
       Top = 314
       Width = 76
       Height = 14
       Caption = 'Faltando Ler'
+      FocusControl = EditQtdeRestante
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -12
@@ -277,8 +283,59 @@ object FormLeituraCartao: TFormLeituraCartao
       Font.Style = [fsBold]
       ParentFont = False
     end
+    object SpeedButtonAddLeitura: TSpeedButton
+      Left = 741
+      Top = 33
+      Width = 36
+      Height = 31
+      Hint = 'Incluir nova sigla de objeto Sedex'
+      Glyph.Data = {
+        36050000424D3605000000000000360400002800000010000000100000000100
+        08000000000000010000130B0000130B000000010000000100002184290039B5
+        520063A563006BAD840094DE8C00FF00FF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+        FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00050505050505
+        0505050505050505050505050505050503000003050505050505050505050505
+        0204010005050505050505050505050502040100050505050505050505050505
+        0204010005050505050505050505050502040100050505050505050300000000
+        0004010000000000030505020101010101010101010101010005050204040404
+        0404010404040404000505030202020202040100000000000305050505050505
+        0204010005050505050505050505050502040100050505050505050505050505
+        0204010005050505050505050505050502040100050505050505050505050505
+        0302020305050505050505050505050505050505050505050505}
+      OnClick = SpeedButtonAddLeituraClick
+    end
     object edtCodigo: TEdit
-      Left = 333
+      Left = 432
       Top = 33
       Width = 161
       Height = 31
@@ -296,7 +353,7 @@ object FormLeituraCartao: TFormLeituraCartao
       OnKeyPress = edtCodigoKeyPress
     end
     object eBin: TEdit
-      Left = 513
+      Left = 640
       Top = 33
       Width = 81
       Height = 31
@@ -309,17 +366,15 @@ object FormLeituraCartao: TFormLeituraCartao
       MaxLength = 6
       ParentFont = False
       TabOrder = 2
-      OnExit = eBinExit
       OnKeyPress = eBinKeyPress
     end
     object StringGridARsLidos: TStringGrid
       Left = 13
       Top = 70
-      Width = 396
+      Width = 510
       Height = 267
       TabStop = False
       Color = clSilver
-      ColCount = 4
       Ctl3D = False
       DefaultRowHeight = 22
       FixedColor = clNavy
@@ -334,7 +389,6 @@ object FormLeituraCartao: TFormLeituraCartao
       Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSelect]
       ParentCtl3D = False
       ParentFont = False
-      ScrollBars = ssVertical
       TabOrder = 3
       OnDrawCell = StringGridARsLidosDrawCell
       OnKeyUp = StringGridARsLidosKeyUp
@@ -342,19 +396,20 @@ object FormLeituraCartao: TFormLeituraCartao
         30
         130
         60
-        150)
+        182
+        114)
     end
     object lcCD_MOTIVO: TDBLookupComboBox
       Left = 13
       Top = 38
-      Width = 308
-      Height = 24
+      Width = 376
+      Height = 27
       Hint = 'Selecione o motivo da devolu'#231#227'o'
       DropDownRows = 13
       Enabled = False
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       KeyField = 'cd_motivo'
@@ -366,7 +421,7 @@ object FormLeituraCartao: TFormLeituraCartao
       TabOrder = 0
     end
     object EditQtdeRestante: TEdit
-      Left = 628
+      Left = 676
       Top = 306
       Width = 49
       Height = 31
@@ -384,9 +439,9 @@ object FormLeituraCartao: TFormLeituraCartao
       Text = '0'
     end
     object StringGridResumoLeituras: TStringGrid
-      Left = 427
+      Left = 539
       Top = 70
-      Width = 250
+      Width = 278
       Height = 230
       TabStop = False
       Color = clSilver
@@ -408,9 +463,44 @@ object FormLeituraCartao: TFormLeituraCartao
       ScrollBars = ssVertical
       TabOrder = 5
       OnDrawCell = StringGridResumoLeiturasDrawCell
+      OnKeyUp = StringGridResumoLeiturasKeyUp
       ColWidths = (
-        195
-        39)
+        220
+        32)
+    end
+    object PanelProgress: TPanel
+      AlignWithMargins = True
+      Left = 263
+      Top = 142
+      Width = 315
+      Height = 68
+      Align = alCustom
+      Anchors = []
+      BevelOuter = bvLowered
+      BorderWidth = 1
+      Caption = 'Executando a opera'#231#227'o. Aguarde...'
+      UseDockManager = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 6
+      VerticalAlignment = taAlignTop
+      Visible = False
+      ExplicitLeft = 260
+      ExplicitTop = 139
+      object PanelProgressBar: TProgressBar
+        AlignWithMargins = True
+        Left = 24
+        Top = 26
+        Width = 265
+        Height = 23
+        BorderWidth = 2
+        Smooth = True
+        TabOrder = 0
+      end
     end
   end
   object btnFechar: TBitBtn
@@ -531,7 +621,7 @@ object FormLeituraCartao: TFormLeituraCartao
   object StatusBarMessages: TStatusBar
     Left = 0
     Top = 481
-    Width = 717
+    Width = 844
     Height = 26
     Panels = <
       item
@@ -802,8 +892,8 @@ object FormLeituraCartao: TFormLeituraCartao
         Name = 'COD_BIN'
         ParamType = ptUnknown
       end>
-    Left = 642
-    Top = 107
+    Left = 786
+    Top = 27
     ParamData = <
       item
         DataType = ftUnknown
