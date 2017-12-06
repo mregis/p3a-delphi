@@ -55,13 +55,13 @@ Function TfGeraArqDev.MontarFiltroGrupoBIN(grupo : integer; semFamilia : Boolean
 begin
   try
     if semFamilia then
-    begin
-      Result := ' NOT IN(SELECT DISTINCT F.CODBIN FROM GRUPO_FAMILIA G JOIN IBI_CADASTRO_FAMILIA F ON F.ID = G.ID_FAMILIA WHERE G.ID_GRUPO <> '+IntToStr(grupo)+')';
-    end
+      begin
+        Result := ' NOT IN(SELECT DISTINCT F.CODBIN FROM GRUPO_FAMILIA G JOIN IBI_CADASTRO_FAMILIA F ON F.ID = G.ID_FAMILIA WHERE G.ID_GRUPO <> '+IntToStr(grupo)+')';
+      end
     else
-    begin
-      Result := ' IN(SELECT DISTINCT F.CODBIN FROM GRUPO_FAMILIA G JOIN IBI_CADASTRO_FAMILIA F ON F.ID = G.ID_FAMILIA WHERE G.ID_GRUPO = '+IntToStr(grupo)+')';
-    end;
+      begin
+        Result := ' IN(SELECT DISTINCT F.CODBIN FROM GRUPO_FAMILIA G JOIN IBI_CADASTRO_FAMILIA F ON F.ID = G.ID_FAMILIA WHERE G.ID_GRUPO = '+IntToStr(grupo)+')';
+      end;
   except
     on E: Exception do
     begin
@@ -134,14 +134,12 @@ begin
     Query.Close;
     Query.SQL.Clear;
     Query.Params.Clear;
-    Query.SQL.Add('SELECT');
-    Query.SQL.Add('   (nro_cartao || ''005'' || cd_motivo || replace(dt_devolucao,''-'','''') || ''  '') AS LINHA');
-    Query.SQL.Add('FROM');
-    Query.SQL.Add('   ibi_controle_devolucoes_fac DV');
-    Query.SQL.Add('WHERE');
-    Query.SQL.Add('       DATA >= :XPDATAINI');
+    Query.SQL.Add('SELECT (nro_cartao || ''005'' || cd_motivo || ' +
+                'to_char(dt_devolucao, ''yyyyddmm'') || ''  '') AS LINHA');
+    Query.SQL.Add('FROM ibi_controle_devolucoes_fac DV');
+    Query.SQL.Add('WHERE DATA >= :XPDATAINI');
     Query.SQL.Add('   AND DATA <= :XPDATAFIM');
-    Query.SQL.Add('   AND DV.CODBIN '+MontarFiltroGrupoBIN(grupoId, familia));
+    Query.SQL.Add('   AND DV.CODBIN ' + MontarFiltroGrupoBIN(grupoId, familia));
     Query.ParamByName('XPDATAINI').AsDate := dtini;
     Query.ParamByName('XPDATAFIM').AsDate := dtfim;
     Query.Open;
@@ -314,7 +312,7 @@ begin
     Query.SQL.Clear;
     Query.Params.Clear;
     Query.SQL.Add('SELECT');
-    Query.SQL.Add('   (nro_conta || ''007'' || cd_motivo || replace(dt_devolucao,''-'','''')) AS LINHA');
+    Query.SQL.Add('   (nro_conta || ''007'' || cd_motivo || TO_CHAR(dt_devolucao,''yyyymmdd'')) AS LINHA');
     Query.SQL.Add('FROM');
     Query.SQL.Add('   cea_controle_devolucoes DV');
     Query.SQL.Add('WHERE');
@@ -480,7 +478,8 @@ begin
       Application.ProcessMessages;
 
       xGerou   := True;
-      xNomeArq := 'ADDRESS2ACC.CARTAO.FAC.'+FormatDateTime('DDMMYYYY', Now)+'.TMP';
+      xNomeArq := 'ADDRESS2ACC.CARTAO.FAC.' +
+              FormatDateTime('DDMMYYYY', Now) + '.TMP';
 
       AssignFile(xFile, xDiretorio+xNomeArq);
       Rewrite(xFile);

@@ -266,82 +266,198 @@ begin
       sMensagem := 'Deseja remover o cartão ' + StringGridFaturasLidas.Cells[1, srow] +
         ' da lista? Ele será removido também da base e não será ' +
         'incluído nos arquivos.';
-    if Application.MessageBox(pchar(sMensagem), 'Aviso',
+      if Application.MessageBox(pchar(sMensagem), 'Aviso',
           MB_YESNO + MB_ICONQUESTION + MB_SYSTEMMODAL) = ID_YES then
-      begin
-        // Removendo da base de dados
-        With DM do
-          begin
-            SqlAux.Close;
-            SqlAux.SQL.Text := 'DELETE FROM cea_controle_devolucoes ' +
-                  'WHERE id=:id';
-            SqlAux.ParamByName('id').AsInteger := StrToInt64(StringGridFaturasLidas.Cells[4, srow]);
-            SqlAux.ExecSQL;
-            if SqlAux.RowsAffected > 0 then
-              begin
-                // Removendo a leitura do resumo
-                for i := 1 to StringGridResumoLeituras.RowCount - 1 do
-                  begin
-                    if (StringGridResumoLeituras.Cells[0, i] = StringGridFaturasLidas.Cells[3, srow]) then
-                      begin
-                        StringGridResumoLeituras.Cells[1, i] := IntToStr(StrToInt(StringGridResumoLeituras.Cells[1, i]) -1 );
-                        if (StringGridResumoLeituras.Cells[1, i] = '0') then
-                          // Se zerar um dos motivos devemos removê-lo da lista 
-                          begin
-                            for j := i to StringGridResumoLeituras.RowCount - 2 do
-                              begin
-                                StringGridResumoLeituras.Cells[0, j] := StringGridResumoLeituras.Cells[0, j + 1];
-                                StringGridResumoLeituras.Cells[1, j] := StringGridResumoLeituras.Cells[1, j + 1];
-                              end; // for
-                            StringGridResumoLeituras.RowCount := StringGridResumoLeituras.RowCount - 1;
-                          end;
-                      end;
-                  end; // for
+        begin
+          // Removendo da base de dados
+          With DM do
+            begin
+              SqlAux.Close;
+              SqlAux.SQL.Text := 'DELETE FROM cea_controle_devolucoes ' +
+                  'WHERE id=:id AND codusu=:codusu';
+              SqlAux.ParamByName('id').AsInteger := StrToInt64(StringGridFaturasLidas.Cells[5, srow]);
+              SqlAux.ParamByName('codusu').AsInteger := usuaces;
+              SqlAux.ExecSQL;
+              if SqlAux.RowsAffected > 0 then
+                begin
+                  // Removendo a leitura do resumo
+                  for i := 1 to StringGridResumoLeituras.RowCount - 1 do
+                    begin
+                      if (StringGridResumoLeituras.Cells[0, i] = StringGridFaturasLidas.Cells[3, srow]) then
+                        begin
+                          StringGridResumoLeituras.Cells[1, i] := IntToStr(StrToInt(StringGridResumoLeituras.Cells[1, i]) -1 );
+                          if (StringGridResumoLeituras.Cells[1, i] = '0') then
+                            // Se zerar um dos motivos devemos removê-lo da lista
+                            begin
+                              for j := i to StringGridResumoLeituras.RowCount - 2 do
+                                begin
+                                  StringGridResumoLeituras.Cells[0, j] := StringGridResumoLeituras.Cells[0, j + 1];
+                                  StringGridResumoLeituras.Cells[1, j] := StringGridResumoLeituras.Cells[1, j + 1];
+                                end; // for
+                              StringGridResumoLeituras.RowCount := StringGridResumoLeituras.RowCount - 1;
+                            end;
+                        end;
+                    end; // for
 
-                for i := srow to StringGridFaturasLidas.RowCount - 2 do
-                  begin
-                    if (StringGridFaturasLidas.Cells[0, i + 1] = '') then
-                      StringGridFaturasLidas.Cells[0, i] := ''
-                    else
-                      StringGridFaturasLidas.Cells[0, i] := IntToStr(i);
+                  for i := srow to StringGridFaturasLidas.RowCount - 2 do
+                    begin
+                      if (StringGridFaturasLidas.Cells[0, i + 1] = '') then
+                        StringGridFaturasLidas.Cells[0, i] := ''
+                      else
+                        StringGridFaturasLidas.Cells[0, i] := IntToStr(i);
 
-                    StringGridFaturasLidas.Cells[1, i] := StringGridFaturasLidas.Cells[1, i + 1];
-                    StringGridFaturasLidas.Cells[2, i] := StringGridFaturasLidas.Cells[2, i + 1];
-                  end; // for
-                StringGridFaturasLidas.RowCount := StringGridFaturasLidas.RowCount - 1;
-                StatusBarMessages.Panels.Items[1].Text := IntToStr(StringGridFaturasLidas.RowCount - 1);
-                BitBtnLimparLeituras.Enabled := StringGridFaturasLidas.RowCount > 1;
-              end
-            else
-              begin
-                Application.MessageBox(pchar('Ocorreu um erro ao tentar excluir '+
+                      StringGridFaturasLidas.Cells[1, i] := StringGridFaturasLidas.Cells[1, i + 1];
+                      StringGridFaturasLidas.Cells[2, i] := StringGridFaturasLidas.Cells[2, i + 1];
+                    end; // for
+
+                  StringGridFaturasLidas.RowCount := StringGridFaturasLidas.RowCount - 1;
+                  StatusBarMessages.Panels.Items[1].Text := IntToStr(StringGridFaturasLidas.RowCount - 1);
+                  BitBtnLimparLeituras.Enabled := StringGridFaturasLidas.RowCount > 1;
+                end
+              else
+                begin
+                  Application.MessageBox(pchar('Ocorreu um erro ao tentar excluir '+
                         'a entrada. Procure o administrador do sistema.'),
                     'ERRO',
                     MB_OK + MB_ICONERROR);
-                exit;
-              end;
-          end; // with
-      end;
-  end;
+                  exit;
+                end;
+            end; // with
+        end;
+    end;
 
 end;
 
 procedure TFormLeituraFatura.StringGridResumoLeiturasDrawCell(Sender: TObject;
   ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
 begin
-  If (arow > 0)  then // testa se não é a primeira linha (fixa)
+  If (aRow > 0)  then // testa se não é a primeira linha (fixa)
     begin
       StringGridResumoLeituras.Canvas.Font.Color:= clBlack;
       StringGridResumoLeituras.Canvas.Font.Style:= [];
-      if (odd(arow)) then
-        // verifica se a linha é impar
-        StringGridResumoLeituras.Canvas.Brush.Color:= clSilver
+      if (State = [gdSelected]) then
+        StringGridResumoLeituras.Canvas.Brush.Color := clGray
       else
-        StringGridResumoLeituras.Canvas.Brush.Color:= clGray;
+        if (odd(aRow)) then
+          // verifica se a linha é impar
+          StringGridResumoLeituras.Canvas.Brush.Color := $009D9D4F
+        else
+          StringGridResumoLeituras.Canvas.Brush.Color := $00CDCD9C;
+    end
+  else   // Cabeçalhos
+    begin
+        StringGridFaturasLidas.Canvas.Font.Style:= [fsBold];
+        StringGridFaturasLidas.Canvas.Brush.Color := clNavy;
+        StringGridFaturasLidas.Canvas.Font.Color:= clWhite;
+    end;
 
-      StringGridResumoLeituras.Canvas.FillRect(Rect); // redesenha a celula
-      StringGridResumoLeituras.Canvas.TextOut(Rect.Left + 2, Rect.Top,
-        StringGridResumoLeituras.Cells[acol, arow]); // reimprime  o texto.
+  StringGridResumoLeituras.Canvas.FillRect(Rect); // redesenha a celula
+  StringGridResumoLeituras.Canvas.TextOut(Rect.Left + 2, Rect.Top,
+  StringGridResumoLeituras.Cells[acol, arow]); // reimprime  o texto.
+
+end;
+
+procedure TFormLeituraFatura.StringGridResumoLeiturasKeyUp(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+var sMensagem : string;
+    i, srow, qtde, k: Integer;
+    myTmpGrid : TStringGrid;
+begin
+  if Key = VK_DELETE then
+    begin
+      srow := StringGridResumoLeituras.Row;
+      if (srow < 1 ) then
+        exit; // Não apagar cabeçalhos
+
+      sMensagem := 'Deseja remover todas as leituras com o motivo ' + StringGridResumoLeituras.Cells[0, srow] +
+        ' da lista? Eles serão removidos também da base e não serão ' +
+        'incluídos nos arquivos.';
+      if Application.MessageBox(pchar(sMensagem), 'Aviso',
+          MB_YESNO + MB_ICONQUESTION + MB_SYSTEMMODAL) = ID_YES then
+        begin
+          // Preparando o ProgressBar
+          PanelProgressBar.Max := StrToInt(StringGridResumoLeituras.Cells[1, srow]);
+          PanelProgressBar.Step := 0;
+          PanelProgress.Visible := True;
+
+          // Removendo da base de dados
+          With DM do
+            begin
+              SqlAux.Close;
+              // SQL base para a execução em lote
+              SqlAux.SQL.Text := 'DELETE FROM cea_controle_devolucoes ' +
+                  'WHERE id=:id AND codusu=:codusu';
+              qtde := 0;
+              myTmpGrid := TStringGrid.Create(Self);
+              myTmpGrid.ColCount := 6;
+              myTmpGrid.RowCount := 1;
+              for i := 1 to StringGridFaturasLidas.RowCount - 1 do
+                begin;
+                  // Verificando se é um motivo para ser removido e que tenha sido lido pelo
+                  // operador autenticado
+                  if (StringGridFaturasLidas.Cells[3, i] = StringGridResumoLeituras.Cells[0, srow]) AND
+                      (StringGridFaturasLidas.Cells[4, i] = operador) then
+                    begin
+                      SqlAux.ParamByName('codusu').AsInteger := usuaces; // Limitando apenas ao usuário autenticado
+                      SqlAux.ParamByName('id').AsInteger := StrToInt64(StringGridFaturasLidas.Cells[5, i]);
+                      SqlAux.ExecSQL;
+                      if SqlAux.RowsAffected < 1 then
+                        begin
+                          sMensagem := SqlAux.SQL.GetText;
+                          Application.MessageBox(pchar('Ocorreu um erro ao tentar excluir '+
+                                'as entradas. Procure o administrador do sistema.'),
+                            'ERRO',
+                            MB_OK + MB_ICONERROR);
+                          exit;
+                        end;
+                      qtde := qtde + 1;
+                    end
+                  else
+                    begin
+                      // Copiando Item que não deve ser removido
+                      // Para uma Grid temporária
+                      myTmpGrid.Cells[0, myTmpGrid.RowCount - 1] := IntToStr(myTmpGrid.RowCount);
+                      for k := 1 to StringGridFaturasLidas.ColCount - 1 do
+                        begin
+                          myTmpGrid.Cells[k, myTmpGrid.RowCount - 1] := StringGridFaturasLidas.Cells[k, i];
+                        end;
+
+                      myTmpGrid.RowCount := myTmpGrid.RowCount + 1;
+                    end;
+                  ProgressBarStepItOne;
+                end; // for
+
+              // Após ter executado as instruções de remoção da base,
+              // Copiar os itens que estão na lista temporária
+              StringGridFaturasLidas.RowCount := 1;
+              for i := 0 to myTmpGrid.RowCount - 2 do
+                begin
+                  StringGridFaturasLidas.RowCount := StringGridFaturasLidas.RowCount + 1;
+                  // Copiando todos os dados do item posterior
+                  for k := 0 to myTmpGrid.ColCount do
+                    StringGridFaturasLidas.Cells[k, StringGridFaturasLidas.RowCount - 1] := myTmpGrid.Cells[k, i];
+                end; //for 1
+
+              // Verificando se é necessário remover o item da lista de resumo
+              // ou somente reduzir o valor
+              if (StrToInt(StringGridResumoLeituras.Cells[1, srow]) > qtde) then
+                  StringGridResumoLeituras.Cells[1, srow] := IntToStr(StrToInt(StringGridResumoLeituras.Cells[1, srow]) - qtde )
+              else
+                begin
+                  for i := srow to StringGridResumoLeituras.RowCount - 2 do
+                    begin
+                      StringGridResumoLeituras.Cells[0, i] := StringGridResumoLeituras.Cells[0, i + 1];
+                      StringGridResumoLeituras.Cells[1, i] := StringGridResumoLeituras.Cells[1, i + 1];
+                    end;
+                  StringGridResumoLeituras.RowCount := StringGridResumoLeituras.RowCount - 1;
+                end;
+
+              StatusBarMessages.Panels.Items[1].Text := IntToStr(StringGridFaturasLidas.RowCount);
+              BitBtnLimparLeituras.Enabled := StringGridFaturasLidas.RowCount > 1;
+              myTmpGrid.Free;
+              PanelProgress.Hide;
+            end; // with
+        end;
     end;
 end;
 
@@ -485,7 +601,8 @@ begin
               StringGridFaturasLidas.Cells[1, r] := edtCodigo.Text;
               StringGridFaturasLidas.Cells[2, r] := sBin;
               StringGridFaturasLidas.Cells[3, r] := Dm.qraMotivoDescricao.AsString;
-              StringGridFaturasLidas.Cells[4, r] := id;
+              StringGridFaturasLidas.Cells[4, r] := Dm.operador;
+              StringGridFaturasLidas.Cells[5, r] := id;
               StringGridFaturasLidas.Row := r;
               // Adicionando a leitura no resumo por motivo
               // Buscando a entrada referente ao motivo lido
@@ -530,9 +647,13 @@ begin
             end; // try..except
           end // With
       else
-        Application.MessageBox('Valor inválido para o campo Número Cartão! ',
-            'ERRO',
-            MB_OK + MB_ICONERROR + MB_SYSTEMMODAL);
+        begin
+          Application.MessageBox('Valor inválido para o campo Número Cartão! ',
+              'ERRO',
+              MB_OK + MB_ICONERROR + MB_SYSTEMMODAL);
+          edtCodigo.Clear;
+          edtCodigo.SetFocus;
+        end;
     end; // if
 end;
 

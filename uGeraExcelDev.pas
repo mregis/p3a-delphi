@@ -385,6 +385,7 @@ begin
 end;
 
 Procedure TfGeraExcelDev.LimitarRegistros(dtini : TDate; dtfim : TDate);
+var s: string;
 begin
   try
     idini1 := 0;
@@ -426,6 +427,7 @@ begin
     TBLIMITE.SQL.Add('   AND CODBIN '+MontarFiltroGrupoBIN(grupoId, familia));
     TBLIMITE.SQL.Add('GROUP BY');
     TBLIMITE.SQL.Add('   3');
+    s := TBLIMITE.SQL.Text;
     TBLIMITE.ParamByName('XPDTINI1').AsDate := dtini;
     TBLIMITE.ParamByName('XPDTFIM1').AsDate := dtfim;
     TBLIMITE.ParamByName('XPDTINI2').AsDate := dtini;
