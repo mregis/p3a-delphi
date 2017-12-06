@@ -3,8 +3,8 @@ object FormLeituraFatura: TFormLeituraFatura
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Controle de Devolu'#231#245'es - Leitura de Cart'#245'es Devolvidos'
-  ClientHeight = 507
-  ClientWidth = 717
+  ClientHeight = 552
+  ClientWidth = 775
   Color = clHotLight
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,8 +20,8 @@ object FormLeituraFatura: TFormLeituraFatura
   object GroupBox1: TGroupBox
     Left = 8
     Top = 0
-    Width = 689
-    Height = 432
+    Width = 759
+    Height = 465
     Caption = 'Leituras FACs'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -31,7 +31,7 @@ object FormLeituraFatura: TFormLeituraFatura
     ParentFont = False
     TabOrder = 0
     object LabelNumCartao: TLabel
-      Left = 440
+      Left = 513
       Top = 80
       Width = 92
       Height = 14
@@ -84,7 +84,7 @@ object FormLeituraFatura: TFormLeituraFatura
       ParentFont = False
     end
     object edtCodigo: TEdit
-      Left = 440
+      Left = 513
       Top = 96
       Width = 235
       Height = 31
@@ -101,26 +101,27 @@ object FormLeituraFatura: TFormLeituraFatura
     end
     object StringGridFaturasLidas: TStringGrid
       Left = 13
-      Top = 129
-      Width = 412
-      Height = 285
+      Top = 132
+      Width = 484
+      Height = 322
       TabStop = False
-      Color = clSilver
+      Color = clWhite
+      ColCount = 6
       Ctl3D = False
-      DefaultRowHeight = 22
+      DefaultRowHeight = 20
+      DefaultDrawing = False
       FixedColor = clNavy
       FixedCols = 0
       RowCount = 1
       FixedRows = 0
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -13
-      Font.Name = 'Tahoma'
+      Font.Height = -12
+      Font.Name = 'Verdana'
       Font.Style = [fsBold]
-      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSelect]
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goRowSelect]
       ParentCtl3D = False
       ParentFont = False
-      ScrollBars = ssVertical
       TabOrder = 4
       OnDrawCell = StringGridFaturasLidasDrawCell
       OnKeyUp = StringGridFaturasLidasKeyUp
@@ -129,18 +130,19 @@ object FormLeituraFatura: TFormLeituraFatura
         138
         60
         163
+        140
         0)
     end
     object lcCD_MOTIVO: TDBLookupComboBox
       Left = 13
       Top = 99
       Width = 412
-      Height = 24
+      Height = 27
       Hint = 'Selecione o motivo da devolu'#231#227'o'
       DropDownRows = 13
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       KeyField = 'cd_motivo'
@@ -150,18 +152,20 @@ object FormLeituraFatura: TFormLeituraFatura
       ParentShowHint = False
       ShowHint = True
       TabOrder = 2
+      TabStop = False
       OnKeyPress = lcCD_MOTIVOKeyPress
     end
     object StringGridResumoLeituras: TStringGrid
-      Left = 440
-      Top = 132
+      Left = 513
+      Top = 133
       Width = 237
-      Height = 285
+      Height = 322
       TabStop = False
-      Color = clSilver
+      Color = clWhite
       ColCount = 2
       Ctl3D = False
-      DefaultRowHeight = 22
+      DefaultRowHeight = 20
+      DefaultDrawing = False
       FixedColor = clNavy
       FixedCols = 0
       RowCount = 1
@@ -177,6 +181,7 @@ object FormLeituraFatura: TFormLeituraFatura
       ScrollBars = ssVertical
       TabOrder = 5
       OnDrawCell = StringGridResumoLeiturasDrawCell
+      OnKeyUp = StringGridResumoLeiturasKeyUp
       ColWidths = (
         195
         39)
@@ -221,8 +226,8 @@ object FormLeituraFatura: TFormLeituraFatura
     end
     object PanelProgress: TPanel
       AlignWithMargins = True
-      Left = 230
-      Top = 271
+      Left = 282
+      Top = 256
       Width = 315
       Height = 68
       Align = alCustom
@@ -242,8 +247,6 @@ object FormLeituraFatura: TFormLeituraFatura
       TabOrder = 6
       VerticalAlignment = taAlignTop
       Visible = False
-      ExplicitLeft = 227
-      ExplicitTop = 268
       object PanelProgressBar: TProgressBar
         AlignWithMargins = True
         Left = 24
@@ -258,7 +261,7 @@ object FormLeituraFatura: TFormLeituraFatura
   end
   object btnFechar: TBitBtn
     Left = 553
-    Top = 435
+    Top = 478
     Width = 126
     Height = 41
     Caption = '&Fechar'
@@ -373,8 +376,8 @@ object FormLeituraFatura: TFormLeituraFatura
   end
   object StatusBarMessages: TStatusBar
     Left = 0
-    Top = 481
-    Width = 717
+    Top = 526
+    Width = 775
     Height = 26
     Panels = <
       item
@@ -402,7 +405,7 @@ object FormLeituraFatura: TFormLeituraFatura
   end
   object BitBtnLimparLeituras: TBitBtn
     Left = 189
-    Top = 435
+    Top = 478
     Width = 149
     Height = 41
     Caption = '&Limpar Leituras'

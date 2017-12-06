@@ -3,7 +3,7 @@ object FormLeituraCartao: TFormLeituraCartao
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Controle de Devolu'#231#245'es - Leitura de Cart'#245'es Devolvidos'
-  ClientHeight = 507
+  ClientHeight = 543
   ClientWidth = 844
   Color = clHotLight
   Font.Charset = DEFAULT_CHARSET
@@ -19,9 +19,9 @@ object FormLeituraCartao: TFormLeituraCartao
   TextHeight = 13
   object GroupBoxDadosLote: TGroupBox
     Left = 8
-    Top = 4
+    Top = 0
     Width = 828
-    Height = 81
+    Height = 117
     Caption = 'Caixa'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -31,8 +31,8 @@ object FormLeituraCartao: TFormLeituraCartao
     ParentFont = False
     TabOrder = 0
     object LabelDataDevolucao: TLabel
-      Left = 293
-      Top = 17
+      Left = 13
+      Top = 64
       Width = 96
       Height = 14
       Caption = 'Data Devolu'#231#227'o'
@@ -45,7 +45,7 @@ object FormLeituraCartao: TFormLeituraCartao
       ParentFont = False
     end
     object LabelNumCaixa: TLabel
-      Left = 13
+      Left = 438
       Top = 17
       Width = 83
       Height = 14
@@ -59,8 +59,8 @@ object FormLeituraCartao: TFormLeituraCartao
       ParentFont = False
     end
     object LabelQtde: TLabel
-      Left = 451
-      Top = 17
+      Left = 250
+      Top = 64
       Width = 30
       Height = 14
       Caption = 'Qtde'
@@ -72,13 +72,27 @@ object FormLeituraCartao: TFormLeituraCartao
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object EditNumCaixa: TEdit
+    object LblProduto: TLabel
       Left = 13
-      Top = 37
+      Top = 17
+      Width = 44
+      Height = 14
+      Caption = 'Servi'#231'o'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object EditNumCaixa: TEdit
+      Left = 438
+      Top = 32
       Width = 252
       Height = 31
       Hint = 'N'#250'mero da Lista de Objetos Entregues ao  Carteiro (LOEC)'
       CharCase = ecUpperCase
+      Enabled = False
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -19
@@ -86,13 +100,14 @@ object FormLeituraCartao: TFormLeituraCartao
       Font.Style = []
       MaxLength = 40
       ParentFont = False
-      TabOrder = 0
+      TabOrder = 1
+      OnChange = EditNumCaixaChange
       OnExit = EditNumCaixaExit
       OnKeyPress = EditNumCaixaKeyPress
     end
     object cbDT_DEVOLUCAO: TDateTimePicker
-      Left = 293
-      Top = 39
+      Left = 13
+      Top = 79
       Width = 134
       Height = 27
       Hint = 'Data da retirada da caixa de objetos da ag'#234'ncia'
@@ -104,12 +119,12 @@ object FormLeituraCartao: TFormLeituraCartao
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
-      TabOrder = 1
+      TabOrder = 2
       OnKeyPress = cbDT_DEVOLUCAOKeyPress
     end
     object EditQtde: TEdit
-      Left = 451
-      Top = 37
+      Left = 250
+      Top = 79
       Width = 49
       Height = 31
       Hint = 'Quantidade de objetos presente na Lista'
@@ -121,24 +136,26 @@ object FormLeituraCartao: TFormLeituraCartao
       Font.Style = []
       MaxLength = 4
       ParentFont = False
-      TabOrder = 2
+      TabOrder = 3
+      OnChange = EditQtdeChange
       OnDblClick = EditQtdeDblClick
       OnExit = EditQtdeExit
       OnKeyPress = EditQtdeKeyPress
     end
     object BitBtnIniciarLeituras: TBitBtn
-      Left = 533
-      Top = 39
+      Left = 438
+      Top = 78
       Width = 138
       Height = 31
       Caption = '&Iniciar Leituras'
+      Enabled = False
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -13
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
-      TabOrder = 3
+      TabOrder = 4
       OnClick = BitBtnIniciarLeiturasClick
       Glyph.Data = {
         B6080000424DB608000000000000360400002800000030000000180000000100
@@ -213,10 +230,33 @@ object FormLeituraCartao: TFormLeituraCartao
         0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B}
       NumGlyphs = 2
     end
+    object lcCD_SERVICO: TDBLookupComboBox
+      Left = 13
+      Top = 31
+      Width = 370
+      Height = 27
+      Hint = 'Selecione o Servi'#231'o'
+      DropDownRows = 15
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      KeyField = 'id'
+      ListField = 'descricao'
+      ListSource = DM.dsServicos
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 0
+      OnClick = lcCD_SERVICOClick
+      OnDropDown = lcCD_SERVICODropDown
+      OnKeyPress = lcCD_SERVICOKeyPress
+    end
   end
   object GroupBoxLeituras: TGroupBox
     Left = 8
-    Top = 86
+    Top = 118
     Width = 828
     Height = 346
     Caption = 'Leituras ARs'
@@ -470,8 +510,8 @@ object FormLeituraCartao: TFormLeituraCartao
     end
     object PanelProgress: TPanel
       AlignWithMargins = True
-      Left = 263
-      Top = 142
+      Left = 299
+      Top = 178
       Width = 315
       Height = 68
       Align = alCustom
@@ -489,8 +529,6 @@ object FormLeituraCartao: TFormLeituraCartao
       TabOrder = 6
       VerticalAlignment = taAlignTop
       Visible = False
-      ExplicitLeft = 260
-      ExplicitTop = 139
       object PanelProgressBar: TProgressBar
         AlignWithMargins = True
         Left = 24
@@ -505,7 +543,7 @@ object FormLeituraCartao: TFormLeituraCartao
   end
   object btnFechar: TBitBtn
     Left = 553
-    Top = 435
+    Top = 467
     Width = 126
     Height = 41
     Caption = '&Fechar'
@@ -620,7 +658,7 @@ object FormLeituraCartao: TFormLeituraCartao
   end
   object StatusBarMessages: TStatusBar
     Left = 0
-    Top = 481
+    Top = 517
     Width = 844
     Height = 26
     Panels = <
@@ -649,7 +687,7 @@ object FormLeituraCartao: TFormLeituraCartao
   end
   object BitBtnLimparLeituras: TBitBtn
     Left = 189
-    Top = 435
+    Top = 467
     Width = 149
     Height = 41
     Caption = '&Limpar Leituras'
@@ -765,7 +803,7 @@ object FormLeituraCartao: TFormLeituraCartao
   end
   object BitBtnFinalizarLeituras: TBitBtn
     Left = 382
-    Top = 435
+    Top = 467
     Width = 149
     Height = 41
     Caption = '&Fechar Caixa'

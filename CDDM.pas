@@ -147,6 +147,10 @@ uses
     qraProdutoPrivBand: TStringField;
     qraMotivoDescricao: TStringField;
     qraProdutodescricao: TStringField;
+    dsServicos: TDataSource;
+    qraServicos: TZReadOnlyQuery;
+    qraServicosid: TIntegerField;
+    qraServicosdescricao: TStringField;
     procedure TimerTimer(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
     procedure envarq;

@@ -111,30 +111,4 @@ ALTER TABLE public.ibi_motivo_devolucoes
     PRIMARY KEY (cd_motivo, servico_id);
 
 -- Novos dados para a tabela de Motivos de Devolução
-BEGIN;
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'00',E'SEM MOTIVO DEFINIDO',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'09',E'EXTRAVIADO',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'12',E'REFUGADO',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'19',E'ENDEREÇO INCORRETO',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'22',E'REINTEGRADO',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'26',E'NÃO PROCURADO - DEVOLVIDO AO REMETENTE',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'29',E'ROUBADO',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'33',E'DOCUMENTAÇÃO NÃO FORNECIDA',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'34',E'LOGRADOURO COM NUMERAÇÃO IRREGULAR',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'71',E'MUDOU-SE',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'72',E'DESCONHECIDO',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'73',E'RECUSADO',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'74',E'INF PREST PELO PORTEIRO OU SINDICO',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'75',E'ENDEREÇO INSUFICIENTE',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'76',E'NÃO EXISTE O NÚMERO INDICADO',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'77',E'AUSENTE - DEVOLVIDO AO REMETENTE',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'78',E'NÃO PROCURADO',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'79',E'FALECIDO',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'99',E'OUTROS',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'20',E'AUSENTE NOVA TENTATIVA',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'02',E'AUSENTE - ENCAMINHADO P/ ENTREGA INTERNA',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'24',E'DISPONÍVEL CAIXA POSTAL',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'46',E'ENTREGA NÃO EFETUADA',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'66',E'ÁREA RESTRIÇÃO DE ENTREGA',2);
-INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'32',E'ENTREGA AGENDADA',2);
-COMMIT	
+	

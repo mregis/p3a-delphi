@@ -36,6 +36,13 @@ type
     SpeedButtonAddLeitura: TSpeedButton;
     PanelProgress: TPanel;
     PanelProgressBar: TProgressBar;
+    lcCD_SERVICO: TDBLookupComboBox;
+    LblProduto: TLabel;
+    procedure lcCD_SERVICOClick(Sender: TObject);
+    procedure EditQtdeChange(Sender: TObject);
+    procedure lcCD_SERVICODropDown(Sender: TObject);
+    procedure lcCD_SERVICOKeyPress(Sender: TObject; var Key: Char);
+    procedure EditNumCaixaChange(Sender: TObject);
     procedure StringGridResumoLeiturasKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure SpeedButtonAddLeituraClick(Sender: TObject);
@@ -64,6 +71,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure BitBtnIniciarLeiturasClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure AtivaBtnLeitura;
   private
     { Private declarations }
     ListSiglas : TStringList;
@@ -165,11 +173,12 @@ begin
           begin
             SqlAux.Close;
             SqlAux.SQL.Clear;
-            SqlAux.SQL.Add('INSERT INTO lote (codigo, qtde, dt_devolucao) ');
-            SqlAux.SQL.Add('VALUES (:codigo, :qtde, :dt_devolucao) ');
+            SqlAux.SQL.Add('INSERT INTO lote (codigo, qtde, dt_devolucao, servico_id) ');
+            SqlAux.SQL.Add('VALUES (:codigo, :qtde, :dt_devolucao, :servico) ');
             SqlAux.ParamByName('codigo').AsString := EditNumCaixa.Text;
             SqlAux.ParamByName('qtde').AsInteger := int_temp;
             SqlAux.ParamByName('dt_devolucao').AsDate := cbDT_DEVOLUCAO.Date;
+            SqlAux.ParamByName('servico').AsInteger:= lcCD_SERVICO.KeyValue;
             SqlAux.ExecSQL;
             if SqlAux.RowsAffected > 0 then
               begin
@@ -180,6 +189,7 @@ begin
                 // habilitando campos
                 lcCD_MOTIVO.Enabled := True;
                 DM.qMotivo.Close;
+                DM.qMotivo.ParamByName('servico').AsInteger:= lcCD_SERVICO.KeyValue;
                 DM.qMotivo.Open;
                 edtCodigo.Enabled := True;
                 eBin.Enabled := True;
@@ -255,8 +265,9 @@ begin
             end;
 
           // removendo entradas da caixa
-          SQl.Text := 'DELETE FROM lote WHERE codigo =:codigo';
+          SQl.Text := 'DELETE FROM lote WHERE codigo =:codigo AND servico_id= :servico';
           ParamByName('codigo').AsString := EditNumCaixa.Text;
+          ParamByName('servico').AsInteger:= lcCD_SERVICO.KeyValue;
           ExecSQL;
           if RowsAffected  < 1 then
             begin
@@ -304,7 +315,10 @@ procedure TFormLeituraCartao.cbDT_DEVOLUCAOKeyPress(Sender: TObject;
   var Key: Char);
 begin
   if key = #13 then
-    EditQtde.SetFocus;
+    begin
+      SelectNext(Sender as tWinControl, True, True);
+      Key := #0;
+    end;
     
 end;
 
@@ -524,6 +538,11 @@ begin
 
 end;
 
+procedure TFormLeituraCartao.EditNumCaixaChange(Sender: TObject);
+begin
+  AtivaBtnLeitura;
+end;
+
 procedure TFormLeituraCartao.EditNumCaixaExit(Sender: TObject);
 var res : Integer;
 begin
@@ -559,8 +578,16 @@ end;
 procedure TFormLeituraCartao.EditNumCaixaKeyPress(Sender: TObject;
   var Key: Char);
 begin
-  if Key = #13 then
-    cbDT_DEVOLUCAO.SetFocus;
+  if key = #13 then
+    begin
+      SelectNext(Sender as tWinControl, True, True);
+      Key := #0;
+    end;
+end;
+
+procedure TFormLeituraCartao.EditQtdeChange(Sender: TObject);
+begin
+  AtivaBtnLeitura;
 end;
 
 procedure TFormLeituraCartao.EditQtdeDblClick(Sender: TObject);
@@ -645,11 +672,10 @@ end;
 procedure TFormLeituraCartao.EditQtdeKeyPress(Sender: TObject; var Key: Char);
 begin
   if Key = #13 then
-    if BitBtnIniciarLeituras.Enabled then    
-      BitBtnIniciarLeituras.SetFocus
-    else
-      edtCodigo.SetFocus;
-      
+    begin
+      SelectNext(Sender as tWinControl, True, True);
+      Key := #0;
+    end;
 end;
 
 procedure TFormLeituraCartao.edtCodigoChange(Sender: TObject);
@@ -819,6 +845,29 @@ end;
 
 procedure TFormLeituraCartao.FormShow(Sender: TObject);
 begin
+  DM.qraServicos.Open;
+end;
+
+procedure TFormLeituraCartao.lcCD_SERVICOClick(Sender: TObject);
+begin
+  EditNumCaixa.Enabled:= lcCD_SERVICO.KeyValue > 0;
+  AtivaBtnLeitura;
+end;
+
+procedure TFormLeituraCartao.lcCD_SERVICODropDown(Sender: TObject);
+begin
+  EditNumCaixa.Enabled:= lcCD_SERVICO.KeyValue > 0;
+  AtivaBtnLeitura;
+end;
+
+procedure TFormLeituraCartao.lcCD_SERVICOKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+  if key = #13 then
+    begin
+      SelectNext(Sender as tWinControl, True, True);
+      Key := #0;
+    end;
 end;
 
 {
@@ -832,9 +881,11 @@ begin
   // Recuperar informações da caixa do banco de dados
   With DM.SqlAux Do
     begin
-      SQL.Text := 'SELECT id, codigo, qtde, dt_devolucao FROM lote ' +
-            'WHERE codigo = :codigo';
+      SQL.Text := 'SELECT id, codigo, qtde, dt_devolucao, ' +
+            '   servico_id FROM lote ' +
+            'WHERE codigo = :codigo AND servico_id = :servico';
       ParamByName('codigo').AsString := EditNumCaixa.Text;
+      ParamByName('servico').AsInteger := lcCD_SERVICO.KeyValue;
       Open;
       if IsEmpty then
         begin
@@ -917,6 +968,15 @@ begin
 StatusBarMessages.Panels.Items[4].Text := '';
 if Trim(eBin.Text) <> '' then
   begin
+    // Validando o campo Serviço
+    if lcCD_SERVICO.KeyValue = null then
+      begin
+        Application.MessageBox('Selecione um Serviço.', 'Aviso',
+            MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
+        lcCD_SERVICO.SetFocus;
+        exit;
+      end;
+
     // Validando campo Motivo
     if lcCD_MOTIVO.KeyValue = null then
       begin
@@ -997,7 +1057,7 @@ if Trim(eBin.Text) <> '' then
                   sql := 'UPDATE ibi_controle_devolucoes_ar SET codusu=:codusu,' +
                          'cd_motivo=:motivo, dt_devolucao = :dt_devolucao, codbin=:bin, ' +
                          'lote_id=(SELECT b.id FROM lote b ' +
-                         'WHERE b.codigo = :codigo) ' + #13#10 +
+                         'WHERE b.codigo = :codigo AND b.servico_id= :servico) ' + #13#10 +
                          'WHERE cod_ar=:cod';
 
                 end
@@ -1008,7 +1068,7 @@ if Trim(eBin.Text) <> '' then
             sql := 'INSERT INTO ibi_controle_devolucoes_ar ' +
                 '(cod_ar,cd_motivo,dt_devolucao,codbin,codusu,lote_id) ' +
                 'SELECT :cod, :motivo, :dt_devolucao, :bin, :codusu, b.id ' +
-                'FROM lote b WHERE b.codigo = :codigo';
+                'FROM lote b WHERE b.codigo = :codigo AND b.servico_id = :servico';
 
           SqlAux.Close;
 
@@ -1021,6 +1081,7 @@ if Trim(eBin.Text) <> '' then
           SqlAux.ParamByName('bin').AsString := eBin.Text;
           SqlAux.ParamByName('codusu').AsInteger := usuaces;
           SqlAux.ParamByName('codigo').AsString := EditNumCaixa.Text;
+          SqlAux.ParamByName('servico').AsInteger := lcCD_SERVICO.KeyValue;
           SqlAux.ExecSQL;
           // Mesmo quando for atualização, obrigatoriamente o número da caixa
           // ou o id do lote precisará ser modificado, pois somente com lote
@@ -1376,4 +1437,13 @@ begin
   PanelProgress.Refresh;
 end;
 
+procedure TFormLeituraCartao.AtivaBtnLeitura;
+var qt_temp: Integer;
+begin
+  qt_temp:= 0;
+  TryStrToInt(EditQtde.Text, qt_temp);
+  BitBtnIniciarLeituras.Enabled:= (qt_temp > 0) and
+    (Length(EditNumCaixa.Text) > 0) and
+    (lcCD_SERVICO.KeyValue > 0);
+end;
 end.

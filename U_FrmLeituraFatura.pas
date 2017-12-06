@@ -25,6 +25,8 @@ type
     lcCD_PRODUTO: TDBLookupComboBox;
     PanelProgress: TPanel;
     PanelProgressBar: TProgressBar;
+    procedure StringGridResumoLeiturasKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure lcCD_MOTIVOKeyPress(Sender: TObject; var Key: Char);
@@ -71,9 +73,10 @@ begin
     begin
       inTransaction := False;
       try
-        PanelProgress.Visible := True;
+        PanelProgressBar.Max := StringGridFaturasLidas.RowCount;
         PanelProgressBar.Step := 0;
-        PanelProgressBar.Max := StringGridFaturasLidas.RowCount;            
+        PanelProgress.Visible := True;
+
         With Dm.SqlAux do
           begin
             // Iniciando transação
@@ -89,7 +92,7 @@ begin
             for i := 1 to StringGridFaturasLidas.RowCount - 1 do
               begin
                 ProgressBarStepItOne;
-                ParamByName('id').AsString := StringGridFaturasLidas.Cells[4, i];
+                ParamByName('id').AsString := StringGridFaturasLidas.Cells[5, i];
                 ExecSQL;
                 if RowsAffected  < 1 then
                   begin
@@ -201,9 +204,18 @@ begin
   StringGridFaturasLidas.Cells[1,0] := 'Numero Objeto';
   StringGridFaturasLidas.Cells[2,0] := 'BIN';
   StringGridFaturasLidas.Cells[3,0] := 'Motivo Devolução';
+  StringGridFaturasLidas.Cells[4,0] := 'Operador';
+  StringGridFaturasLidas.Cells[5,0] := 'ID';
+
+  StringGridResumoLeituras.Canvas.Brush.Color := clNavy;
+  StringGridResumoLeituras.Canvas.Font.Color:= clWhite;
+
   StringGridResumoLeituras.Cells[0,0] := 'Motivo Devolução';
   StringGridResumoLeituras.Cells[1,0] := 'Qtde';
+
+
   cbDT_DEVOLUCAO.DateTime := Date;
+  cbDT_DEVOLUCAO.MaxDate := Date;
 end;
 
 procedure TFormLeituraFatura.FormShow(Sender: TObject);
@@ -219,16 +231,25 @@ begin
     begin
       StringGridFaturasLidas.Canvas.Font.Color:= clBlack;
       StringGridFaturasLidas.Canvas.Font.Style:= [];
-      if (odd(arow)) then
-        // verifica se a linha é impar
-        StringGridFaturasLidas.Canvas.Brush.Color:= clSilver
+      if (State = [gdSelected]) then
+        StringGridFaturasLidas.Canvas.Brush.Color := clGray
       else
-        StringGridFaturasLidas.Canvas.Brush.Color:= clGray;
-
-      StringGridFaturasLidas.Canvas.FillRect(Rect); // redesenha a celula
-      StringGridFaturasLidas.Canvas.TextOut(Rect.Left + 2, Rect.Top,
-        StringGridFaturasLidas.Cells[acol, arow]); // reimprime  o texto.
+        if (odd(arow)) then
+          // verifica se a linha é impar
+          StringGridFaturasLidas.Canvas.Brush.Color := $009D9D4F
+        else
+          StringGridFaturasLidas.Canvas.Brush.Color := $00CDCD9C;
+    end
+  else   // Cabeçalhos
+    begin
+        StringGridFaturasLidas.Canvas.Font.Style:= [fsBold];
+        StringGridFaturasLidas.Canvas.Brush.Color := clNavy;
+        StringGridFaturasLidas.Canvas.Font.Color:= clWhite;
     end;
+
+  StringGridFaturasLidas.Canvas.FillRect(Rect); // redesenha a celula
+  StringGridFaturasLidas.Canvas.TextOut(Rect.Left + 2, Rect.Top,
+  StringGridFaturasLidas.Cells[acol, arow]); // reimprime  o texto.
 end;
 
 procedure TFormLeituraFatura.StringGridFaturasLidasKeyUp(Sender: TObject;
