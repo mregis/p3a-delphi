@@ -208,7 +208,7 @@ end;
 procedure TFormLeituraFatura.FormCreate(Sender: TObject);
 begin
   StringGridFaturasLidas.Cells[0,0] := '#';
-  StringGridFaturasLidas.Cells[1,0] := 'Numero Objeto';
+  StringGridFaturasLidas.Cells[1,0] := 'Cartão';
   StringGridFaturasLidas.Cells[2,0] := 'BIN';
   StringGridFaturasLidas.Cells[3,0] := 'Motivo Devolução';
   StringGridFaturasLidas.Cells[4,0] := 'Operador';

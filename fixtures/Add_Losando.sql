@@ -24,6 +24,14 @@ IS 'Data de criaçao do registro';
 COMMENT ON COLUMN public.servicos.estado
 IS 'Indica o estado do produto (0=inativo, 1=ativo, 9=cancelado)';
 
-
+-- Alterando a tabela Lote para ser possivel separar por TIPO DE SERVICO
 ALTER TABLE public.lote  ADD COLUMN servico_id INTEGER DEFAULT 1 NOT NULL;
-ALTER TABLE public.lote  ADD CONSTRAINT "FK_LOTE_SERVICO" FOREIGN KEY (servico_id)  REFERENCES public.servicos(id)  ON DELETE NO ACTION  ON UPDATE NO ACTION  NOT DEFERRABLE;
+ALTER TABLE public.lote  ADD CONSTRAINT "FK_LOTE_SERVICO" FOREIGN KEY (servico_id)  REFERENCES public.servicos(id) 
+	ON DELETE NO ACTION  ON UPDATE NO ACTION  NOT DEFERRABLE;
+
+-- Alterando a tabela CADASTRO_FAMILIA para ser possivel separar por TIPO DE SERVICO
+ALTER TABLE public.ibi_cadastro_familia ADD COLUMN servico_id INTEGER DEFAULT 1 NOT NULL;
+COMMENT ON COLUMN public.ibi_cadastro_familia.servico_id
+IS 'Identificador do registro na tabela Servicos';
+ALTER TABLE public.ibi_cadastro_familia ADD CONSTRAINT "FK_FAMILIA_SERVICO" FOREIGN KEY (servico_id) REFERENCES public.servicos(id)
+    ON DELETE NO ACTION ON UPDATE NO ACTION NOT DEFERRABLE;

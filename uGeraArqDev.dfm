@@ -4,8 +4,8 @@ object fGeraArqDev: TfGeraArqDev
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Gerar Arquivo de Devolu'#231#227'o'
-  ClientHeight = 135
-  ClientWidth = 370
+  ClientHeight = 312
+  ClientWidth = 417
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

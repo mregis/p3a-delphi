@@ -238,8 +238,8 @@ object FormLeituraFatura: TFormLeituraFatura
     end
     object PanelProgress: TPanel
       AlignWithMargins = True
-      Left = 294
-      Top = 268
+      Left = 303
+      Top = 277
       Width = 315
       Height = 68
       Align = alCustom
@@ -259,8 +259,6 @@ object FormLeituraFatura: TFormLeituraFatura
       TabOrder = 7
       VerticalAlignment = taAlignTop
       Visible = False
-      ExplicitLeft = 291
-      ExplicitTop = 265
       object PanelProgressBar: TProgressBar
         AlignWithMargins = True
         Left = 24
@@ -453,7 +451,7 @@ object FormLeituraFatura: TFormLeituraFatura
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
-    TabOrder = 2
+    TabOrder = 1
     OnClick = BitBtnLimparLeiturasClick
     Glyph.Data = {
       360C0000424D360C000000000000360400002800000040000000200000000100

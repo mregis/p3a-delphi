@@ -138,3 +138,33 @@ INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'46'
 INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'66',E'ÁREA RESTRIÇÃO DE ENTREGA',2);
 INSERT INTO ibi_motivo_devolucoes (cd_motivo,ds_motivo,servico_id) VALUES (E'32',E'ENTREGA AGENDADA',2);
 COMMIT	
+
+-- Novos dados para a tabela de Familias de BINs
+BEGIN;
+INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'302',E'VIVA INTERNACIONAL',E'423944',E'LOSANGO VISA','1');
+INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'001',E'LOSANGO VISA',E'432031',E'LOSANGO VISA','1');
+INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'003',E'RICARDO ELETRO/CITYLAR/CREDMOVEIS/ELETROSHOPPING/RABELO',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'004',E'CITYLAR',E'432032',E'LOSANGO VISA','1');
+--INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'005',E'CREDMOVEIS',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'007',E'ELETROSHOPPING',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'010',E'VIVA NACIONAL',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'012',E'RABELO',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'019',E'MANLEC',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'020',E'FACIL VISA',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'024',E'CARRINHO CHEIO',E'432035',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'026',E'GABRYELLA',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'027',E'HERING',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'028',E'FUJIOKA',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'031',E'ATACADAO DOS ELETROS',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'032',E'COMERCIAL SÃO JORGE',E'432032',E'LOSANGO VISA','1');
+INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'038',E'ATACADAO DM/VIVA NACIONAL/BISTECK/CARRINHO CHEIO',E'432035',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'040',E'VIVA NACIONAL',E'432035',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'046',E'CARTAO GUIDO',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'051',E'BISTECK',E'432035',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'053',E'SUPERMERCADO PREÇO BOM',E'432035',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'085',E'INSINUANTE',E'432032',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'086',E'COLOMBO',E'432032',E'LOSANGO VISA','1');
+INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'090',E'LEROY MERLIN/VIVA INTERNACIONAL',E'400437',E'LOSANGO VISA','1');
+-- INSERT INTO ibi_cadastro_familia(org,logo,descricao,codbin,familia,priv_band) VALUES (E'407',E'302',E'VIVA INTERNACIONAL',E'423944',E'LOSANGO VISA','1');
+
+COMMIT;
