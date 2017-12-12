@@ -121,6 +121,7 @@ begin
                 eBin.Enabled := False;
                 EditQtdeRestante.Text := '0';
                 // Liberando os campos para novas informações
+                lcCD_SERVICO.Enabled:= True;
                 EditNumCaixa.Clear;
                 EditNumCaixa.Enabled := True;
                 cbDT_DEVOLUCAO.Enabled := True;
@@ -184,6 +185,7 @@ begin
               begin
                 EditNumCaixa.Enabled := False;
                 cbDT_DEVOLUCAO.Enabled := false;
+                lcCD_SERVICO.Enabled:= False;
                 EditQtde.ReadOnly := True;
                 BitBtnIniciarLeituras.Enabled := false;
                 // habilitando campos

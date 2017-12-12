@@ -25,6 +25,12 @@ type
     lcCD_PRODUTO: TDBLookupComboBox;
     PanelProgress: TPanel;
     PanelProgressBar: TProgressBar;
+    Label1: TLabel;
+    lcCD_SERVICO: TDBLookupComboBox;
+    procedure lcCD_SERVICOKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure lcCD_SERVICODropDown(Sender: TObject);
+    procedure lcCD_SERVICOClick(Sender: TObject);
     procedure StringGridResumoLeiturasKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure FormShow(Sender: TObject);
@@ -46,6 +52,7 @@ type
   private
     procedure IncluirLeitura;
     procedure ProgressBarStepItOne;
+    procedure AtualizaMotivos;
     { Private declarations }
   public
     { Public declarations }
@@ -194,7 +201,7 @@ end;
 procedure TFormLeituraFatura.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
-  DM.qraMotivo.Close;
+  DM.qMotivo.Close;
   DM.qraProduto.Close;
 end;
 
@@ -220,7 +227,7 @@ end;
 
 procedure TFormLeituraFatura.FormShow(Sender: TObject);
 begin
-  DM.qraMotivo.Open;
+  DM.qraServicos.Open;
   DM.qraProduto.Open;
 end;
 
@@ -474,6 +481,15 @@ begin
   r := 0;
   if Trim(edtCodigo.Text) <> '' then
     begin
+      // Validando o campo Servico
+      if lcCD_SERVICO.KeyValue = null then
+        begin
+          Application.MessageBox('Selecione um Serviço.', 'Aviso',
+            MB_OK + MB_ICONWARNING + MB_SYSTEMMODAL);
+          lcCD_SERVICO.SetFocus;
+          exit;
+        end;
+
       // Validando o campo Produto
       if lcCD_PRODUTO.KeyValue = null then
         begin
@@ -600,7 +616,7 @@ begin
               StringGridFaturasLidas.Cells[0, r] := IntToStr(r);
               StringGridFaturasLidas.Cells[1, r] := edtCodigo.Text;
               StringGridFaturasLidas.Cells[2, r] := sBin;
-              StringGridFaturasLidas.Cells[3, r] := Dm.qraMotivoDescricao.AsString;
+              StringGridFaturasLidas.Cells[3, r] := Dm.qMotivodescricao.AsString;
               StringGridFaturasLidas.Cells[4, r] := Dm.operador;
               StringGridFaturasLidas.Cells[5, r] := id;
               StringGridFaturasLidas.Row := r;
@@ -608,7 +624,7 @@ begin
               // Buscando a entrada referente ao motivo lido
               for i := 1 to StringGridResumoLeituras.RowCount - 1 do
                 begin
-                  if (StringGridResumoLeituras.Cells[0, i] = Dm.qraMotivoDescricao.AsString) then
+                  if (StringGridResumoLeituras.Cells[0, i] = Dm.qMotivoDescricao.AsString) then
                     begin
                       StringGridResumoLeituras.Cells[1, i] := IntToStr(1 + StrToInt(StringGridResumoLeituras.Cells[1, i]));
                       s := 'T'; // Flag pra indicar que já foi atualizado o motivo no resumo
@@ -620,7 +636,7 @@ begin
                 begin
                   i := StringGridResumoLeituras.RowCount;
                   StringGridResumoLeituras.RowCount := i + 1;
-                  StringGridResumoLeituras.Cells[0, i] := Dm.qraMotivoDescricao.AsString;
+                  StringGridResumoLeituras.Cells[0, i] := Dm.qMotivoDescricao.AsString;
                   StringGridResumoLeituras.Cells[1, i] := '1';
                 end;
 
@@ -671,6 +687,22 @@ begin
     lcCD_MOTIVO.SetFocus;
 end;
 
+procedure TFormLeituraFatura.lcCD_SERVICOClick(Sender: TObject);
+begin
+  AtualizaMotivos;
+end;
+
+procedure TFormLeituraFatura.lcCD_SERVICODropDown(Sender: TObject);
+begin
+  AtualizaMotivos;
+end;
+
+procedure TFormLeituraFatura.lcCD_SERVICOKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  AtualizaMotivos;
+end;
+
 procedure TFormLeituraFatura.ProgressBarStepItOne;
 begin
   // Remover as leituras desta caixa da base de dados
@@ -681,4 +713,13 @@ begin
   PanelProgress.Refresh;
 end;
 
+procedure TFormLeituraFatura.AtualizaMotivos;
+begin
+  DM.qMotivo.Close;
+  if (lcCD_SERVICO.KeyValue > 0) then
+    begin
+      DM.qMotivo.ParamByName('SERVICO').AsInteger:=lcCD_SERVICO.KeyValue;
+      DM.qMotivo.Open;
+    end;
+end;
 end.

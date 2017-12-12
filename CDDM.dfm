@@ -806,7 +806,7 @@ object DM: TDM
     Top = 62
   end
   object dsProdutos: TDataSource
-    DataSet = qraServicos
+    DataSet = qraProduto
     Left = 313
     Top = 62
   end

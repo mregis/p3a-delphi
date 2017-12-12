@@ -510,8 +510,8 @@ object FormLeituraCartao: TFormLeituraCartao
     end
     object PanelProgress: TPanel
       AlignWithMargins = True
-      Left = 299
-      Top = 178
+      Left = 308
+      Top = 187
       Width = 315
       Height = 68
       Align = alCustom
