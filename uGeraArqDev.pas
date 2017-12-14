@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, ComCtrls, ExtCtrls, DB, ZAbstractRODataset,
-  ZAbstractDataset, ZDataset;
+  ZAbstractDataset, ZDataset, DBCtrls, FileCtrl;
 
 type
   TfGeraArqDev = class(TForm)
@@ -18,13 +18,16 @@ type
     btnGerar: TBitBtn;
     TB_AUX: TZQuery;
     cbdtfim: TDateTimePicker;
-    SaveDialog: TSaveDialog;
     lblPlanilha: TLabel;
     cbgrupo: TComboBox;
     Label1: TLabel;
+    LblProduto: TLabel;
+    lcCD_SERVICO: TDBLookupComboBox;
+    procedure lcCD_SERVICOClick(Sender: TObject);
+    procedure lcCD_SERVICOKeyUp(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure lbldataClick(Sender: TObject);
     procedure btnGerarClick(Sender: TObject);
   private
     { Private declarations }
@@ -37,6 +40,7 @@ type
 
     Function MontarFiltroGrupoBIN(grupo : integer; semFamilia : Boolean) : String;
 
+    procedure AtivaDemaisCampos;
   public
     { Public declarations }
   end;
@@ -99,7 +103,7 @@ var
 begin
   cbdtini.Date := Now;
   cbdtfim.Date := Now;
-
+  DM.qraServicos.Open;
   cbgrupo.Items.Clear;
 
   query := TB_AUX;
@@ -109,20 +113,18 @@ begin
   query.SQL.Add('SELECT * FROM GRUPO ORDER BY ID');
   query.Open;
   if query.RecordCount <= 0 then
-  begin
     Exit;
-  end;
 
   while not query.Eof do
-  begin
-    if query.FieldByName('semfamilia').AsBoolean then
-     semFamilia := 'S'
-    else
-     semFamilia := 'N';
+    begin
+      if query.FieldByName('semfamilia').AsBoolean then
+        semFamilia := 'S'
+      else
+        semFamilia := 'N';
 
-    cbgrupo.Items.Add(FormatCurr('000', query.FieldByName('ID').AsInteger)+' - '+semFamilia+' - '+query.FieldByName('DESCRICAO').AsString);
-    query.Next;
-  end;
+      cbgrupo.Items.Add(FormatCurr('000', query.FieldByName('ID').AsInteger)+' - '+semFamilia+' - '+query.FieldByName('DESCRICAO').AsString);
+      query.Next;
+    end;
 
 end;
 
@@ -134,12 +136,15 @@ begin
     Query.Close;
     Query.SQL.Clear;
     Query.Params.Clear;
-    Query.SQL.Add('SELECT (nro_cartao || ''005'' || cd_motivo || ' +
-                'to_char(dt_devolucao, ''yyyyddmm'') || ''  '') AS LINHA');
+    Query.SQL.Add('SELECT (DV.nro_cartao || ''005'' || DV.cd_motivo || ' +
+                'to_char(DV.dt_devolucao, ''yyyyddmm'') || ''  '') AS LINHA');
     Query.SQL.Add('FROM ibi_controle_devolucoes_fac DV');
-    Query.SQL.Add('WHERE DATA >= :XPDATAINI');
-    Query.SQL.Add('   AND DATA <= :XPDATAFIM');
+    Query.SQL.Add(' INNER JOIN ibi_motivo_devolucoes MD ON (DV.cd_motivo=MD.cd_motivo)');
+    Query.SQL.Add('WHERE MD.servico_id=:SERVICO');
+    Query.SQL.Add('   AND DV.DATA >= :XPDATAINI');
+    Query.SQL.Add('   AND DV.DATA <= :XPDATAFIM');
     Query.SQL.Add('   AND DV.CODBIN ' + MontarFiltroGrupoBIN(grupoId, familia));
+    Query.ParamByName('SERVICO').AsInteger := lcCD_SERVICO.KeyValue;
     Query.ParamByName('XPDATAINI').AsDate := dtini;
     Query.ParamByName('XPDATAFIM').AsDate := dtfim;
     Query.Open;
@@ -147,35 +152,35 @@ begin
 
     if (Query.IsEmpty) or
        (Query.RecordCount <= 0) then
-    begin
-      Result := '';
-      Exit;
-    end;
+      begin
+        Result := '';
+        Exit;
+      end;
 
     if progress <> nil then
-    begin
-      panelBarra.Visible := True;
-      progress.Min      := 1;
-      progress.Max      := TB_AUX.RecordCount;
-      progress.Position := 1;
-    end;
+      begin
+        panelBarra.Visible := True;
+        progress.Min      := 1;
+        progress.Max      := TB_AUX.RecordCount;
+        progress.Position := 1;
+      end;
 
     Application.ProcessMessages;
     xArqVirtual := '';
     while not TB_AUX.Eof do
-    begin
-      if statusbar <> nil then
-       statusbar.Panels[0].Text := 'Processando '+IntToStr(Query.RecNo)+' de '+IntToStr(Query.RecordCount);
+      begin
+        if statusbar <> nil then
+          statusbar.Panels[0].Text := 'Processando '+IntToStr(Query.RecNo)+' de '+IntToStr(Query.RecordCount);
 
-      Application.ProcessMessages;
-      xArqVirtual := xArqVirtual + TB_AUX.Fields[0].AsString+#13+#10;
-      Query.Next;
+        Application.ProcessMessages;
+        xArqVirtual := xArqVirtual + TB_AUX.Fields[0].AsString+#13+#10;
+        Query.Next;
 
-      if progress <> nil then
-       progress.Position := progress.Position +1;
+        if progress <> nil then
+          progress.Position := progress.Position +1;
 
-      Application.ProcessMessages;
-    end;
+        Application.ProcessMessages;
+      end;
 
     Result := xArqVirtual;
 
@@ -184,10 +189,10 @@ begin
     Query.Params.Clear;
     
     if progress <> nil then
-     panelBarra.Visible := False;
+      panelBarra.Visible := False;
 
     if statusbar <> nil then
-     statusbar.Panels[0].Text := '';
+      statusbar.Panels[0].Text := '';
   except
     on E: Exception do
     begin
@@ -202,7 +207,7 @@ begin
        panelBarra.Visible       := False;
 
       if statusbar <> nil then
-       StatusBar.Panels[0].Text := '';
+        StatusBar.Panels[0].Text := '';
       Exit;
     end;
   end;
@@ -217,14 +222,15 @@ begin
     Query.SQL.Clear;
     Query.Params.Clear;
     Query.SQL.Add('SELECT');
-    Query.SQL.Add('   (cod_ar || cd_motivo || ''005'') AS LINHA');
-    Query.SQL.Add('FROM');
-    Query.SQL.Add('   ibi_controle_devolucoes_ar DV');
-    Query.SQL.Add('WHERE');
-    Query.SQL.Add('       DATA >= :XPDATAINI');
-    Query.SQL.Add('   AND DATA <= :XPDATAFIM');
-    Query.SQL.Add('   AND CD_MOTIVO <> :XPCD_MOTIVO');
+    Query.SQL.Add('   (DV.cod_ar || DV.cd_motivo || ''005'') AS LINHA');
+    Query.SQL.Add('FROM ibi_controle_devolucoes_ar DV');
+    Query.SQL.Add('   INNER JOIN ibi_motivo_devolucoes MD ON (DV.cd_motivo=MD.cd_motivo)');
+    Query.SQL.Add('WHERE MD.servico_id=:SERVICO');
+    Query.SQL.Add('   AND DV.DATA >= :XPDATAINI');
+    Query.SQL.Add('   AND DV.DATA <= :XPDATAFIM');
+    Query.SQL.Add('   AND DV.CD_MOTIVO <> :XPCD_MOTIVO');
     Query.SQL.Add('   AND DV.CODBIN '+MontarFiltroGrupoBIN(grupoId, familia));
+    Query.ParamByName('SERVICO').AsInteger    := lcCD_SERVICO.KeyValue;
     Query.ParamByName('XPDATAINI').AsDate     := dtini;
     Query.ParamByName('XPDATAFIM').AsDate     := dtfim;
     Query.ParamByName('XPCD_MOTIVO').AsString := '007';
@@ -293,14 +299,15 @@ begin
   end;
 end;
 
-procedure TfGeraArqDev.lbldataClick(Sender: TObject);
-var
-  xDiretorio : String;
+procedure TfGeraArqDev.lcCD_SERVICOClick(Sender: TObject);
 begin
-  SaveDialog.InitialDir := DM.currdir;
-  SaveDialog.Execute;
-  xDiretorio := ExtractFilePath(SaveDialog.FileName);
-  ShowMessage(xDiretorio);
+  AtivaDemaisCampos;
+end;
+
+procedure TfGeraArqDev.lcCD_SERVICOKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  AtivaDemaisCampos;
 end;
 
 Function TfGeraArqDev.GerarArquivo_FACFat(dtini : TDate; dtfim : TDate; Query : TZQuery; progress : TProgressBar; statusbar : TStatusBar) : String;
@@ -312,13 +319,14 @@ begin
     Query.SQL.Clear;
     Query.Params.Clear;
     Query.SQL.Add('SELECT');
-    Query.SQL.Add('   (nro_conta || ''007'' || cd_motivo || TO_CHAR(dt_devolucao,''yyyymmdd'')) AS LINHA');
-    Query.SQL.Add('FROM');
-    Query.SQL.Add('   cea_controle_devolucoes DV');
-    Query.SQL.Add('WHERE');
-    Query.SQL.Add('       DATA >= :XPDATAINI');
-    Query.SQL.Add('   AND DATA <= :XPDATAFIM');
+    Query.SQL.Add('   (DV.nro_conta || ''007'' || DV.cd_motivo || TO_CHAR(DV.dt_devolucao,''yyyymmdd'')) AS LINHA');
+    Query.SQL.Add('FROM cea_controle_devolucoes DV');
+    Query.SQL.Add('   INNER JOIN ibi_motivo_devolucoes MD ON (DV.cd_motivo=MD.cd_motivo)');
+    Query.SQL.Add('WHERE MD.servico_id=:SERVICO');
+    Query.SQL.Add('   AND DV.DATA >= :XPDATAINI');
+    Query.SQL.Add('   AND DV.DATA <= :XPDATAFIM');
     Query.SQL.Add('   AND DV.CODBIN '+MontarFiltroGrupoBIN(grupoId, familia));
+    Query.ParamByName('SERVICO').AsInteger := lcCD_SERVICO.KeyValue;
     Query.ParamByName('XPDATAINI').AsDate := dtini;
     Query.ParamByName('XPDATAFIM').AsDate := dtfim;
     Query.Open;
@@ -396,130 +404,165 @@ var
   xDiretorio : String;
   xDtAux : TDate;
   xDtInicial, xDtFinal : TDate;
+  sDtExtr: String; // Data dos registros
 begin
   try
     if panelBarra.Visible then
-    begin
       Exit;
-    end;
+
+    if lcCD_SERVICO.KeyValue < 0 then
+      begin
+        Application.MessageBox('Selecione o serviço !', 'Atenção', MB_OK + MB_ICONWARNING);
+        lcCD_SERVICO.SetFocus;
+        Exit;
+      end;
 
     if cbgrupo.ItemIndex < 0 then
-    begin
-      Application.MessageBox('Selecione o grupo !', 'Atenção', MB_OK+MB_ICONWARNING);
-      cbgrupo.SetFocus;
-      Exit;
-    end;
+      begin
+        Application.MessageBox('Selecione o grupo !', 'Atenção', MB_OK+MB_ICONWARNING);
+        cbgrupo.SetFocus;
+        Exit;
+      end;
 
     if cbdtini.Date = 0 then
-    begin
-      Application.MessageBox('Selecione a data inicial do período !', 'Atenção', MB_OK+MB_ICONWARNING);
-      cbdtini.SetFocus;
-      Exit;
-    end;
-
-    if cbdtfim.Date = 0 then
-    begin
-      Application.MessageBox('Selecione a data final do período !', 'Atenção', MB_OK+MB_ICONWARNING);
-      cbdtfim.SetFocus;
-      Exit;
-    end;
-
-    if cbdtini.Date > cbdtfim.Date then
-    begin
-      if Application.MessageBox('As datas aparentemente estão invertidas, deseja que o sistema inverta ou prefere corrigi-la manualmente ? Sim(Automático) ou Não(Manual).', 'Confirmação', MB_YESNO+MB_ICONQUESTION) = ID_YES then
       begin
-        xDtAux       := cbdtini.Date;
-        cbdtini.Date := cbdtfim.Date;
-        cbdtfim.Date := xDtAux;
-      end
-      else
-      begin
+        Application.MessageBox('Selecione a data inicial do período !', 'Atenção', MB_OK+MB_ICONWARNING);
         cbdtini.SetFocus;
         Exit;
       end;
-    end;
 
-    SaveDialog.Execute;
-    xDiretorio := ExtractFilePath(SaveDialog.FileName);
-    if (Trim(xDiretorio) = '') or
-       (not DirectoryExists(xDiretorio)) then
-    begin
-      Application.MessageBox('Defina o local onde os arquivos serão salvos !', 'Atenção', MB_OK+MB_ICONWARNING);
-      Exit;
-    end;
-
-    if not DirectoryExists(xDiretorio+'FAC_Fatura\') then
-    begin
-      if not CreateDir(xDiretorio+'FAC_Fatura\') then
+    if cbdtfim.Date = 0 then
       begin
-        Application.MessageBox('Não foi possível criar o diretório p/ separar o arquivo FAC_Fatura !', 'Atenção', MB_OK+MB_ICONWARNING);
+        Application.MessageBox('Selecione a data final do período !', 'Atenção', MB_OK+MB_ICONWARNING);
+        cbdtfim.SetFocus;
         Exit;
       end;
-    end;
 
+    if cbdtini.Date > cbdtfim.Date then
+      begin
+        Application.MessageBox('Data final deve ser igual ou superior a data inicial.', 'Atenção', MB_OK + MB_ICONWARNING);
+        cbdtini.SetFocus;
+        Exit;
+      end;
+
+    sDtExtr:= FormatDateTime('DDMMYYYY', cbdtini.Date);
+    if cbdtfim.Date > cbdtini.Date then
+      sDtExtr:= sDtExtr + '_a_' + FormatDateTime('DDMMYYYY', cbdtfim.Date);
+    
+    xDiretorio:= GetCurrentDir;
+    if not SelectDirectory(xDiretorio, [], 0) then
+      begin
+        Application.MessageBox('Nenhum diretório selecionado. O processo será abortado', 'Aviso', MB_OK + MB_ICONINFORMATION);
+        exit;
+      end;
+    // Incluindo o separador de diretórios
+    xDiretorio:=xDiretorio + '\';
+    if not DirectoryExists(xDiretorio) then
+      begin
+        if not CreateDir(xDiretorio) then
+          begin
+            Application.MessageBox('Não foi possível criar o diretório onde os ' +
+                  'arquivos seriam armazenados. Verifique as permissões ou ' +
+                  'entre em contato com o administrador do sistema!',
+                'Atenção', MB_OK + MB_ICONWARNING);
+            Exit;
+          end;
+      end;
+
+    panelBarra.Visible:= true;
+    lblPlanilha.Caption := 'Iniciando criação dos arquivos. Aguarde...';
+    lblPlanilha.Refresh;
+    Application.ProcessMessages;
+
+    // Chegou até arqui, diretório preparado para salvar os arquivos
     grupoId := StrToInt(Copy(cbgrupo.Text, 1, 3));
     if Copy(cbgrupo.Text, 7, 1) = 'S' then
-     familia := True
+      familia := True
     else
-     familia := False;
+      familia := False;
 
 
     xGerou := False;
+    // Mensagem sobre criação do primeiro arquivo
+    lblPlanilha.Caption := 'Arquivo 1 de 3...';
+    lblPlanilha.Refresh;
+    Application.ProcessMessages;
 
     xDtInicial := Trunc(cbdtini.Date);
     xDtFinal   := Trunc(cbdtfim.Date);
 
     xArquivo := '';
     xArquivo := Trim(GerarArquivo_FAC(xDtInicial, xDtFinal, TB_AUX, ProgressBar, Status));
+
     if xArquivo <> '' then
-    begin
-      lblPlanilha.Caption := 'Arquivo 1 de 3...';
-      lblPlanilha.Refresh;
-      Application.ProcessMessages;
+      begin
 
-      xGerou   := True;
-      xNomeArq := 'ADDRESS2ACC.CARTAO.FAC.' +
-              FormatDateTime('DDMMYYYY', Now) + '.TMP';
 
-      AssignFile(xFile, xDiretorio+xNomeArq);
-      Rewrite(xFile);
-      Write(xFile, xArquivo);
-      CloseFile(xFile);
-    end;
+        xGerou   := True;
+        xNomeArq := 'ADDRESS2ACC.CARTAO.FAC.' + sDtExtr + '.TMP';
+
+        AssignFile(xFile, xDiretorio+xNomeArq);
+        Rewrite(xFile);
+        Write(xFile, xArquivo);
+        CloseFile(xFile);
+      end
+    else
+      begin
+        // Mensagem sobre inexistencia de dados
+        lblPlanilha.Caption := 'Não há dados para gerar o arquivo ' + xNomeArq;
+        lblPlanilha.Refresh;
+        Application.ProcessMessages;
+      end;
+
+    // Mensagem sobre criação do primeiro arquivo
+    lblPlanilha.Caption := 'Arquivo 2 de 3...';
+    lblPlanilha.Refresh;
+    Application.ProcessMessages;
 
     xArquivo := '';
     xArquivo := Trim(GerarArquivo_OUT(xDtInicial, xDtFinal, TB_AUX, ProgressBar, Status));
     if xArquivo <> '' then
-    begin
-      lblPlanilha.Caption := 'Arquivo 2 de 3...';
-      lblPlanilha.Refresh;
-      Application.ProcessMessages;
+      begin
+        xGerou   := True;
+        xNomeArq := 'ADDRESS2ACC.CARTAO.OUTR.' + sDtExtr +'.TMP';
 
-      xGerou   := True;
-      xNomeArq := 'ADDRESS2ACC.CARTAO.OUTR.'+FormatDateTime('DDMMYYYY', Now)+'.TMP';
+        AssignFile(xFile, xDiretorio+xNomeArq);
+        Rewrite(xFile);
+        Write(xFile, xArquivo);
+        CloseFile(xFile);
+      end
+    else
+      begin
+        // Mensagem sobre inexistencia de dados
+        lblPlanilha.Caption := 'Não há dados para gerar o arquivo ' + xNomeArq;
+        lblPlanilha.Refresh;
+        Application.ProcessMessages;
+      end;
 
-      AssignFile(xFile, xDiretorio+xNomeArq);
-      Rewrite(xFile);
-      Write(xFile, xArquivo);
-      CloseFile(xFile);
-    end;
+    // Mensagem sobre criação do primeiro arquivo
+    lblPlanilha.Caption := 'Arquivo 3 de 3...';
+    lblPlanilha.Refresh;
+    Application.ProcessMessages;
 
     xArquivo := '';
     xArquivo := Trim(GerarArquivo_FACFat(xDtInicial, xDtFinal, TB_AUX, ProgressBar, Status));
     if xArquivo <> '' then
-    begin
-      lblPlanilha.Caption := 'Arquivo 3 de 3...';
-      lblPlanilha.Refresh;
-      Application.ProcessMessages;
+      begin
+        xGerou   := True;
+        xNomeArq := 'ADDRESS2ACC.CARTAO.FAC.' + sDtExtr +'.TMP';
 
-      xGerou   := True;
-      xNomeArq := 'ADDRESS2ACC.CARTAO.FAC.'+FormatDateTime('DDMMYYYY', Now)+'.TMP';
-
-      AssignFile(xFile, xDiretorio+'FAC_Fatura\'+xNomeArq);
-      Rewrite(xFile);
-      Write(xFile, xArquivo);
-      CloseFile(xFile);
-    end;
+        AssignFile(xFile, xDiretorio + xNomeArq);
+        Rewrite(xFile);
+        Write(xFile, xArquivo);
+        CloseFile(xFile);
+      end
+    else
+      begin
+        // Mensagem sobre inexistencia de dados
+        lblPlanilha.Caption := 'Não há dados para gerar o arquivo ' + xNomeArq;
+        lblPlanilha.Refresh;
+        Application.ProcessMessages;
+      end;
 
     if xGerou then
      Application.MessageBox('Arquivos gerados com sucesso !', 'Sucesso', MB_OK+MB_ICONINFORMATION)
@@ -540,4 +583,12 @@ begin
   end;
 end;
 
+procedure TfGeraArqDev.AtivaDemaisCampos;
+var st: Boolean;
+begin
+  st:= (lcCD_SERVICO.KeyValue > 0);
+  cbgrupo.Enabled:= st;
+  cbdtini.Enabled:= st;
+  cbdtfim.Enabled:= st;
+end;
 end.

@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, ComCtrls, ExtCtrls, DB, ZAbstractRODataset,
-  ZAbstractDataset, ZDataset, ComObj, DateUtils, Mask, DBCtrls;
+  ZAbstractDataset, ZDataset, ComObj, DateUtils, Mask, DBCtrls, ExcelXP;
 
 type
   arrayDate = Array of TDate;
@@ -1074,8 +1074,12 @@ begin
     try
     SaveDialog.InitialDir := DM.currdir;
     SaveDialog.FileName := 'Relatorio_Devolucoes_' +
-      FormatDateTime('dd-mm-yyyy', cbdtini.Date) + '_a_' +
-      FormatDateTime('dd-mm-yyyy', cbdtini.Date) + '.xls';
+      FormatDateTime('dd-mm-yyyy', cbdtini.Date);
+    if xDtFinal > xDtInicial then
+      SaveDialog.FileName := SaveDialog.FileName + '_a_' +
+          FormatDateTime('dd-mm-yyyy', cbdtfim.Date);
+    SaveDialog.FileName := SaveDialog.FileName + '.xls';
+
     if SaveDialog.Execute = false then exit;
     xDiretorio := ExtractFilePath(SaveDialog.FileName);
     if (Trim(xDiretorio) = '') or
@@ -1085,7 +1089,7 @@ begin
       Exit;
     end;
 
-
+      // @todo Remover necessidade de ter o Excel instalado
       excel := CreateOleObject('\excel.application\');
       excel.WorkBooks.Add;
       xInstallExcel := True;
@@ -1120,7 +1124,7 @@ begin
       ProgressBar.Position := 0;
 
       try
-        excel.WorkBooks[1].SaveAs(SaveDialog.FileName);
+        excel.WorkBooks[1].SaveAs(SaveDialog.FileName, xlExcel9795);
       except
         Application.MessageBox('Não foi possível salvar a planilha, salve-a antes de fechá-la !', 'Informação', MB_OK+MB_ICONINFORMATION);
       end;

@@ -4,7 +4,7 @@ object fGeraArqDev: TfGeraArqDev
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Gerar Arquivo de Devolu'#231#227'o'
-  ClientHeight = 312
+  ClientHeight = 207
   ClientWidth = 417
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,14 +19,15 @@ object fGeraArqDev: TfGeraArqDev
   PixelsPerInch = 96
   TextHeight = 13
   object group: TGroupBox
-    Left = 3
+    Left = 0
     Top = 0
-    Width = 363
-    Height = 115
+    Width = 417
+    Height = 188
+    Align = alClient
     TabOrder = 0
     object lbldata: TLabel
       Left = 8
-      Top = 60
+      Top = 119
       Width = 127
       Height = 16
       Caption = 'Informar o Per'#237'odo:'
@@ -36,11 +37,10 @@ object fGeraArqDev: TfGeraArqDev
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
-      OnClick = lbldataClick
     end
     object Label1: TLabel
       Left = 8
-      Top = 11
+      Top = 64
       Width = 38
       Height = 16
       Caption = 'Grupo'
@@ -50,73 +50,184 @@ object fGeraArqDev: TfGeraArqDev
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
-      OnClick = lbldataClick
     end
-    object cbgrupo: TComboBox
+    object LblProduto: TLabel
       Left = 8
-      Top = 33
-      Width = 347
-      Height = 22
-      Style = csOwnerDrawFixed
-      ItemHeight = 16
-      TabOrder = 0
-    end
-    object cbdtini: TDateTimePicker
-      Left = 8
-      Top = 79
-      Width = 94
-      Height = 22
-      Date = 41240.611727731480000000
-      Time = 41240.611727731480000000
+      Top = 14
+      Width = 44
+      Height = 14
+      Caption = 'Servi'#231'o'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -12
-      Font.Name = 'Tahoma'
-      Font.Style = []
-      ParentFont = False
-      TabOrder = 1
-    end
-    object btnGerar: TBitBtn
-      Left = 214
-      Top = 79
-      Width = 141
-      Height = 24
-      Caption = 'Gerar Arquivo'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -15
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
-      TabOrder = 3
-      OnClick = btnGerarClick
     end
-    object cbdtfim: TDateTimePicker
-      Left = 111
-      Top = 79
-      Width = 94
-      Height = 22
-      Date = 0.611727731477003500
-      Time = 0.611727731477003500
+    object cbgrupo: TComboBox
+      Left = 8
+      Top = 84
+      Width = 370
+      Height = 28
+      Style = csOwnerDrawFixed
+      Enabled = False
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -12
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ItemHeight = 22
+      ParentFont = False
+      TabOrder = 1
+    end
+    object cbdtini: TDateTimePicker
+      Left = 8
+      Top = 141
+      Width = 113
+      Height = 27
+      Date = 43080.611727731480000000
+      Time = 43080.611727731480000000
+      Enabled = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
       Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
       TabOrder = 2
     end
-    object panelBarra: TPanel
-      Left = 4
-      Top = 10
-      Width = 356
-      Height = 101
+    object btnGerar: TBitBtn
+      Left = 266
+      Top = 141
+      Width = 141
+      Height = 27
+      Caption = 'Gerar Arquivo'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
       TabOrder = 4
+      OnClick = btnGerarClick
+      Glyph.Data = {
+        2A080000424D2A0800000000000036040000280000002A000000170000000100
+        080000000000F4030000120B0000120B0000000100000001000024AE5300FF00
+        FF00EBDFC800D5C8C800EBD3A800BB974D00926501005CA65900C6AE7B00908E
+        6800B6E9D800FFCCFF00FCDFF30017CB7F0077A7B600D1E0C800BAA36C0058C3
+        7900DDCBC800E7E7E700BCCA9F00B5D9C000B58D3A0025C479008E621400CBE4
+        F70027CA8100C8D8C800FFFFFF00C8DFC800C69E500034B96D009B967C00B086
+        2F008C9E7500ECDFDC0003DA9600E3D6B600E7DCC8007CA4A900C8D6CE00D1F5
+        E400B7974A00D2BC8C00C8E7CB00F4F1F000DDD2C800E6F4FC00C5AB71003BC2
+        790059B36700A77F29008FC7930021B3620066CC9900E7CEC800A0C08800AF9E
+        6A00CA843200EEF0EC00ECE2CE00E3E0C80015E7A2002EBE7200E3CB9F0065A0
+        8D00A47D2300D5F6F800F8B5E300B5883300E1D9D20021D28A00CEA45500CCCC
+        CC0075D08700DFC89B00B99D6000D1AC710098967800C6D7D700C8EECF00C5E5
+        F800CCCCCC00B179200008BA64004BA56B0050C09200FCE5DD00C29A4A00EDFA
+        F400D0C19A0093B77C00E7D7C800E4E3E100F3E3C800CBC6BA00F5F6FB009384
+        470033CC9900BF8936000FD79000FAE5E90070B0630095E7C00096B37200CCB6
+        86009EEAEE00DFCEC800E3F3FB0005F2A80033AB4D00D7C9A600CDB17600A4B3
+        6600E3D1C80073B66A00F4F3F300E6DFDB00F1EADC006DC07500C6E7C600D6E4
+        CC00C4BCA30039C9820012D58E00A273110074AC5F00C8E4D000F3F0EE00F5F1
+        E900DFCEAD00F3E3D700FBF9F600BAA67100BE9545001BB86700D6D3D000F8F0
+        E300C8F5D700DFEFE400C6974100D4A95C0097927500EFDCBD00FFF8F40063D2
+        8F0070D8A600F8F9FF00B0975A00D7C8C800D7B37000D3C09800F6F4EF00DAFC
+        FF0023BB6B00D29B4D00CAB38100EAD8C800D2DEC80029C67C00CCCCCC00F9F6
+        F2009D7E2F0085A5B20024BF7400A7883F00EDECEB00C4A46B00C8ECCE00EBEA
+        E800F4EFE700EEE5D200E2E8D600E6E2D700A4997800F6ECDA00C3AD7B0025AE
+        6100E8DEC90047C18000DCE9FF0027AF5500E3DAC80030B165006CCA7F00E4CC
+        C800D7A45500E7D2C800EFFEFF00C8E3C800C8D8DA0022CF8600B7904100E9E7
+        E100ECD7B200A89C7C00DBC29A00E1CAC600FEF4F000E1D7C800BEB67E00C68C
+        3C00F3E9D6000CDB9500C9B68900F3EBDE00D9D7D300CFE7D100D2EBFF00D8D3
+        C80019D38D00ECE6D70099947800C8EED900D2B57800EBE1CD001AD08700A5C3
+        8F002DC07700EBDBC8002DC88000FBF3F300E3DCD700CCA15100BFA56B002DC2
+        7900ECF6FF00BC9B5300EEE8D900EFDDCF00C8EBCB0029B5670003F1AF00E0F6
+        EE00C8DBC800E4D8C800EAE9E700E7DBC600D7C091007CA5AA00C3AA7400CDAD
+        6F00B58C420021D68F0037C88500D0B98A00F2EFEC0024CE8300C8F6D900ECE4
+        D300E0D2C800A5802800C5B18100CCCCCC00D8C29600B1863000010101010101
+        0101010101010101010101010101010B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B
+        0B0B0B0B0D0D01015DDECE8888494949494949494988CEDE5D01010B0B748080
+        A6A6A6A6ECECECECECECA6A680800B0B0D0D0103C34E4E4E8E8E8E8E8E8E8E8E
+        4E222220AE5F010BA9D1D1D1D1D1D1D1D1D1D1D1D1D1D1D1D1D1C10B0D0D0197
+        610EEF2727272727272727A3416E550E09F0010BF903BEBEBEBEBEBEBEBEBEBE
+        BE28EAEABE49B60B0D0D01083999D019191919191919B4515600B16A7A4C010B
+        262EBCE22F2F2F2F2F2F2FE22F7FEAEA43ADC70B0D0D019CE01C89E583838383
+        83575734B5B70091C8A7010BB2EB1C90819898989898C6C6CF1D1D1DA83D5C0B
+        0D0D0169E01CA6DE75757575756515E7351F1F8707E0010BB2EB1CA1802D2D2D
+        2D2DDD8B1D1D1D1D1D1DEB0B0D0D0169E01CA6DE7575757565CEB3873F3F3F3F
+        9A5B010BB2B21CA1802D2D2D2DDD3BBDBDBDBDBDBDBD0F0B0D0D0169301CA946
+        75757575753654A4E1DADADA9FF4290BB2B21CA1F62D2D2D2D2D7F1DBDBDBDBD
+        BDBDBD590D0D01F5301C1C60939393930A6262DC179F9F9FE19F920BD7261C1C
+        1C1C1C1C1CE9505078787878787878D50D0D012BE3822525252525251438D97B
+        0D1A1AD83268010B3CFA76CDCDCDCDCDCDAC79792C2C2C2C2C1D9E0B0D0D01FE
+        16FF212121212121453A63317CF7F77C7E4D010BAB6B121212121212121212B9
+        BDA8A8A8A8EADB0B0D0D01FEC0C0C0C0C0C0C0C0C0C9C07B64BFBF646670010B
+        AB72726B6B6B6B6B6B6B373778505050501DB20B0D0D01FE8686868686868686
+        86C9867BCB4747CB6670010BAB72727272727272727272722C505050501D020B
+        0D0D01C4581E1E1E1E1E1E1E1E9B1E7BCBF3F3CB73D6010BABBB5C5C5C5C5C5C
+        5C5C5C5C2C505050501D020B0D0D014B1E2A334242FBFBFBFB5333DCCBD2D224
+        73D6010BCA5CFA95959595959595959578505050501D020B0D0D014058A294CC
+        5AFC858585A710476D3E3EE877D6010BCA72032ED7F926C7C7C7C7C7E6F8F8F8
+        F8BD020B0D0D0140869481D36FD398989898986711B84A91714B010BCA727284
+        98E498848484848429BDBDE6E69ECA0B0D0D014086851CB018CC1C1C1C1C1CCD
+        A5C08D488D44010BCA72721C2649D71C1C1C1C1CA11212DBDBDB0C0B0D0D0140
+        58F01CF0069C1C1C1C1C1CCDF28CBABA8F01010BCABBB61CB603B21C1C1C1C1C
+        A16BBBDBDB890B0B0D0D0104DF081C9C7D2B1C1C1C1C1CCD051E8DC20101010B
+        AF9D9D1CB2953C1C1C1C1C1CA17272DBAF0B0B0B0D0D01AF96EE1CCD25761C1C
+        1C1C1C81F1965E010101010BA102AB1CA1CDA11C1C1C1C1C84DBDB890B0B0B0B
+        0D0D0101010101010101010101010101010101010101010B0B0B0B0B0B0B0B0B
+        0B0B0B0B0B0B0B0B0B0B0B0B0D0D}
+      NumGlyphs = 2
+    end
+    object cbdtfim: TDateTimePicker
+      Left = 141
+      Top = 141
+      Width = 113
+      Height = 27
+      Date = 43080.611727731480000000
+      Time = 43080.611727731480000000
+      Enabled = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 3
+    end
+    object lcCD_SERVICO: TDBLookupComboBox
+      Left = 8
+      Top = 31
+      Width = 370
+      Height = 27
+      Hint = 'Selecione o Servi'#231'o'
+      DropDownRows = 15
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      KeyField = 'id'
+      ListField = 'descricao'
+      ListSource = DM.dsServicos
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 0
+      OnClick = lcCD_SERVICOClick
+      OnKeyUp = lcCD_SERVICOKeyUp
+    end
+    object panelBarra: TPanel
+      Left = 30
+      Top = 42
+      Width = 356
+      Height = 104
+      TabOrder = 5
       Visible = False
       object lblPlanilha: TLabel
-        Left = 3
-        Top = 15
-        Width = 345
+        Left = 8
+        Top = 70
+        Width = 335
         Height = 23
         Alignment = taCenter
         AutoSize = False
@@ -130,7 +241,7 @@ object fGeraArqDev: TfGeraArqDev
       end
       object ProgressBar: TProgressBar
         Left = 8
-        Top = 48
+        Top = 20
         Width = 335
         Height = 31
         Step = 1
@@ -140,8 +251,8 @@ object fGeraArqDev: TfGeraArqDev
   end
   object Status: TStatusBar
     Left = 0
-    Top = 116
-    Width = 370
+    Top = 188
+    Width = 417
     Height = 19
     Panels = <
       item
@@ -151,14 +262,7 @@ object fGeraArqDev: TfGeraArqDev
   object TB_AUX: TZQuery
     Connection = DM.CtrlDvlDBConn
     Params = <>
-    Left = 32
-    Top = 16
-  end
-  object SaveDialog: TSaveDialog
-    DefaultExt = '.TMP'
-    FileName = 'arquivos_ibis'
-    Title = 'Salvar arquivos'
-    Left = 88
-    Top = 16
+    Left = 368
+    Top = 64
   end
 end

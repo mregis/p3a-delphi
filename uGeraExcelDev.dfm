@@ -25,10 +25,6 @@ object fGeraExcelDev: TfGeraExcelDev
     Height = 183
     Align = alClient
     TabOrder = 0
-    ExplicitLeft = 3
-    ExplicitTop = -3
-    ExplicitWidth = 480
-    ExplicitHeight = 262
     object lbldata: TLabel
       Left = 8
       Top = 123
@@ -272,8 +268,6 @@ object fGeraExcelDev: TfGeraExcelDev
       item
         Width = 50
       end>
-    ExplicitTop = 111
-    ExplicitWidth = 370
   end
   object TBLIMITE: TZQuery
     Connection = DM.CtrlDvlDBConn
