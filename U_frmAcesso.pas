@@ -69,6 +69,7 @@ begin
           if ZQUsuario.RecordCount > 0 then
             begin
               DM.usuaces  :=  ZQUsuariocodusu.AsInteger;
+              DM.operador := ZQUsuarionomusu.AsString;
               acesso  :=  true;
               application.CreateForm(TfrmMain, frmMain);
               frmMain.Show;

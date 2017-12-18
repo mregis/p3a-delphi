@@ -28,13 +28,27 @@ object DM: TDM
       'SELECT id, cd_motivo, ds_motivo, '
       'CAST (cd_motivo || '#39' - '#39' || ds_motivo AS VARCHAR) AS descricao'
       'FROM ibi_motivo_devolucoes a'
+      'WHERE a.servico_id= :servico'
       'ORDER BY cd_motivo')
-    Params = <>
+    Params = <
+      item
+        DataType = ftInteger
+        Name = 'servico'
+        ParamType = ptInput
+        Value = 1
+      end>
     Properties.Strings = (
       'select * from ibi_motivo_devolucoes'
       'order by cd_motivo')
     Left = 229
     Top = 118
+    ParamData = <
+      item
+        DataType = ftInteger
+        Name = 'servico'
+        ParamType = ptInput
+        Value = 1
+      end>
     object qMotivoid: TIntegerField
       FieldName = 'id'
       Required = True
@@ -1032,5 +1046,30 @@ object DM: TDM
     DataSet = qraRelMensal
     Left = 313
     Top = 118
+  end
+  object dsServicos: TDataSource
+    DataSet = qraServicos
+    Left = 473
+    Top = 62
+  end
+  object qraServicos: TZReadOnlyQuery
+    Connection = CtrlDvlDBConn
+    SQL.Strings = (
+      'SELECT id, descricao'
+      'FROM servicos')
+    Params = <>
+    Properties.Strings = (
+      'SELECT * FROM servicos')
+    Left = 543
+    Top = 62
+    object qraServicosid: TIntegerField
+      FieldName = 'id'
+      Required = True
+    end
+    object qraServicosdescricao: TStringField
+      FieldName = 'descricao'
+      Required = True
+      Size = 252
+    end
   end
 end

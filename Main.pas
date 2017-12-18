@@ -185,6 +185,7 @@ procedure TfrmMain.BitBtnConfigClick(Sender: TObject);
 begin
   frmConfig := TfrmConfig.Create(self);
   frmConfig.ShowModal;
+
   SetFocus;
   frmConfig.Free;
 end;

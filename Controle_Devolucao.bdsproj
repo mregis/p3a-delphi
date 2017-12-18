@@ -148,9 +148,9 @@
 			<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
 			<VersionInfo Name="AutoIncBuild">True</VersionInfo>
 			<VersionInfo Name="MajorVer">2</VersionInfo>
-			<VersionInfo Name="MinorVer">1</VersionInfo>
+			<VersionInfo Name="MinorVer">2</VersionInfo>
 			<VersionInfo Name="Release">1</VersionInfo>
-			<VersionInfo Name="Build">23</VersionInfo>
+			<VersionInfo Name="Build">37</VersionInfo>
 			<VersionInfo Name="Debug">False</VersionInfo>
 			<VersionInfo Name="PreRelease">False</VersionInfo>
 			<VersionInfo Name="Special">False</VersionInfo>
@@ -162,9 +162,9 @@
 		<VersionInfoKeys>
 			<VersionInfoKeys Name="CompanyName"></VersionInfoKeys>
 			<VersionInfoKeys Name="FileDescription"></VersionInfoKeys>
-			<VersionInfoKeys Name="FileVersion">2.1.1.23</VersionInfoKeys>
-			<VersionInfoKeys Name="InternalName"></VersionInfoKeys>
-			<VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys>
+			<VersionInfoKeys Name="FileVersion">2.2.1.37</VersionInfoKeys>
+			<VersionInfoKeys Name="InternalName">Controle de Devoluções</VersionInfoKeys>
+			<VersionInfoKeys Name="LegalCopyright">Address S.A.</VersionInfoKeys>
 			<VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys>
 			<VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys>
 			<VersionInfoKeys Name="ProductName"></VersionInfoKeys>

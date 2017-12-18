@@ -3,8 +3,8 @@ object FormLeituraFatura: TFormLeituraFatura
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Controle de Devolu'#231#245'es - Leitura de Cart'#245'es Devolvidos'
-  ClientHeight = 507
-  ClientWidth = 717
+  ClientHeight = 552
+  ClientWidth = 775
   Color = clHotLight
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,8 +20,8 @@ object FormLeituraFatura: TFormLeituraFatura
   object GroupBox1: TGroupBox
     Left = 8
     Top = 0
-    Width = 689
-    Height = 432
+    Width = 759
+    Height = 465
     Caption = 'Leituras FACs'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -31,7 +31,7 @@ object FormLeituraFatura: TFormLeituraFatura
     ParentFont = False
     TabOrder = 0
     object LabelNumCartao: TLabel
-      Left = 440
+      Left = 513
       Top = 80
       Width = 92
       Height = 14
@@ -45,7 +45,7 @@ object FormLeituraFatura: TFormLeituraFatura
       ParentFont = False
     end
     object Label3: TLabel
-      Left = 13
+      Left = 156
       Top = 80
       Width = 110
       Height = 14
@@ -59,7 +59,7 @@ object FormLeituraFatura: TFormLeituraFatura
     end
     object LabelDataDevolucao: TLabel
       Left = 13
-      Top = 23
+      Top = 80
       Width = 96
       Height = 14
       Caption = 'Data Devolu'#231#227'o'
@@ -71,8 +71,8 @@ object FormLeituraFatura: TFormLeituraFatura
       ParentFont = False
     end
     object LblProduto: TLabel
-      Left = 153
-      Top = 23
+      Left = 409
+      Top = 22
       Width = 51
       Height = 14
       Caption = 'Produto'
@@ -83,8 +83,21 @@ object FormLeituraFatura: TFormLeituraFatura
       Font.Style = [fsBold]
       ParentFont = False
     end
+    object Label1: TLabel
+      Left = 13
+      Top = 22
+      Width = 44
+      Height = 14
+      Caption = 'Servi'#231'o'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
     object edtCodigo: TEdit
-      Left = 440
+      Left = 513
       Top = 96
       Width = 235
       Height = 31
@@ -96,32 +109,33 @@ object FormLeituraFatura: TFormLeituraFatura
       Font.Style = []
       MaxLength = 19
       ParentFont = False
-      TabOrder = 3
+      TabOrder = 4
       OnKeyPress = edtCodigoKeyPress
     end
     object StringGridFaturasLidas: TStringGrid
       Left = 13
-      Top = 129
-      Width = 412
-      Height = 285
+      Top = 132
+      Width = 484
+      Height = 322
       TabStop = False
-      Color = clSilver
+      Color = clWhite
+      ColCount = 6
       Ctl3D = False
-      DefaultRowHeight = 22
+      DefaultRowHeight = 20
+      DefaultDrawing = False
       FixedColor = clNavy
       FixedCols = 0
       RowCount = 1
       FixedRows = 0
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -13
-      Font.Name = 'Tahoma'
+      Font.Height = -12
+      Font.Name = 'Verdana'
       Font.Style = [fsBold]
-      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSelect]
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goRowSelect]
       ParentCtl3D = False
       ParentFont = False
-      ScrollBars = ssVertical
-      TabOrder = 4
+      TabOrder = 5
       OnDrawCell = StringGridFaturasLidasDrawCell
       OnKeyUp = StringGridFaturasLidasKeyUp
       ColWidths = (
@@ -129,39 +143,41 @@ object FormLeituraFatura: TFormLeituraFatura
         138
         60
         163
+        140
         0)
     end
     object lcCD_MOTIVO: TDBLookupComboBox
-      Left = 13
+      Left = 153
       Top = 99
-      Width = 412
-      Height = 24
+      Width = 344
+      Height = 27
       Hint = 'Selecione o motivo da devolu'#231#227'o'
       DropDownRows = 13
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       KeyField = 'cd_motivo'
       ListField = 'descricao'
-      ListSource = DM.dsMotivos
+      ListSource = DM.dtsMotivo
       ParentFont = False
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 2
+      TabOrder = 3
       OnKeyPress = lcCD_MOTIVOKeyPress
     end
     object StringGridResumoLeituras: TStringGrid
-      Left = 440
-      Top = 132
+      Left = 513
+      Top = 133
       Width = 237
-      Height = 285
+      Height = 322
       TabStop = False
-      Color = clSilver
+      Color = clWhite
       ColCount = 2
       Ctl3D = False
-      DefaultRowHeight = 22
+      DefaultRowHeight = 20
+      DefaultDrawing = False
       FixedColor = clNavy
       FixedCols = 0
       RowCount = 1
@@ -175,33 +191,34 @@ object FormLeituraFatura: TFormLeituraFatura
       ParentCtl3D = False
       ParentFont = False
       ScrollBars = ssVertical
-      TabOrder = 5
+      TabOrder = 6
       OnDrawCell = StringGridResumoLeiturasDrawCell
+      OnKeyUp = StringGridResumoLeiturasKeyUp
       ColWidths = (
         195
         39)
     end
     object cbDT_DEVOLUCAO: TDateTimePicker
       Left = 13
-      Top = 39
+      Top = 99
       Width = 134
       Height = 27
       Hint = 'Data da retirada da caixa de objetos da ag'#234'ncia'
-      Date = 42697.765975347210000000
-      Time = 42697.765975347210000000
+      Date = 43080.765975347210000000
+      Time = 43080.765975347210000000
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
-      TabOrder = 0
+      TabOrder = 2
       OnKeyPress = cbDT_DEVOLUCAOKeyPress
     end
     object lcCD_PRODUTO: TDBLookupComboBox
-      Left = 153
-      Top = 39
-      Width = 370
+      Left = 409
+      Top = 42
+      Width = 339
       Height = 27
       Hint = 'Selecione o C'#243'digo do Produto'
       DropDownRows = 15
@@ -221,8 +238,8 @@ object FormLeituraFatura: TFormLeituraFatura
     end
     object PanelProgress: TPanel
       AlignWithMargins = True
-      Left = 230
-      Top = 271
+      Left = 303
+      Top = 277
       Width = 315
       Height = 68
       Align = alCustom
@@ -239,11 +256,9 @@ object FormLeituraFatura: TFormLeituraFatura
       Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
-      TabOrder = 6
+      TabOrder = 7
       VerticalAlignment = taAlignTop
       Visible = False
-      ExplicitLeft = 227
-      ExplicitTop = 268
       object PanelProgressBar: TProgressBar
         AlignWithMargins = True
         Left = 24
@@ -255,10 +270,33 @@ object FormLeituraFatura: TFormLeituraFatura
         TabOrder = 0
       end
     end
+    object lcCD_SERVICO: TDBLookupComboBox
+      Left = 13
+      Top = 42
+      Width = 380
+      Height = 27
+      Hint = 'Selecione o Servi'#231'o'
+      DropDownRows = 15
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      KeyField = 'id'
+      ListField = 'descricao'
+      ListSource = DM.dsServicos
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 0
+      OnClick = lcCD_SERVICOClick
+      OnDropDown = lcCD_SERVICODropDown
+      OnKeyUp = lcCD_SERVICOKeyUp
+    end
   end
   object btnFechar: TBitBtn
     Left = 553
-    Top = 435
+    Top = 478
     Width = 126
     Height = 41
     Caption = '&Fechar'
@@ -268,7 +306,7 @@ object FormLeituraFatura: TFormLeituraFatura
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
-    TabOrder = 1
+    TabOrder = 3
     OnClick = btnFecharClick
     Glyph.Data = {
       360C0000424D360C000000000000360400002800000040000000200000000100
@@ -373,8 +411,8 @@ object FormLeituraFatura: TFormLeituraFatura
   end
   object StatusBarMessages: TStatusBar
     Left = 0
-    Top = 481
-    Width = 717
+    Top = 526
+    Width = 775
     Height = 26
     Panels = <
       item
@@ -402,7 +440,7 @@ object FormLeituraFatura: TFormLeituraFatura
   end
   object BitBtnLimparLeituras: TBitBtn
     Left = 189
-    Top = 435
+    Top = 478
     Width = 149
     Height = 41
     Caption = '&Limpar Leituras'
@@ -413,7 +451,7 @@ object FormLeituraFatura: TFormLeituraFatura
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 1
     OnClick = BitBtnLimparLeiturasClick
     Glyph.Data = {
       360C0000424D360C000000000000360400002800000040000000200000000100

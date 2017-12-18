@@ -41,6 +41,14 @@ type
     BitBtnGetRelatDir: TBitBtn;
     BitBtnGetRetDir: TBitBtn;
     SaveDialogConfig: TSaveDialog;
+    LabelSiglasSedex: TLabel;
+    EditSiglasSedex: TEdit;
+    SpeedButtonAddSigla: TSpeedButton;
+    ListBoxSiglas: TListBox;
+    procedure ListBoxSiglasKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure SpeedButtonAddSiglaClick(Sender: TObject);
+    procedure EditSiglasSedexKeyPress(Sender: TObject; var Key: Char);
     procedure BitBtnGetRetDirClick(Sender: TObject);
     procedure BitBtnGetRelatDirClick(Sender: TObject);
     procedure BitBtnGetWorkDirClick(Sender: TObject);
@@ -91,8 +99,13 @@ procedure TFrmConfig.BitBtnSalvarClick(Sender: TObject);
 var i, intTemp : Integer;
 begin
   // Necessário validar campos
+  // Campos obrigatórios terão TAGs igual a zero e
+  // Campos que não devem passar pela validação terão TAG = 1
   for i := 0 to ComponentCount - 1 do
-    if (Components[i] is TEdit) and ((Components[i] as TEdit).Text = '') then
+    if  (Components[i].Tag = 0) and
+       (((Components[i] is TEdit) and ((Components[i] as TEdit).Text = '')) or
+        ((Components[i] is TListBox) and ((Components[i] as TListBox).Items.CommaText = ''))
+        ) then
       Begin
         Application.MessageBox(PChar('O campo "' + (Components[i] as TEdit).Hint +
           '"' + #13#10 + 'não pode ficar em branco.'),
@@ -159,6 +172,10 @@ begin
       // Maximo de tentativas de logins antes da aplicação encerrar
       if ( tryStrToInt(EditMaxLoginErros.Text, intTemp) AND (intTemp > 0)) then
         DM.IniFile.WriteInteger('Geral', 'MaxLoginErros', intTemp);
+
+      // Siglas para Números de Objetos de Sedex utilizadas pelo Bradesco
+      DM.iniFile.WriteString('Geral', 'SiglasSedexValidas', ListBoxSiglas.Items.CommaText);
+
     except on E: Exception do
       Application.MessageBox(PChar(E.Message), 'Controle de Devolução', MB_OK + MB_ICONERROR);
     end;
@@ -217,6 +234,12 @@ begin
   end;
 end;
 
+procedure TFrmConfig.EditSiglasSedexKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+    SpeedButtonAddSigla.Click;
+end;
+
 procedure TFrmConfig.BitBtnFecharClick(Sender: TObject);
 begin
   Close;
@@ -254,9 +277,60 @@ begin
 
     // Quantidade Máxima de tentativa de logins incorretos
     EditMaxLoginErros.Text := IntToStr(DM.IniFile.ReadInteger('Geral', 'MaxLoginErros', 5));
+
+    // Siglas Válidas para Objetos SEDEX do Bradesco
+    ListBoxSiglas.Items.CommaText := DM.IniFile.ReadString('Geral', 'SiglasSedexValidas', '');
   finally
     DM.IniFile.Free;
   end;
+end;
+
+procedure TFrmConfig.ListBoxSiglasKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Key = VK_DELETE) and (ListBoxSiglas.Items.Count > 0) then
+    if (Application.MessageBox(PCHAR('Deseja remover o[s] item[s] da lista?'),
+            'ERRO', MB_YESNO + MB_ICONEXCLAMATION) = ID_YES) then
+        ListBoxSiglas.DeleteSelected;
+end;
+
+procedure TFrmConfig.SpeedButtonAddSiglaClick(Sender: TObject);
+var sigla: String;
+  i, tam : Integer;
+begin
+  sigla := UpperCase(EditSiglasSedex.Text);
+  tam := Length(sigla);
+  // Verificando se tem algum conteúdo
+  if (tam > 0) then
+    begin
+      if (tam <> 2) then // verificando se a sigla é de dois caracteres (apenas)
+        begin
+          Application.MessageBox(PCHAR('A Sigla deve conter obrigatóriamente ' +
+            'duas letras.'),
+            'ERRO', MB_OK + MB_ICONERROR);
+          exit;
+        end;
+
+      for i := 1 to tam do // Validando os caracteres
+        if not (sigla[i] in ['A'..'Z']) then
+          begin
+            Application.MessageBox(Pchar(Format('"%s" é um caracter inválido para Sigla', [sigla[i]])),
+                'ERRO', MB_OK + MB_ICONERROR);
+            exit;
+          end;
+      // Tudo validado, incluindo na Lista
+      // Verificando se já não existe
+      if (ListBoxSiglas.Items.IndexOf(sigla) > -1) then
+        begin
+            Application.MessageBox(Pchar(Format('"%s" já está na lista!', [sigla])),
+                'ATENÇÃO', MB_OK + MB_ICONEXCLAMATION);
+            exit;
+        end;
+
+      ListBoxSiglas.Items.Add(sigla);
+      EditSiglasSedex.Clear;
+
+    end;
 end;
 
 end.

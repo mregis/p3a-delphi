@@ -1453,16 +1453,23 @@ end;
 
 {
   Função que valida um número de Cartão de Crédito
-  Valida pelo tamanho e pelo Luhnn
+  Valida pelo tamanho e pelo conteudo se é ou não numerico
 }
 function validaNumCartaoCredito(const ncc: string) : boolean;
+var i, itemp: integer;
 begin
   result := false; // Falso por premissa
-  // Verificando o tamanho.
-  if (12 > Length(ncc)) and (Length(ncc) > 19) then
-    exit;
-  // Checando a sequencia
-  result := (isValidLuhnn(ncc) OR (Length(ncc) = 16));
+  if Length(ncc) = 16 then
+    begin
+      // verificando se tem algum caracter não numerico
+      for i := 1 to 16 do
+        if not TryStrToInt(ncc[i], itemp) then
+          begin
+            result := false;
+            exit;
+          end;
+      result := true;
+    end;
 end;
 
 {
