@@ -402,7 +402,6 @@ var
   xArquivo : String;
   xGerou : Boolean;
   xDiretorio : String;
-  xDtAux : TDate;
   xDtInicial, xDtFinal : TDate;
   sDtExtr: String; // Data dos registros
 begin

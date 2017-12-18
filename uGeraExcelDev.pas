@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Buttons, ComCtrls, ExtCtrls, DB, ZAbstractRODataset,
-  ZAbstractDataset, ZDataset, ComObj, DateUtils, Mask, DBCtrls, ExcelXP;
+  ZAbstractDataset, ZDataset, ComObj, DateUtils, Mask, DBCtrls, OleServer;
 
 type
   arrayDate = Array of TDate;
@@ -105,16 +105,12 @@ begin
     progress.Step     := 1;
 
     for I := 0 to arrayQuery.Count - 1 do
-    begin
       progress.Max := progress.Max + TZQuery(arrayQuery.Items[I]).RecordCount;
-    end;
 
     Result := True;
   except
     on E: Exception do
-    begin
       Result := False;
-    end;
   end;
 end;
 
@@ -423,7 +419,6 @@ begin
 end;
 
 Procedure TfGeraExcelDev.LimitarRegistros(dtini : TDate; dtfim : TDate);
-var s: string;
 begin
   try
     idini1 := 0;
@@ -568,7 +563,6 @@ begin
             Query.Filter   := '';
             Query.Filtered := False;
           end;
-
 
         if Query.Locate('FAMILIA', TBFAMILIA.FieldByName('FAMILIA').AsString, []) then
           begin
@@ -799,7 +793,7 @@ begin
     colunaMotivos := 2;
     xLinha        := 2;
 
-    lblPlanilha.Caption := 'Planilha '+nomeAba;
+    lblPlanilha.Caption := 'Planilha ' + nomeAba;
 
     TBFAMILIA.Close;
     TBFAMILIA.ParamByName('SERVICO').AsInteger:= lcCD_SERVICO.KeyValue;
@@ -1001,7 +995,6 @@ procedure TfGeraExcelDev.btnGerarClick(Sender: TObject);
 var
   xGerou : Boolean;
   xDiretorio : String;
-  xDtAux : TDate;
   excel : Variant;
   xInstallExcel : Boolean;
 begin
@@ -1072,85 +1065,87 @@ begin
     end;
 
     try
-    SaveDialog.InitialDir := DM.currdir;
-    SaveDialog.FileName := 'Relatorio_Devolucoes_' +
-      FormatDateTime('dd-mm-yyyy', cbdtini.Date);
-    if xDtFinal > xDtInicial then
-      SaveDialog.FileName := SaveDialog.FileName + '_a_' +
-          FormatDateTime('dd-mm-yyyy', cbdtfim.Date);
-    SaveDialog.FileName := SaveDialog.FileName + '.xls';
+      SaveDialog.InitialDir := DM.currdir;
+      SaveDialog.FileName := 'Relatorio_Devolucoes_' +
+            FormatDateTime('dd-mm-yyyy', cbdtini.Date);
+      if xDtFinal > xDtInicial then
+        SaveDialog.FileName := SaveDialog.FileName + '_a_' +
+              FormatDateTime('dd-mm-yyyy', cbdtfim.Date);
+      SaveDialog.FileName := SaveDialog.FileName + '.xls';
 
-    if SaveDialog.Execute = false then exit;
-    xDiretorio := ExtractFilePath(SaveDialog.FileName);
-    if (Trim(xDiretorio) = '') or
-       (not DirectoryExists(xDiretorio)) then
-    begin
-      Application.MessageBox('Defina o local onde os arquivos serão salvos !', 'Atenção', MB_OK+MB_ICONWARNING);
-      Exit;
-    end;
+      if SaveDialog.Execute = false then exit;
+      xDiretorio := ExtractFilePath(SaveDialog.FileName);
+      if (Trim(xDiretorio) = '') or
+        (not DirectoryExists(xDiretorio)) then
+        begin
+          Application.MessageBox('Defina o local onde os arquivos serão salvos !', 'Atenção', MB_OK+MB_ICONWARNING);
+          Exit;
+        end;
+
+      panelBarra.Visible := True;
+      lblPlanilha.Caption:= 'Iniciando processo de exportação';
 
       // @todo Remover necessidade de ter o Excel instalado
-      excel := CreateOleObject('\excel.application\');
-      excel.WorkBooks.Add;
+      Excel := CreateOleObject('Excel.Application');
+      Excel.WorkBooks.Add;
       xInstallExcel := True;
     except
       on E: Exception do
-      begin
         xInstallExcel := False;
-      end;
     end;
 
     if xInstallExcel then
-    begin
-      listOfQuery := TList.Create;
-      listOfQuery.Add(TBCONSOLIDA);
-      listOfQuery.Add(TBDEV);
-      listOfQuery.Add(TBDEVFAC);
-      listOfQuery.Add(TBDEVAR);
+      begin
+        listOfQuery := TList.Create;
+        listOfQuery.Add(TBCONSOLIDA);
+        listOfQuery.Add(TBDEV);
+        listOfQuery.Add(TBDEVFAC);
+        listOfQuery.Add(TBDEVAR);
 
-      AjustarProgressBar(ProgressBar, listOfQuery);
-      panelBarra.Visible := True;
+        AjustarProgressBar(ProgressBar, listOfQuery);
 
-      GerarExcelConsolidado('Resumo_consolidado', excel);
-      GerarExcelDevolucao(TBDEV,    'FATURA',     excel, arrayDataDev);
-      GerarExcelDevolucao(TBDEVAR,  'AR_RE',      excel, arrayDataDevAR);
-      GerarExcelDevolucao(TBDEVFAC, 'TARJA',      excel, arrayDataDevFAC);
+        lblPlanilha.Caption:= 'Criando Aba Consolidao';
 
-      excel.WorkBooks[1].Sheets[5].Delete;
-      excel.WorkBooks[1].Sheets[5].Delete;
-      excel.WorkBooks[1].Sheets[5].Delete;
+        GerarExcelConsolidado('Resumo_consolidado', excel);
+        lblPlanilha.Caption:= 'Criando Aba Fatura';
+        GerarExcelDevolucao(TBDEV,    'FATURA',     excel, arrayDataDev);
+        lblPlanilha.Caption:= 'Criando Aba AR_RE';
+        GerarExcelDevolucao(TBDEVAR,  'AR_RE',      excel, arrayDataDevAR);
+        lblPlanilha.Caption:= 'Criando Aba TARJA';
+        GerarExcelDevolucao(TBDEVFAC, 'TARJA',      excel, arrayDataDevFAC);
+        lblPlanilha.Caption:= 'Removendo abas desnecessárias...';
+        While Excel.WorkBooks[1].WorkSheets.Count > 4 do
+          Excel.WorkBooks[1].Sheets[Excel.WorkBooks[1].WorkSheets.Count].Delete;
 
-      panelBarra.Visible   := False;
-      ProgressBar.Position := 0;
+        lblPlanilha.Caption:= 'Processo concluído!';
+        panelBarra.Visible   := False;
+        ProgressBar.Position := 0;
+        Excel.Visible:= True;
 
-      try
-        excel.WorkBooks[1].SaveAs(SaveDialog.FileName, xlExcel9795);
-      except
-        Application.MessageBox('Não foi possível salvar a planilha, salve-a antes de fechá-la !', 'Informação', MB_OK+MB_ICONINFORMATION);
-      end;
+        try
+          excel.WorkBooks[1].SaveAs(SaveDialog.FileName, 56);
+        except
+          Application.MessageBox('Não foi possível salvar a planilha, salve-a antes de fechá-la !', 'Informação', MB_OK+MB_ICONINFORMATION);
+        end;
 
-      excel.Visible :=True;
-
-      if xGerou then
-       Application.MessageBox('Planilha(s) gerada(s) com sucesso !', 'Sucesso', MB_OK+MB_ICONINFORMATION)
-      else
-       Application.MessageBox('Não foram encontrados dados para o período informado !', 'Atenção', MB_OK+MB_ICONWARNING);
-    end
+        if xGerou then
+          Application.MessageBox('Planilha(s) gerada(s) com sucesso !', 'Sucesso', MB_OK+MB_ICONINFORMATION)
+        else
+          Application.MessageBox('Não foram encontrados dados para o período informado !', 'Atenção', MB_OK+MB_ICONWARNING);
+      end
     else
-    begin
-      Application.MessageBox('Para gerar planilhas é necessário ter o Excel instalado na máquina! Verifique.', 'Atenção', MB_OK+MB_ICONWARNING);
-    end;
+        Application.MessageBox('Para gerar planilhas é necessário ter o Excel instalado na máquina! Verifique.', 'Atenção', MB_OK+MB_ICONWARNING);
   except
     on E: Exception do
-    begin
-      Application.MessageBox(PCHAR('Ocorreu um problema durante a geração da(s) planilhas! Erro:'+E.Message), 'ERRO', MB_OK+MB_ICONERROR);
-      TBLIMITE.Close;
-      TBLIMITE.SQL.Clear;
-      TBLIMITE.Params.Clear;
-      panelBarra.Visible    := False;
-      Status.Panels[0].Text := '';
-      Exit;
-    end;
+      begin
+        Application.MessageBox(PCHAR('Ocorreu um problema durante a geração da(s) planilhas! Erro:'+E.Message), 'ERRO', MB_OK+MB_ICONERROR);
+        TBLIMITE.Close;
+        TBLIMITE.SQL.Clear;
+        TBLIMITE.Params.Clear;
+        panelBarra.Visible    := False;
+        Status.Panels[0].Text := '';
+        Exit;
+      end;
   end;
 end;
 

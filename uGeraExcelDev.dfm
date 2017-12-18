@@ -235,10 +235,10 @@ object fGeraExcelDev: TfGeraExcelDev
       TabOrder = 0
       Visible = False
       object lblPlanilha: TLabel
-        Left = 0
-        Top = 89
-        Width = 355
-        Height = 23
+        Left = 5
+        Top = 56
+        Width = 342
+        Height = 28
         Alignment = taCenter
         AutoSize = False
         Font.Charset = DEFAULT_CHARSET
@@ -250,8 +250,8 @@ object fGeraExcelDev: TfGeraExcelDev
         Layout = tlCenter
       end
       object ProgressBar: TProgressBar
-        Left = 8
-        Top = 38
+        Left = 5
+        Top = 19
         Width = 342
         Height = 28
         Step = 1
