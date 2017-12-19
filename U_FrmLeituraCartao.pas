@@ -905,8 +905,9 @@ begin
             'FROM ibi_controle_devolucoes_ar b ' +
             '    INNER JOIN ibi_motivo_devolucoes c ON (b.cd_motivo = c.cd_motivo) ' +
             '    INNER JOIN ibi_cadusuario d ON (b.codusu = d.codusu) ' +
-            'WHERE b.lote_id = :id';
-      ParamByName('id').AsInteger := i;
+            'WHERE c.servico_id=:SERVICO AND b.lote_id = :ID';
+      ParamByName('SERVICO').AsInteger := lcCD_SERVICO.KeyValue;
+      ParamByName('ID').AsInteger := i;
       Open;
       StringGridARsLidos.RowCount := 1;
       while not Eof do
