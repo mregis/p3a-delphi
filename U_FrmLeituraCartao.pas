@@ -38,6 +38,9 @@ type
     PanelProgressBar: TProgressBar;
     lcCD_SERVICO: TDBLookupComboBox;
     LblProduto: TLabel;
+    BitBtnCancelaLeitura: TBitBtn;
+    procedure EditQtdeRestanteChange(Sender: TObject);
+    procedure BitBtnCancelaLeituraClick(Sender: TObject);
     procedure lcCD_SERVICOClick(Sender: TObject);
     procedure EditQtdeChange(Sender: TObject);
     procedure lcCD_SERVICODropDown(Sender: TObject);
@@ -72,6 +75,7 @@ type
     procedure BitBtnIniciarLeiturasClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure AtivaBtnLeitura;
+    procedure PreparaNovaLeitura;
   private
     { Private declarations }
     ListSiglas : TStringList;
@@ -92,6 +96,14 @@ uses CDDM, U_Func;
 
 {$R *.dfm}
 
+procedure TFormLeituraCartao.BitBtnCancelaLeituraClick(Sender: TObject);
+begin
+  if Application.MessageBox( PChar('Tem certeza que deseja parar de ler ' +
+            'objetos para este lote? Você poderá retormar a leitura mais tarde.'),
+          'ATENÇÃO', MB_YESNO + MB_ICONQUESTION) = mrYes then
+      PreparaNovaLeitura;
+end;
+
 procedure TFormLeituraCartao.BitBtnFinalizarLeiturasClick(Sender: TObject);
 begin
   try
@@ -107,26 +119,7 @@ begin
             ExecSQL;
             if RowsAffected > 0 then
               begin
-                // Limpando os dados do formulário para preparar para nova
-                // caixa
-                StringGridARsLidos.RowCount := 1;
-                StatusBarMessages.Panels.Items[1].Text := '0';
-                BitBtnLimparLeituras.Enabled := false;
-                StringGridResumoLeituras.RowCount := 1;
-                BitBtnFinalizarLeituras.Enabled := False;
-                lcCD_MOTIVO.Enabled := False;
-                edtCodigo.Clear;
-                edtCodigo.Enabled := False;
-                eBin.Clear;
-                eBin.Enabled := False;
-                EditQtdeRestante.Text := '0';
-                // Liberando os campos para novas informações
-                lcCD_SERVICO.Enabled:= True;
-                EditNumCaixa.Clear;
-                EditNumCaixa.Enabled := True;
-                cbDT_DEVOLUCAO.Enabled := True;
-                EditQtde.Text := '0';
-                EditQtde.ReadOnly := False;
+                PreparaNovaLeitura;
                 Application.MessageBox(Pchar('A caixa ' + EditNumCaixa.Text +
                         ' foi fechada com sucesso! Você já pode iniciar uma nova caixa.'),
                       'Controle de Devoluções - Cartões',
@@ -188,6 +181,7 @@ begin
                 lcCD_SERVICO.Enabled:= False;
                 EditQtde.ReadOnly := True;
                 BitBtnIniciarLeituras.Enabled := false;
+                BitBtnCancelaLeitura.Enabled:= True;
                 // habilitando campos
                 lcCD_MOTIVO.Enabled := True;
                 DM.qMotivo.Close;
@@ -196,6 +190,7 @@ begin
                 edtCodigo.Enabled := True;
                 eBin.Enabled := True;
                 EditQtdeRestante.Text := IntToStr(int_temp);
+
               end
             else
               begin
@@ -548,32 +543,35 @@ end;
 procedure TFormLeituraCartao.EditNumCaixaExit(Sender: TObject);
 var res : Integer;
 begin
-  res := ExisteLeituras(EditNumCaixa.Text);
-  if (res = 1) then
-    exit
-  else if res = 2 then
-    begin // Existem leituras para o numero de caixa informado
-        if Application.MessageBox(PChar('Esta caixa já possui leituras!' + #13#10 +
-                    'Deseja retomar a leitura para esta caixa?'),
-              'Controle de Devoluções - Cartões',
-              MB_YESNO + MB_ICONQUESTION) = ID_YES then
-          RetomarLeituras // Retomando a leitura de onde parou
-        else
-          begin // Foi pedido para não retormar leiturass então não podemos
-            // liberar para continuar sem que seja alterado o código da caixa
-            EditNumCaixa.SetFocus;
-            EditNumCaixa.SelectAll;
-          end;          
-    end
-  else if res = 3 then
+  if Length(EditNumCaixa.Text) > 0 then
     begin
-      Application.MessageBox(PChar('Esta caixa já está fechada e não pode ser ' +
-                    'retomada. Verifique as informações ou entre em contato ' +
-                    'com o administrador do sistema'),
-              'Controle de Devoluções - Cartões',
-              MB_OK + MB_ICONWARNING);
-      EditNumCaixa.SetFocus;
-      EditNumCaixa.SelectAll;
+      res := ExisteLeituras(EditNumCaixa.Text);
+      if (res = 1) then
+        exit
+      else if res = 2 then
+        begin // Existem leituras para o numero de caixa informado
+            if Application.MessageBox(PChar('Esta caixa já possui leituras!' + #13#10 +
+                        'Deseja retomar a leitura para esta caixa?'),
+                  'Controle de Devoluções - Cartões',
+                  MB_YESNO + MB_ICONQUESTION) = ID_YES then
+              RetomarLeituras // Retomando a leitura de onde parou
+            else
+              begin // Foi pedido para não retormar leiturass então não podemos
+                // liberar para continuar sem que seja alterado o código da caixa
+                EditNumCaixa.SetFocus;
+                EditNumCaixa.SelectAll;
+              end;
+        end
+      else if res = 3 then
+        begin
+          Application.MessageBox(PChar('Esta caixa já está fechada e não pode ser ' +
+                        'retomada. Verifique as informações ou entre em contato ' +
+                        'com o administrador do sistema'),
+                  'Controle de Devoluções - Cartões',
+                  MB_OK + MB_ICONWARNING);
+          EditNumCaixa.SetFocus;
+          EditNumCaixa.SelectAll;
+        end;
     end;
 end;
 
@@ -658,9 +656,11 @@ begin
                     exit;
                   end;
                 
-                SQL.Text := 'UPDATE lote SET qtde=:qtde WHERE codigo = :codigo';
+                SQL.Text := 'UPDATE lote SET qtde=:qtde '+
+                    'WHERE codigo = :codigo AND servico_id=:servico';
                 ParamByName('qtde').AsInteger := t;
                 ParamByName('codigo').AsString := EditNumCaixa.Text;
+                ParamByName('servico').AsInteger := lcCD_SERVICO.KeyValue;
                 ExecSQL;
                 EditQtde.ReadOnly := True;
               end;
@@ -677,6 +677,24 @@ begin
     begin
       SelectNext(Sender as tWinControl, True, True);
       Key := #0;
+    end;
+end;
+
+procedure TFormLeituraCartao.EditQtdeRestanteChange(Sender: TObject);
+begin
+  // Verificando se já leu toda a caixa
+  BitBtnFinalizarLeituras.Enabled:= False;
+  if (StringGridARsLidos.RowCount > 1) and (EditQtdeRestante.Text = '0') then
+    begin
+      BitBtnFinalizarLeituras.Enabled:= True;
+      if Application.MessageBox(PChar('Você já leu a quantidade ' +
+                  'indicada para a caixa atual. Deseja Fechar a caixa agora?'),
+                'Atenção',
+                MB_YESNO + MB_ICONQUESTION)= ID_YES then
+        begin
+          BitBtnFinalizarLeituras.Click;
+          exit;
+        end;
     end;
 end;
 
@@ -903,10 +921,11 @@ begin
       SQL.Text := 'SELECT b.cod_ar, b.codbin, CAST (c.cd_motivo || '' - '' || c.ds_motivo AS VARCHAR) AS desc_motivo, ' +
             '    d.nomusu as operador ' +
             'FROM ibi_controle_devolucoes_ar b ' +
-            '    INNER JOIN ibi_motivo_devolucoes c ON (b.cd_motivo = c.cd_motivo) ' +
+            '    INNER JOIN lote l ON (b.lote_id=l.id) ' +
+            '	   INNER JOIN ibi_motivo_devolucoes c ON (b.cd_motivo = c.cd_motivo) ' +
+    	      '               AND c.servico_id=l.servico_id ' +
             '    INNER JOIN ibi_cadusuario d ON (b.codusu = d.codusu) ' +
-            'WHERE c.servico_id=:SERVICO AND b.lote_id = :ID';
-      ParamByName('SERVICO').AsInteger := lcCD_SERVICO.KeyValue;
+            'WHERE b.lote_id = :ID';
       ParamByName('ID').AsInteger := i;
       Open;
       StringGridARsLidos.RowCount := 1;
@@ -952,6 +971,7 @@ begin
           BitBtnFinalizarLeituras.Click;
             
       BitBtnIniciarLeituras.Enabled := False;
+      BitBtnCancelaLeitura.Enabled:= True;
       BitBtnLimparLeituras.Enabled := StringGridARsLidos.RowCount > 1;
       EditNumCaixa.Enabled := False;
       cbDT_DEVOLUCAO.Enabled := false;
@@ -1125,19 +1145,6 @@ if Trim(eBin.Text) <> '' then
 
           EditQtdeRestante.Text := IntToStr(StrToInt(EditQtde.Text) - r);
 
-          // Verificando se já leu toda a caixa
-          if (EditQtdeRestante.Text = '0') then
-            begin
-              if Application.MessageBox(PChar('Você já leu a quantidade ' +
-                    'indicada para a caixa atual. Deseja Fechar a caixa agora?'),
-                  'Atenção',
-                  MB_YESNO + MB_ICONQUESTION)= ID_YES then
-                begin
-                  BitBtnFinalizarLeituras.Click;
-                  exit;
-                end;
-            end;
-
           StatusBarMessages.Panels.Items[1].Text := IntToStr(r);
           StatusBarMessages.Panels.Items[3].Text := edtCodigo.Text + ' | ' +
           eBin.Text;
@@ -1195,7 +1202,7 @@ begin
         exit; // Não apagar cabeçalhos
 
       sMensagem := 'Deseja remover o Objeto ' + StringGridARsLidos.Cells[1, srow] +
-        ' da lista? Ele não será removido também da base e nã será ' +
+        ' da lista? Ele será removido também da base e não será ' +
         'incluído nos arquivos.';
     if Application.MessageBox(pchar(sMensagem), 'Aviso',
           MB_YESNO + MB_ICONQUESTION + MB_SYSTEMMODAL) = ID_YES then
@@ -1447,6 +1454,35 @@ begin
   TryStrToInt(EditQtde.Text, qt_temp);
   BitBtnIniciarLeituras.Enabled:= (qt_temp > 0) and
     (Length(EditNumCaixa.Text) > 0) and
-    (lcCD_SERVICO.KeyValue > 0);
+    (lcCD_SERVICO.KeyValue > 0) and
+    (BitBtnLimparLeituras.Enabled=false);
 end;
+
+procedure TFormLeituraCartao.PreparaNovaLeitura;
+begin
+  // Limpando os dados do formulário para preparar para nova
+  // caixa
+  StringGridARsLidos.RowCount := 1;
+  StatusBarMessages.Panels.Items[1].Text := '0';
+  BitBtnLimparLeituras.Enabled := false;
+  StringGridResumoLeituras.RowCount := 1;
+  BitBtnFinalizarLeituras.Enabled := False;
+  lcCD_MOTIVO.Enabled := False;
+  edtCodigo.Clear;
+  edtCodigo.Enabled := False;
+  eBin.Clear;
+  eBin.Enabled := False;
+  EditQtdeRestante.Text := '0';
+  // Liberando os campos para novas informações
+  EditNumCaixa.Clear;
+  EditNumCaixa.Enabled := True;
+  cbDT_DEVOLUCAO.Enabled := True;
+  cbDT_DEVOLUCAO.DateTime := Date;
+  EditQtde.Text := '0';
+  EditQtde.ReadOnly := False;
+  BitBtnCancelaLeitura.Enabled:= False;
+  lcCD_SERVICO.Enabled:= True;
+  lcCD_SERVICO.SetFocus;
+end;
+
 end.
