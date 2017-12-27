@@ -92,7 +92,6 @@ object FormLeituraCartao: TFormLeituraCartao
       Height = 31
       Hint = 'N'#250'mero da Lista de Objetos Entregues ao  Carteiro (LOEC)'
       CharCase = ecUpperCase
-      Enabled = False
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -19

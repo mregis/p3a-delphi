@@ -76,6 +76,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure AtivaBtnLeitura;
     procedure PreparaNovaLeitura;
+    procedure refreshMotivos;
   private
     { Private declarations }
     ListSiglas : TStringList;
@@ -182,11 +183,7 @@ begin
                 EditQtde.ReadOnly := True;
                 BitBtnIniciarLeituras.Enabled := false;
                 BitBtnCancelaLeitura.Enabled:= True;
-                // habilitando campos
-                lcCD_MOTIVO.Enabled := True;
-                DM.qMotivo.Close;
-                DM.qMotivo.ParamByName('servico').AsInteger:= lcCD_SERVICO.KeyValue;
-                DM.qMotivo.Open;
+                refreshMotivos;
                 edtCodigo.Enabled := True;
                 eBin.Enabled := True;
                 EditQtdeRestante.Text := IntToStr(int_temp);
@@ -554,7 +551,12 @@ begin
                         'Deseja retomar a leitura para esta caixa?'),
                   'Controle de Devoluções - Cartões',
                   MB_YESNO + MB_ICONQUESTION) = ID_YES then
-              RetomarLeituras // Retomando a leitura de onde parou
+              begin
+                  lcCD_SERVICO.KeyValue:= Dm.SqlAux.FieldByName('servico_id').AsInteger;
+
+                  RetomarLeituras; // Retomando a leitura de onde parou
+              end
+
             else
               begin // Foi pedido para não retormar leiturass então não podemos
                 // liberar para continuar sem que seja alterado o código da caixa
@@ -870,13 +872,11 @@ end;
 
 procedure TFormLeituraCartao.lcCD_SERVICOClick(Sender: TObject);
 begin
-  EditNumCaixa.Enabled:= lcCD_SERVICO.KeyValue > 0;
   AtivaBtnLeitura;
 end;
 
 procedure TFormLeituraCartao.lcCD_SERVICODropDown(Sender: TObject);
 begin
-  EditNumCaixa.Enabled:= lcCD_SERVICO.KeyValue > 0;
   AtivaBtnLeitura;
 end;
 
@@ -976,9 +976,7 @@ begin
       EditNumCaixa.Enabled := False;
       cbDT_DEVOLUCAO.Enabled := false;
       EditQtde.ReadOnly := True;
-      lcCD_MOTIVO.Enabled := True;
-      DM.qMotivo.Close;
-      DM.qMotivo.Open;
+      refreshMotivos;
       edtCodigo.Enabled := True;
       eBin.Enabled := True;
     end;
@@ -1420,7 +1418,7 @@ begin
     begin
       SqlAux.Close;
       SqlAux.SQL.Clear;
-      SqlAux.SQL.Add('SELECT l.codigo, l.qtde, l.dt_fechamento ');
+      SqlAux.SQL.Add('SELECT l.codigo, l.qtde, l.dt_fechamento, l.servico_id ');
       SqlAux.SQL.Add('FROM lote l ');
       SqlAux.SQL.Add('WHERE l.codigo = :caixa ');
       SqlAux.ParamByName('caixa').AsString := EditNumCaixa.Text;
@@ -1485,4 +1483,17 @@ begin
   lcCD_SERVICO.SetFocus;
 end;
 
+
+procedure TFormLeituraCartao.refreshMotivos;
+begin
+  lcCD_MOTIVO.Enabled := False;
+  if (lcCD_SERVICO.KeyValue > 0) then
+    begin
+      // habilitando campos
+      lcCD_MOTIVO.Enabled := True;
+      DM.qMotivo.Close;
+      DM.qMotivo.ParamByName('servico').AsInteger:= lcCD_SERVICO.KeyValue;
+      DM.qMotivo.Open;
+    end;
+end;
 end.
